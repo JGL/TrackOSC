@@ -19,7 +19,9 @@ struct MacContentView: View {
         ZStack {
             GeometryReader { proxy in
                 ZStack {
-                    cameraPreview(in: proxy.size)
+                    if !model.settings.hideVideoPreview {
+                        cameraPreview(in: proxy.size)
+                    }
                     OverlayView(snapshot: model.overlay, mirrored: isMirrored)
                 }
             }
@@ -107,6 +109,18 @@ struct MacContentView: View {
 
             Spacer()
 
+            Button(
+                model.settings.hideVideoPreview ? "Show Video" : "Hide Video",
+                systemImage: model.settings.hideVideoPreview ? "eye.slash" : "eye",
+                action: toggleVideoPreview
+            )
+            .labelStyle(.iconOnly)
+            .buttonStyle(.plain)
+            .font(.title2)
+            .foregroundStyle(.white)
+            .padding(10)
+            .background(.black.opacity(0.5), in: .circle)
+
             Button("Settings", systemImage: "gearshape", action: openSettings)
                 .labelStyle(.iconOnly)
                 .buttonStyle(.plain)
@@ -122,5 +136,9 @@ struct MacContentView: View {
     private func openSettings() {
         model.refreshCameras()
         showSettings = true
+    }
+
+    private func toggleVideoPreview() {
+        model.settings.hideVideoPreview.toggle()
     }
 }

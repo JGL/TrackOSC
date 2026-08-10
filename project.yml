@@ -36,8 +36,8 @@ settings:
     STRING_CATALOG_GENERATE_SYMBOLS: YES
     # Shared by both apps. Bump CURRENT_PROJECT_VERSION for every TestFlight
     # upload; MARKETING_VERSION is the user-facing version and release tag.
-    MARKETING_VERSION: "1.2.0"
-    CURRENT_PROJECT_VERSION: "7"
+    MARKETING_VERSION: "1.3.0"
+    CURRENT_PROJECT_VERSION: "8"
 
 targets:
   PoseioscSender:

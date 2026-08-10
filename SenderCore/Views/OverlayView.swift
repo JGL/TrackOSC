@@ -31,6 +31,10 @@ struct OverlayView: View {
                 let x = offsetX + CGFloat(p.x) * scale
                 return CGPoint(x: mirrored ? size.width - x : x, y: offsetY + CGFloat(p.y) * scale)
             }
+            func map(_ p: WireXY) -> CGPoint {
+                let x = offsetX + CGFloat(p.x) * scale
+                return CGPoint(x: mirrored ? size.width - x : x, y: offsetY + CGFloat(p.y) * scale)
+            }
             func map(_ r: WireRect) -> CGRect {
                 var x = offsetX + CGFloat(r.left) * scale
                 let width = CGFloat(r.width) * scale
@@ -57,6 +61,19 @@ struct OverlayView: View {
                         with: .color(.cyan)
                     )
                 }
+            }
+            for faceBox in snapshot.faceBoxes {
+                context.stroke(Path(map(faceBox.box)), with: .color(.cyan), lineWidth: 2)
+            }
+            for contour in snapshot.faceContours where !contour.points.isEmpty {
+                // The jawline is an open polyline — mapped per-vertex so
+                // selfie mirroring lands correctly, and never closed.
+                var path = Path()
+                path.move(to: map(contour.points[0]))
+                for point in contour.points.dropFirst() {
+                    path.addLine(to: map(point))
+                }
+                context.stroke(path, with: .color(.cyan), lineWidth: 2)
             }
             drawBoxes(context: context, boxes: snapshot.texts, color: .yellow, map: map)
             drawBoxes(context: context, boxes: snapshot.animals, color: .pink, map: map)

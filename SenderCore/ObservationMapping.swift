@@ -86,22 +86,35 @@ enum ObservationMapping {
 
     // MARK: - Faces
 
+    /// One frame's face output: the VisionOSC-compatible landmark
+    /// constellations plus the additive v1.3 boundary messages. `boxes` and
+    /// `contours` come ungated from the same observation list, so face i in
+    /// /faces/box is face i in /faces/contour. `landmarks` keeps the
+    /// defensive 76-point gate (the /faces/arr wire contract) and can
+    /// therefore contain fewer faces.
+    struct FaceFrames {
+        var landmarks: DetectionFrame<FaceDetection>
+        var boxes: DetectionFrame<FaceBoxDetection>
+        var contours: DetectionFrame<FaceContourDetection>
+    }
+
     static func mapFaces(
         _ observations: [FaceObservation],
         width: Int32,
         height: Int32
-    ) -> DetectionFrame<FaceDetection> {
-        let detections = observations.prefix(WireCounts.maxDetections).compactMap { observation -> FaceDetection? in
+    ) -> FaceFrames {
+        let w = Float(width), h = Float(height)
+        let capped = observations.prefix(WireCounts.maxDetections)
+        let frameSize = CGSize(width: CGFloat(width), height: CGFloat(height))
+
+        let landmarkDetections = capped.compactMap { observation -> FaceDetection? in
             guard let allPoints = observation.landmarks?.allPoints else { return nil }
 
             // Don't assume anything about the landmarks' normalization basis
             // (it is NOT documented in the public interface): let Vision
             // itself convert to image pixels, requesting the wire format's
             // upper-left origin directly.
-            let imagePoints = allPoints.pointsInImageCoordinates(
-                CGSize(width: CGFloat(width), height: CGFloat(height)),
-                origin: .upperLeft
-            )
+            let imagePoints = allPoints.pointsInImageCoordinates(frameSize, origin: .upperLeft)
             guard imagePoints.count == WireCounts.facePoints else { return nil }
 
             let precisions = allPoints.precisionEstimatesPerPoint
@@ -114,7 +127,35 @@ enum ObservationMapping {
             }
             return FaceDetection(confidence: observation.confidence, points: points)
         }
-        return DetectionFrame(width: width, height: height, detections: Array(detections))
+
+        let boxDetections = capped.map { observation in
+            FaceBoxDetection(
+                confidence: observation.confidence,
+                box: CoordinateMapper.rect(
+                    normalized: observation.boundingBox.cgRect,
+                    frameWidth: w,
+                    frameHeight: h
+                ),
+                rollDegrees: Float(observation.roll.converted(to: .degrees).value),
+                yawDegrees: Float(observation.yaw.converted(to: .degrees).value),
+                pitchDegrees: Float(observation.pitch.converted(to: .degrees).value)
+            )
+        }
+
+        let contourDetections = capped.map { observation -> FaceContourDetection in
+            let contourPoints = observation.landmarks?.faceContour
+                .pointsInImageCoordinates(frameSize, origin: .upperLeft) ?? []
+            return FaceContourDetection(
+                confidence: observation.confidence,
+                points: contourPoints.map { WireXY(x: Float($0.x), y: Float($0.y)) }
+            )
+        }
+
+        return FaceFrames(
+            landmarks: DetectionFrame(width: width, height: height, detections: Array(landmarkDetections)),
+            boxes: DetectionFrame(width: width, height: height, detections: Array(boxDetections)),
+            contours: DetectionFrame(width: width, height: height, detections: Array(contourDetections))
+        )
     }
 
     // MARK: - Text

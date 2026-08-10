@@ -82,6 +82,10 @@ struct SettingsView: View {
                     Text("Front camera only. Display-only — the OSC coordinates sent to receivers are always unmirrored.")
                         .font(.footnote)
                         .foregroundStyle(.secondary)
+                    Toggle("Hide video preview", isOn: $settings.hideVideoPreview)
+                    Text("Shows only the tracking overlay on black. The camera and OSC output keep running.")
+                        .font(.footnote)
+                        .foregroundStyle(.secondary)
                 }
 
                 Section("Statistics") {

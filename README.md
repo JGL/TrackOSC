@@ -11,7 +11,7 @@ TrackOSC (formerly Poseiosc) is a native-Swift successor to
 speaks **exactly the same OSC wire format**, so existing VisionOSC/PoseOSC
 receivers (Processing, TouchDesigner, Max/MSP, openFrameworks…) work unchanged.
 
-Three apps:
+Three apps plus an open receiver sketch:
 
 - **TrackOSC** for iOS (iOS 18+, SwiftUI): live camera → Vision → OSC over UDP,
   with on-screen tracking overlays, per-detector toggles, front/back camera
@@ -25,9 +25,15 @@ Three apps:
   9527), draws skeletons/landmarks/boxes with coordinate guides, shows
   per-address message rates and a log, and advertises itself on the local
   network so senders can find it.
+- **[Processing receiver sketch](Examples/Processing/TrackOSCReceiver/TrackOSCReceiver.pde)**
+  (Processing 4 + oscP5): a complete FLOSS receiver in one hackable file —
+  same drawing and coordinate guides as the native receiver — so you can
+  start making software on any platform without touching the Apple stack.
 
 The Mac apps are downloadable, notarized builds; the iOS app is distributed
-via TestFlight or built from source with your own developer account.
+via TestFlight or built from source with your own developer account; the
+Processing sketch just needs the free [Processing](https://processing.org)
+editor.
 
 ## Quick start without building anything
 
@@ -46,6 +52,11 @@ All downloads are signed and notarized — no Gatekeeper hoops.
   `127.0.0.1`.
 - **iPhone sender**: install via the TestFlight link (ask the maintainer),
   using the free [TestFlight app](https://apps.apple.com/app/testflight/id899247664).
+- **Processing receiver**: no Apple anything required — open
+  [`Examples/Processing/TrackOSCReceiver`](Examples/Processing/TrackOSCReceiver/TrackOSCReceiver.pde)
+  in [Processing](https://processing.org), install the **oscP5** library
+  (Sketch → Import Library… → Manage Libraries), and run. See
+  [Processing receiver example](#processing-receiver-example) for details.
 
 Everything below is only needed if you want to build from source.
 
@@ -165,6 +176,28 @@ swift run poseiosc-testlisten 9527
 is a headless decoder that prints one line per received message (quit the
 receiver app first — only one process can bind the port).
 
+### Processing receiver example
+
+[`Examples/Processing/TrackOSCReceiver`](Examples/Processing/TrackOSCReceiver/TrackOSCReceiver.pde)
+is a complete [Processing](https://processing.org) receiver sketch — a FLOSS
+starting point for modding and tinkering with no Apple toolchain required.
+It parses every TrackOSC message, draws skeletons, face landmarks, the face
+box + jawline contour, and text/animal boxes, and shows the same coordinate
+guides as the native receiver.
+
+1. Install the **oscP5** library (Sketch → Import Library… → Manage
+   Libraries → search "oscP5").
+2. Open and run the sketch — it listens on port 9527.
+3. Point a TrackOSC sender at your machine, or use
+   `swift run poseiosc-testsend 127.0.0.1 9527` for a synthetic scene.
+
+### Hiding the video
+
+Both senders have a **Hide video preview** option (the eye button on the
+main screen, or the toggle in Settings): the camera and OSC output keep
+running, but the screen shows only the tracking overlay on black — useful
+on stage or in installations where the raw camera feed shouldn't be visible.
+
 ## Distributing the iOS sender via TestFlight
 
 If you have a **paid** Apple Developer Program membership, you can put the
@@ -259,6 +292,9 @@ float sx = x / frameW * width;   // frameW/frameH from the message header
 float sy = y / frameH * height;
 ```
 
+(For a full working example — parsing, skeletons, coordinate guides — see
+[`Examples/Processing/TrackOSCReceiver`](Examples/Processing/TrackOSCReceiver/TrackOSCReceiver.pde).)
+
 - A keypoint that wasn't detected arrives as `x=0, y=frameHeight,
   confidence=0` — always filter on `confidence == 0`.
 
@@ -310,6 +346,31 @@ ring …; pinky … .
 A joint/point that wasn't detected is sent as `x=0, y=frameHeight,
 confidence=0` (VisionOSC's convention) — filter on `confidence == 0`.
 
+### Face boundary messages (TrackOSC addition, v1.3)
+
+VisionOSC's `/faces/arr` carries only the 76 landmark points — no face
+boundary. TrackOSC adds two messages (VisionOSC receivers ignore them; the
+five messages above are untouched). Both start with the standard
+width/height/n header, and both list the **same faces in the same order**,
+so index i in one matches index i in the other. (`/faces/arr` applies a
+stricter landmark check and can, in rare cases, contain fewer faces — don't
+assume its indices line up with these.)
+
+**`/faces/box`** — per face, 8 floats (fixed stride: face *i* starts at
+argument `3 + i×8`):
+
+| Type | Value |
+|------|-------|
+| float | confidence |
+| float × 4 | bounding box: left, top, width, height (pixels, origin top-left) |
+| float × 3 | head rotation: roll, yaw, pitch in **degrees** (0 when unavailable) |
+
+**`/faces/contour`** — per face: `float` confidence, `int32 m` (contour
+point count), then m × (`float` x, `float` y). The contour is the jawline —
+an **open** polyline from ear to chin to ear; don't close it. `m` varies by
+OS version (typically 17) and is 0 when Vision reports no contour for that
+face — always loop on `m`, never hardcode it.
+
 ## Project layout
 
 ```
@@ -322,6 +383,7 @@ SenderCore/            Platform-neutral sender pipeline shared by both
 Sender/                iOS sender app shell (camera, rotation, UI)
 SenderMac/             macOS sender app shell (camera picker, rig rotation)
 Receiver/              macOS receiver (OSC server, visualizer, log, Bonjour)
+Examples/              Processing (oscP5) reference receiver sketch
 Scripts/               Notarized-release tooling
 PROMPTS_AND_DECISIONS.md   Running record of prompts and design decisions
 ```

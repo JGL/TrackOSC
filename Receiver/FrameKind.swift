@@ -6,9 +6,10 @@
 import PoseioscShared
 import SwiftUI
 
-/// The five Poseiosc message kinds, with display metadata for the UI.
+/// The drawable message kinds (the five VisionOSC messages plus the additive
+/// v1.3 face-boundary pair), with display metadata for the UI.
 enum FrameKind: String, CaseIterable, Identifiable, Sendable {
-    case poses, hands, faces, texts, animals
+    case poses, hands, faces, faceBoxes, faceContours, texts, animals
 
     var id: String { rawValue }
 
@@ -17,6 +18,8 @@ enum FrameKind: String, CaseIterable, Identifiable, Sendable {
         case .poses: OSCAddress.poses
         case .hands: OSCAddress.hands
         case .faces: OSCAddress.faces
+        case .faceBoxes: OSCAddress.faceBox
+        case .faceContours: OSCAddress.faceContour
         case .texts: OSCAddress.texts
         case .animals: OSCAddress.animals
         }
@@ -26,7 +29,7 @@ enum FrameKind: String, CaseIterable, Identifiable, Sendable {
         switch self {
         case .poses: .green
         case .hands: .orange
-        case .faces: .cyan
+        case .faces, .faceBoxes, .faceContours: .cyan
         case .texts: .yellow
         case .animals: .pink
         }
@@ -38,6 +41,8 @@ enum FrameKind: String, CaseIterable, Identifiable, Sendable {
         case .poses: .poses
         case .hands: .hands
         case .faces: .faces
+        case .faceBoxes: .faceBoxes
+        case .faceContours: .faceContours
         case .texts: .texts
         case .animals: .animals
         case .cameraInfo: nil

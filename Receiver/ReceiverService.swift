@@ -131,6 +131,8 @@ final class ReceiverService: Sendable {
         case .poses(let f): f.detections.count
         case .hands(let f): f.detections.count
         case .faces(let f): f.detections.count
+        case .faceBoxes(let f): f.detections.count
+        case .faceContours(let f): f.detections.count
         case .texts(let f): f.detections.count
         case .animals(let f): f.detections.count
         case .cameraInfo: 0

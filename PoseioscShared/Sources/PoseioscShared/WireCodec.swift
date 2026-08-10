@@ -49,6 +49,34 @@ public enum WireCodec {
         ])
     }
 
+    public static func encodeFaceBoxes(_ frame: DetectionFrame<FaceBoxDetection>) -> OSCMessage {
+        var values: OSCValues = header(frame.width, frame.height, frame.detections.count)
+        for detection in frame.detections.prefix(WireCounts.maxDetections) {
+            values.append(Float32(detection.confidence))
+            values.append(Float32(detection.box.left))
+            values.append(Float32(detection.box.top))
+            values.append(Float32(detection.box.width))
+            values.append(Float32(detection.box.height))
+            values.append(Float32(detection.rollDegrees))
+            values.append(Float32(detection.yawDegrees))
+            values.append(Float32(detection.pitchDegrees))
+        }
+        return OSCMessage(OSCAddress.faceBox, values: values)
+    }
+
+    public static func encodeFaceContours(_ frame: DetectionFrame<FaceContourDetection>) -> OSCMessage {
+        var values: OSCValues = header(frame.width, frame.height, frame.detections.count)
+        for detection in frame.detections.prefix(WireCounts.maxDetections) {
+            values.append(Float32(detection.confidence))
+            values.append(Int32(detection.points.count))
+            for point in detection.points {
+                values.append(Float32(point.x))
+                values.append(Float32(point.y))
+            }
+        }
+        return OSCMessage(OSCAddress.faceContour, values: values)
+    }
+
     private static func encodeKeypoints<D: Sendable & Equatable>(
         address: String,
         frame: DetectionFrame<D>,
@@ -102,9 +130,68 @@ public enum WireCodec {
             return try .animals(decodeBoxes(message))
         case OSCAddress.cameraInfo:
             return try .cameraInfo(decodeCameraInfo(message))
+        case OSCAddress.faceBox:
+            return try .faceBoxes(decodeFaceBoxes(message))
+        case OSCAddress.faceContour:
+            return try .faceContours(decodeFaceContours(message))
         default:
             throw WireCodecError.unknownAddress(address)
         }
+    }
+
+    private static func decodeFaceBoxes(_ message: OSCMessage) throws -> DetectionFrame<FaceBoxDetection> {
+        let address = message.addressPattern.stringValue
+        var reader = ValueReader(address: address, values: message.values)
+        let width = try reader.int32()
+        let height = try reader.int32()
+        let count = try reader.int32()
+
+        var detections: [FaceBoxDetection] = []
+        detections.reserveCapacity(min(Int(count), WireCounts.maxDetections))
+        for _ in 0..<count {
+            let confidence = try reader.float()
+            let left = try reader.float()
+            let top = try reader.float()
+            let boxWidth = try reader.float()
+            let boxHeight = try reader.float()
+            let roll = try reader.float()
+            let yaw = try reader.float()
+            let pitch = try reader.float()
+            detections.append(FaceBoxDetection(
+                confidence: confidence,
+                box: WireRect(left: left, top: top, width: boxWidth, height: boxHeight),
+                rollDegrees: roll,
+                yawDegrees: yaw,
+                pitchDegrees: pitch
+            ))
+        }
+        return DetectionFrame(width: width, height: height, detections: detections)
+    }
+
+    private static func decodeFaceContours(_ message: OSCMessage) throws -> DetectionFrame<FaceContourDetection> {
+        let address = message.addressPattern.stringValue
+        var reader = ValueReader(address: address, values: message.values)
+        let width = try reader.int32()
+        let height = try reader.int32()
+        let count = try reader.int32()
+
+        var detections: [FaceContourDetection] = []
+        detections.reserveCapacity(min(Int(count), WireCounts.maxDetections))
+        for _ in 0..<count {
+            let confidence = try reader.float()
+            let pointCount = try reader.int32()
+            var points: [WireXY] = []
+            // The count is attacker-controlled until the reads below validate
+            // it, so cap the up-front allocation; truncation throws in next().
+            points.reserveCapacity(min(Int(pointCount), 512))
+            for _ in 0..<pointCount {
+                let x = try reader.float()
+                let y = try reader.float()
+                points.append(WireXY(x: x, y: y))
+            }
+            detections.append(FaceContourDetection(confidence: confidence, points: points))
+        }
+        return DetectionFrame(width: width, height: height, detections: detections)
     }
 
     private static func decodeCameraInfo(_ message: OSCMessage) throws -> CameraInfo {

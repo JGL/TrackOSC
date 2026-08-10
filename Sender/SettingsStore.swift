@@ -25,6 +25,10 @@ final class SettingsStore {
     /// like a mirror. Display-only: OSC coordinates are always unmirrored.
     var mirrorFrontPreview: Bool { didSet { defaults.set(mirrorFrontPreview, forKey: "mirrorFrontPreview") } }
 
+    /// Hides the camera video, showing only the tracking overlay on black.
+    /// Display-only: the camera and OSC output keep running.
+    var hideVideoPreview: Bool { didSet { defaults.set(hideVideoPreview, forKey: "hideVideoPreview") } }
+
     var cameraOrientation: CameraOrientationSetting {
         didSet { defaults.set(cameraOrientation.rawValue, forKey: "cameraOrientation") }
     }
@@ -47,6 +51,7 @@ final class SettingsStore {
         detectAnimals = bool("detectAnimals", default: false)
         useFrontCamera = bool("useFrontCamera", default: true)
         mirrorFrontPreview = bool("mirrorFrontPreview", default: true)
+        hideVideoPreview = bool("hideVideoPreview", default: false)
         let storedOrientation = defaults.object(forKey: "cameraOrientation") as? Int
         cameraOrientation = storedOrientation.flatMap(CameraOrientationSetting.init(rawValue:)) ?? .auto
     }

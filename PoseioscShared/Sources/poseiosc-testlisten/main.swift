@@ -37,6 +37,12 @@ func summarize(_ decoded: DecodedFrame) -> String {
             (f.detections.first.map { d in " \"\(d.label)\"" } ?? "")
     case .cameraInfo(let info):
         return "/camerainfo  \(info.width)x\(info.height) \(info.orientationName) \(info.isFrontCamera ? "front" : "back")"
+    case .faceBoxes(let f):
+        return "/faces/box   \(f.width)x\(f.height) n=\(f.detections.count)" +
+            (f.detections.first.map { d in String(format: " conf=%.2f box=(%.0f,%.0f %.0fx%.0f) roll=%.0f°", d.confidence, d.box.left, d.box.top, d.box.width, d.box.height, d.rollDegrees) } ?? "")
+    case .faceContours(let f):
+        return "/faces/contour \(f.width)x\(f.height) n=\(f.detections.count)" +
+            (f.detections.first.map { d in String(format: " conf=%.2f m=%d", d.confidence, d.points.count) } ?? "")
     }
 }
 

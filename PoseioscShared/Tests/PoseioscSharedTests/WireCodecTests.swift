@@ -41,6 +41,25 @@ private func makeBox(label: String) -> BoxDetection {
     BoxDetection(confidence: 0.85, box: WireRect(left: 12, top: 34, width: 56, height: 78), label: label)
 }
 
+private func makeFaceBox(seed: Float) -> FaceBoxDetection {
+    FaceBoxDetection(
+        confidence: 0.9,
+        box: WireRect(left: 10 + seed, top: 20 + seed, width: 30, height: 40),
+        rollDegrees: 5 + seed,
+        yawDegrees: -10 + seed,
+        pitchDegrees: 2 + seed
+    )
+}
+
+private func makeFaceContour(seed: Float, pointCount: Int) -> FaceContourDetection {
+    FaceContourDetection(
+        confidence: 0.9,
+        points: (0..<pointCount).map { i in
+            WireXY(x: Float(i) * 5 + seed, y: Float(i) * 7 + seed)
+        }
+    )
+}
+
 // MARK: - Round trips
 
 @Suite("Round-trip encoding/decoding")
@@ -102,6 +121,46 @@ struct RoundTripTests {
         let decoded = try WireCodec.decode(WireCodec.encodeCameraInfo(info))
         guard case .cameraInfo(let out) = decoded else { Issue.record("wrong kind"); return }
         #expect(out == info)
+    }
+
+    @Test func faceBoxes() throws {
+        let frame = DetectionFrame(width: 1080, height: 1920, detections: [makeFaceBox(seed: 1), makeFaceBox(seed: 2)])
+        let decoded = try WireCodec.decode(WireCodec.encodeFaceBoxes(frame))
+        guard case .faceBoxes(let out) = decoded else { Issue.record("wrong kind"); return }
+        #expect(out == frame)
+    }
+
+    @Test func faceContours() throws {
+        // Variable point counts per face, including the m=0 "no contour" sentinel.
+        let frame = DetectionFrame(width: 1080, height: 1920, detections: [
+            makeFaceContour(seed: 1, pointCount: 17),
+            makeFaceContour(seed: 2, pointCount: 0)
+        ])
+        let decoded = try WireCodec.decode(WireCodec.encodeFaceContours(frame))
+        guard case .faceContours(let out) = decoded else { Issue.record("wrong kind"); return }
+        #expect(out == frame)
+    }
+
+    @Test func faceBoxesEmptyFrame() throws {
+        let frame = DetectionFrame<FaceBoxDetection>(width: 640, height: 480, detections: [])
+        let message = WireCodec.encodeFaceBoxes(frame)
+        #expect(message.values.count == 3)
+        let decoded = try WireCodec.decode(message)
+        guard case .faceBoxes(let out) = decoded else { Issue.record("wrong kind"); return }
+        #expect(out == frame)
+    }
+
+    @Test func faceContoursThroughRawBytes() throws {
+        // The variable-length layout is the risky one: full serialize → parse cycle.
+        let frame = DetectionFrame(width: 1920, height: 1080, detections: [
+            makeFaceContour(seed: 3, pointCount: 17),
+            makeFaceContour(seed: 4, pointCount: 21)
+        ])
+        let data = try WireCodec.encodeFaceContours(frame).rawData()
+        let reparsed = try OSCMessage(from: data)
+        let decoded = try WireCodec.decode(reparsed)
+        guard case .faceContours(let out) = decoded else { Issue.record("wrong kind"); return }
+        #expect(out == frame)
     }
 
     @Test func roundTripThroughRawBytes() throws {
@@ -189,6 +248,98 @@ struct GoldenBytesTests {
         #expect(data == expected)
     }
 
+    /// Pins the /faces/box encoding (TrackOSC additive, v1.3): header ints,
+    /// then 8 big-endian float32s per face (conf, box, roll/yaw/pitch degrees).
+    @Test func faceBoxMessageBytes() throws {
+        let frame = DetectionFrame(
+            width: 640, height: 480,
+            detections: [FaceBoxDetection(
+                confidence: 1.0,
+                box: WireRect(left: 1, top: 2, width: 3, height: 4),
+                rollDegrees: 5, yawDegrees: 6, pitchDegrees: 7
+            )]
+        )
+        let data = try WireCodec.encodeFaceBoxes(frame).rawData()
+
+        var expected = Data()
+        func pad4(_ d: inout Data) { while d.count % 4 != 0 { d.append(0) } }
+        func appendString(_ s: String, to d: inout Data) {
+            d.append(s.data(using: .ascii)!)
+            d.append(0)
+            pad4(&d)
+        }
+        func appendInt32(_ v: Int32, to d: inout Data) {
+            withUnsafeBytes(of: v.bigEndian) { d.append(contentsOf: $0) }
+        }
+        func appendFloat32(_ v: Float32, to d: inout Data) {
+            withUnsafeBytes(of: v.bitPattern.bigEndian) { d.append(contentsOf: $0) }
+        }
+
+        appendString("/faces/box", to: &expected)
+        appendString(",iiiffffffff", to: &expected)  // 3 ints, 8 floats
+        appendInt32(640, to: &expected)
+        appendInt32(480, to: &expected)
+        appendInt32(1, to: &expected)
+        appendFloat32(1.0, to: &expected)  // confidence
+        appendFloat32(1, to: &expected)    // left
+        appendFloat32(2, to: &expected)    // top
+        appendFloat32(3, to: &expected)    // width
+        appendFloat32(4, to: &expected)    // height
+        appendFloat32(5, to: &expected)    // roll°
+        appendFloat32(6, to: &expected)    // yaw°
+        appendFloat32(7, to: &expected)    // pitch°
+
+        #expect(data == expected)
+    }
+
+    /// Pins the /faces/contour encoding (TrackOSC additive, v1.3): header ints,
+    /// then per face float32 confidence, int32 point count, count × (x, y).
+    /// Two faces pin the interleaving: one with 3 points, one with 0.
+    @Test func faceContourMessageBytes() throws {
+        let frame = DetectionFrame(
+            width: 640, height: 480,
+            detections: [
+                FaceContourDetection(confidence: 1.0, points: [
+                    WireXY(x: 1, y: 2), WireXY(x: 3, y: 4), WireXY(x: 5, y: 6)
+                ]),
+                FaceContourDetection(confidence: 0.5, points: [])
+            ]
+        )
+        let data = try WireCodec.encodeFaceContours(frame).rawData()
+
+        var expected = Data()
+        func pad4(_ d: inout Data) { while d.count % 4 != 0 { d.append(0) } }
+        func appendString(_ s: String, to d: inout Data) {
+            d.append(s.data(using: .ascii)!)
+            d.append(0)
+            pad4(&d)
+        }
+        func appendInt32(_ v: Int32, to d: inout Data) {
+            withUnsafeBytes(of: v.bigEndian) { d.append(contentsOf: $0) }
+        }
+        func appendFloat32(_ v: Float32, to d: inout Data) {
+            withUnsafeBytes(of: v.bitPattern.bigEndian) { d.append(contentsOf: $0) }
+        }
+
+        appendString("/faces/contour", to: &expected)
+        appendString(",iiififffffffi", to: &expected)  // header; f i ff ff ff; f i
+        appendInt32(640, to: &expected)
+        appendInt32(480, to: &expected)
+        appendInt32(2, to: &expected)
+        appendFloat32(1.0, to: &expected)  // face 0 confidence
+        appendInt32(3, to: &expected)      // face 0 point count
+        appendFloat32(1, to: &expected)
+        appendFloat32(2, to: &expected)
+        appendFloat32(3, to: &expected)
+        appendFloat32(4, to: &expected)
+        appendFloat32(5, to: &expected)
+        appendFloat32(6, to: &expected)
+        appendFloat32(0.5, to: &expected)  // face 1 confidence
+        appendInt32(0, to: &expected)      // face 1 point count (no contour)
+
+        #expect(data == expected)
+    }
+
     /// Pins the poses type tag layout: header ints then 52 floats per pose.
     @Test func posesTypeTags() throws {
         let frame = DetectionFrame(width: 10, height: 20, detections: [makePose(seed: 0)])
@@ -217,6 +368,18 @@ struct MalformedTests {
     @Test func truncatedMessageThrows() {
         // Claims 1 pose but carries no pose data.
         let message = OSCMessage(OSCAddress.poses, values: [Int32(10), Int32(20), Int32(1)])
+        #expect(throws: WireCodecError.self) {
+            _ = try WireCodec.decode(message)
+        }
+    }
+
+    @Test func truncatedContourThrows() {
+        // Claims 5 contour points but carries only 2.
+        let message = OSCMessage(OSCAddress.faceContour, values: [
+            Int32(10), Int32(20), Int32(1),
+            Float32(0.9), Int32(5),
+            Float32(1), Float32(2), Float32(3), Float32(4)
+        ])
         #expect(throws: WireCodecError.self) {
             _ = try WireCodec.decode(message)
         }

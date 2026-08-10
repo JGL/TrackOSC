@@ -33,6 +33,8 @@ struct OverlaySnapshot: Sendable {
     var poses: [PoseDetection] = []
     var hands: [HandDetection] = []
     var faces: [FaceDetection] = []
+    var faceBoxes: [FaceBoxDetection] = []
+    var faceContours: [FaceContourDetection] = []
     var texts: [BoxDetection] = []
     var animals: [BoxDetection] = []
     var processingTime: TimeInterval = 0
@@ -87,8 +89,12 @@ actor VisionProcessor {
             sender.send(WireCodec.encodeHands(result))
         }
         if let result = await faces {
-            snapshot.faces = result.detections
-            sender.send(WireCodec.encodeFaces(result))
+            snapshot.faces = result.landmarks.detections
+            snapshot.faceBoxes = result.boxes.detections
+            snapshot.faceContours = result.contours.detections
+            sender.send(WireCodec.encodeFaces(result.landmarks))
+            sender.send(WireCodec.encodeFaceBoxes(result.boxes))
+            sender.send(WireCodec.encodeFaceContours(result.contours))
         }
         if let result = await texts {
             snapshot.texts = result.detections
@@ -130,7 +136,7 @@ actor VisionProcessor {
         )
     }
 
-    private func runFaces(_ frame: FrameBox) async -> DetectionFrame<FaceDetection>? {
+    private func runFaces(_ frame: FrameBox) async -> ObservationMapping.FaceFrames? {
         // Revision 3 (the only revision of the modern API) produces the
         // 76-point constellation VisionOSC expects.
         let request = DetectFaceLandmarksRequest()

@@ -65,7 +65,7 @@
 		03807F39A230F25D975DAC80 /* CameraPreviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraPreviewView.swift; sourceTree = "<group>"; };
 		044FC8024A8B6744C7E677C2 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		0FCA4347894328D3107380D0 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
-		11C58630B69B8B431316A046 /* TrackOSC.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = TrackOSC.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		11C58630B69B8B431316A046 /* TrackOSC.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TrackOSC.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		14831F8759CB808A50B99626 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		16BDA48C2E84E59039EAF4B9 /* PoseioscSenderMacApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PoseioscSenderMacApp.swift; sourceTree = "<group>"; };
 		1E180D1324327865CBF54DB9 /* ObservationMapping.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ObservationMapping.swift; sourceTree = "<group>"; };
@@ -79,7 +79,7 @@
 		3873AC66AD6991EB0F5F89B5 /* VisionAngle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VisionAngle.swift; sourceTree = "<group>"; };
 		3FEFBCE031E1972E63A30199 /* DetectorChip.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetectorChip.swift; sourceTree = "<group>"; };
 		40B24378FCA4958CC6C67878 /* MacAppModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MacAppModel.swift; sourceTree = "<group>"; };
-		43812415DB456C47561F7F15 /* PoseioscShared */ = {isa = PBXFileReference; lastKnownFileType = folder; name = PoseioscShared; path = PoseioscShared; sourceTree = SOURCE_ROOT; };
+		43812415DB456C47561F7F15 /* PoseioscShared */ = {isa = PBXFileReference; lastKnownFileType = folder; path = PoseioscShared; sourceTree = SOURCE_ROOT; };
 		4CE862C0CD72CC6015830132 /* SidebarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SidebarView.swift; sourceTree = "<group>"; };
 		530A6F40C76AC8E1B770F370 /* OverlayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OverlayView.swift; sourceTree = "<group>"; };
 		5811FE8746B64C33EE554C13 /* MacCameraManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MacCameraManager.swift; sourceTree = "<group>"; };
@@ -346,7 +346,6 @@
 				LastUpgradeCheck = 2630;
 				TargetAttributes = {
 					0027B314DDFC4253CD14F253 = {
-						DevelopmentTeam = "";
 						ProvisioningStyle = Automatic;
 					};
 					0A9C019024B689D94BB76BF2 = {
@@ -502,6 +501,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
+				DEVELOPMENT_TEAM = "";
 				INFOPLIST_FILE = Sender/Info.plist;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -551,7 +551,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 7;
+				CURRENT_PROJECT_VERSION = 8;
 				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				DEVELOPMENT_TEAM = "";
@@ -574,7 +574,7 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				MACOSX_DEPLOYMENT_TARGET = 15.0;
-				MARKETING_VERSION = 1.2.0;
+				MARKETING_VERSION = 1.3.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -641,7 +641,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 7;
+				CURRENT_PROJECT_VERSION = 8;
 				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = "";
@@ -658,7 +658,7 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				MACOSX_DEPLOYMENT_TARGET = 15.0;
-				MARKETING_VERSION = 1.2.0;
+				MARKETING_VERSION = 1.3.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -693,6 +693,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
+				DEVELOPMENT_TEAM = "";
 				INFOPLIST_FILE = Sender/Info.plist;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				LD_RUNPATH_SEARCH_PATHS = (

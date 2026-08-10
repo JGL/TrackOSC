@@ -29,6 +29,18 @@ public struct WirePoint: Sendable, Equatable {
     }
 }
 
+/// A bare coordinate pair in pixel coordinates (origin top-left), for points
+/// that carry no per-point confidence (face contour vertices).
+public struct WireXY: Sendable, Equatable {
+    public var x: Float
+    public var y: Float
+
+    public init(x: Float, y: Float) {
+        self.x = x
+        self.y = y
+    }
+}
+
 /// An axis-aligned bounding box in pixel coordinates (origin top-left).
 public struct WireRect: Sendable, Equatable {
     public var left: Float
@@ -76,6 +88,38 @@ public struct FaceDetection: Sendable, Equatable {
 
     public init(confidence: Float, points: [WirePoint]) {
         precondition(points.count == WireCounts.facePoints, "FaceDetection requires exactly \(WireCounts.facePoints) points")
+        self.confidence = confidence
+        self.points = points
+    }
+}
+
+/// One face's boundary and head pose, for the additive /faces/box message:
+/// bounding box in pixels (origin top-left) plus roll/yaw/pitch in degrees.
+/// An angle Vision didn't report is encoded as 0.
+public struct FaceBoxDetection: Sendable, Equatable {
+    public var confidence: Float
+    public var box: WireRect
+    public var rollDegrees: Float
+    public var yawDegrees: Float
+    public var pitchDegrees: Float
+
+    public init(confidence: Float, box: WireRect, rollDegrees: Float, yawDegrees: Float, pitchDegrees: Float) {
+        self.confidence = confidence
+        self.box = box
+        self.rollDegrees = rollDegrees
+        self.yawDegrees = yawDegrees
+        self.pitchDegrees = pitchDegrees
+    }
+}
+
+/// One face's jawline contour, for the additive /faces/contour message: an
+/// OPEN polyline (ear → chin → ear). The point count varies by OS revision
+/// and is empty when Vision reports no contour for the face.
+public struct FaceContourDetection: Sendable, Equatable {
+    public var confidence: Float
+    public var points: [WireXY]
+
+    public init(confidence: Float, points: [WireXY]) {
         self.confidence = confidence
         self.points = points
     }
@@ -149,6 +193,8 @@ public enum DecodedFrame: Sendable {
     case texts(DetectionFrame<BoxDetection>)
     case animals(DetectionFrame<BoxDetection>)
     case cameraInfo(CameraInfo)
+    case faceBoxes(DetectionFrame<FaceBoxDetection>)
+    case faceContours(DetectionFrame<FaceContourDetection>)
 
     /// The OSC address this frame kind corresponds to.
     public var address: String {
@@ -159,6 +205,8 @@ public enum DecodedFrame: Sendable {
         case .texts: OSCAddress.texts
         case .animals: OSCAddress.animals
         case .cameraInfo: OSCAddress.cameraInfo
+        case .faceBoxes: OSCAddress.faceBox
+        case .faceContours: OSCAddress.faceContour
         }
     }
 }

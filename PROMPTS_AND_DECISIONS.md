@@ -333,6 +333,51 @@ From Joel's mac-to-mac testing:
   the bundle IDs), the PoseioscShared package, the poseiosc-* CLI tools, and
   the `poseiosc-notary` keychain profile.
 
+## v1.3 — Second feedback round from Golan Levin (2026-08-10)
+
+Golan's feedback on the v1.2 TestFlight/notarized builds, plus one feature of
+Joel's own.
+
+- **Hide video preview** (Joel): both senders gain a display-only toggle
+  (Settings switch + on-screen eye button) that removes the camera video and
+  shows just the tracking overlay on black. The capture session and OSC
+  output keep running; the preview view simply isn't instantiated. Safe
+  because preview and overlay were already transformed independently — the
+  overlay's coordinates are oriented-frame pixels and its mirroring is
+  arithmetic, not a canvas transform.
+- **Face boundary** (Golan: "you're not displaying (or tracking?) the
+  boundary of the face — only the eyes/nose/mouth features within it").
+  Investigation confirmed this was a **format-fidelity decision, not a
+  Vision limitation**: `DetectFaceLandmarksRequest` already returns
+  `boundingBox`, `roll`/`yaw`/`pitch`, and the `faceContour` region, but
+  VisionOSC's `/faces/arr` (conf + 76×(x,y,precision)) has no slot for them
+  — VisionOSC itself computed the box and angles internally and never sent
+  them. Resolution: **two additive messages** on the `/camerainfo`
+  precedent, five VisionOSC messages untouched.
+  - `/faces/box`: fixed stride, per face conf + box(l,t,w,h) +
+    roll/yaw/pitch in **degrees** (0 when unavailable). Two addresses rather
+    than one variable-length message so that box-only consumers (the common
+    case, e.g. face extraction) can parse with plain argument arithmetic.
+  - `/faces/contour`: per face conf + int32 m + m×(x,y). Count-prefixed
+    because the jawline point count varies by OS revision (typically 17);
+    m=0 when unavailable. Documented as an OPEN polyline.
+  - Both messages are built ungated from the same observation list so their
+    indices always correlate with each other; `/faces/arr` keeps its
+    defensive 76-point gate and may (theoretically) contain fewer faces —
+    documented rather than "fixed", since gating the new messages would
+    drop boxes for faces the legacy message can't carry anyway.
+  - Both pinned by their own golden-bytes tests; angle sign convention to
+    be confirmed on device and documented.
+- **Processing receiver example** (Golan: "a widely-used FLOSS pathway …
+  so that students can immediately start making software without knowing
+  the Apple stack"): `Examples/Processing/TrackOSCReceiver/` — a single-file
+  oscP5 sketch parsing all eight messages and replicating the native
+  receiver's drawing, including the coordinate-dimension guides. This
+  partially revisits the v1.1 "don't fork the Processing receiver" decision
+  above: the notarized receiver remains the distribution channel; the
+  sketch is a reference *consumer* for tinkering, not a replacement.
+- Versions to 1.3.0 (build 8).
+
 ## Verification record (2026-07-28)
 
 - `swift test` in `PoseioscShared`: 18 tests green, including round-trips for

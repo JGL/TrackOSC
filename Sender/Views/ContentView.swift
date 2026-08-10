@@ -20,7 +20,9 @@ struct ContentView: View {
         ZStack {
             GeometryReader { proxy in
                 ZStack {
-                    cameraPreview(in: proxy.size)
+                    if !model.settings.hideVideoPreview {
+                        cameraPreview(in: proxy.size)
+                    }
                     OverlayView(snapshot: model.overlay, mirrored: isMirrored)
                 }
                 // Size changes are the reliable signal that the interface
@@ -29,6 +31,7 @@ struct ContentView: View {
                     model.refreshInterfaceOrientation()
                 }
             }
+            .background(.black)
             .ignoresSafeArea()
 
             VStack {

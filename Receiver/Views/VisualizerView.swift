@@ -51,6 +51,9 @@ struct VisualizerView: View {
                 func mapPoint(_ p: WirePoint) -> CGPoint {
                     CGPoint(x: offsetX + CGFloat(p.x) * scale, y: offsetY + CGFloat(p.y) * scale)
                 }
+                func mapXY(_ p: WireXY) -> CGPoint {
+                    CGPoint(x: offsetX + CGFloat(p.x) * scale, y: offsetY + CGFloat(p.y) * scale)
+                }
                 func mapRect(_ r: WireRect) -> CGRect {
                     CGRect(
                         x: offsetX + CGFloat(r.left) * scale,
@@ -85,6 +88,20 @@ struct VisualizerView: View {
                                     with: .color(kind.color)
                                 )
                             }
+                        }
+                    case .faceBoxes(let f):
+                        for faceBox in f.detections {
+                            context.stroke(Path(mapRect(faceBox.box)), with: .color(kind.color), lineWidth: 2)
+                        }
+                    case .faceContours(let f):
+                        for contour in f.detections where !contour.points.isEmpty {
+                            // Open polyline (jawline) — never closed.
+                            var path = Path()
+                            path.move(to: mapXY(contour.points[0]))
+                            for point in contour.points.dropFirst() {
+                                path.addLine(to: mapXY(point))
+                            }
+                            context.stroke(path, with: .color(kind.color), lineWidth: 2)
                         }
                     case .texts(let f), .animals(let f):
                         for box in f.detections {
@@ -200,6 +217,8 @@ struct VisualizerView: View {
         case .poses(let f): (f.width, f.height)
         case .hands(let f): (f.width, f.height)
         case .faces(let f): (f.width, f.height)
+        case .faceBoxes(let f): (f.width, f.height)
+        case .faceContours(let f): (f.width, f.height)
         case .texts(let f): (f.width, f.height)
         case .animals(let f): (f.width, f.height)
         case .cameraInfo(let info): (info.width, info.height)

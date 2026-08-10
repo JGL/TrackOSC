@@ -7,8 +7,9 @@
 //
 
 /// The five OSC address patterns emitted by VisionOSC (and by Poseiosc),
-/// plus Poseiosc's additive /camerainfo message (unknown to — and safely
-/// ignored by — original VisionOSC receivers).
+/// plus TrackOSC's additive messages (unknown to — and safely ignored by —
+/// original VisionOSC receivers): /camerainfo (v1.1), /faces/box and
+/// /faces/contour (v1.3).
 public enum OSCAddress {
     public static let poses = "/poses/arr"
     public static let hands = "/hands/arr"
@@ -16,8 +17,10 @@ public enum OSCAddress {
     public static let texts = "/texts/arr"
     public static let animals = "/animals/arr"
     public static let cameraInfo = "/camerainfo"
+    public static let faceBox = "/faces/box"
+    public static let faceContour = "/faces/contour"
 
-    public static let all: [String] = [poses, hands, faces, texts, animals, cameraInfo]
+    public static let all: [String] = [poses, hands, faces, texts, animals, cameraInfo, faceBox, faceContour]
 }
 
 /// Fixed keypoint counts per detection type (VisionOSC constants.h).

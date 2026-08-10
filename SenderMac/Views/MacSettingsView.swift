@@ -79,6 +79,10 @@ struct MacSettingsView: View {
                     Text("Display-only — OSC coordinates are always unmirrored.")
                         .font(.callout)
                         .foregroundStyle(.secondary)
+                    Toggle("Hide video preview", isOn: $settings.hideVideoPreview)
+                    Text("Shows only the tracking overlay on black. The camera and OSC output keep running.")
+                        .font(.callout)
+                        .foregroundStyle(.secondary)
                 }
 
                 Section("Statistics") {

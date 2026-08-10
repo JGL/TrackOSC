@@ -30,6 +30,10 @@ final class MacSettingsStore {
     /// Mirrors the on-screen preview (display-only; wire data is unmirrored).
     var mirrorPreview: Bool { didSet { defaults.set(mirrorPreview, forKey: "mirrorPreview") } }
 
+    /// Hides the camera video, showing only the tracking overlay on black.
+    /// Display-only: the camera and OSC output keep running.
+    var hideVideoPreview: Bool { didSet { defaults.set(hideVideoPreview, forKey: "hideVideoPreview") } }
+
     private let defaults = UserDefaults.standard
 
     init() {
@@ -47,6 +51,7 @@ final class MacSettingsStore {
         detectTexts = bool("detectTexts", default: false)
         detectAnimals = bool("detectAnimals", default: false)
         mirrorPreview = bool("mirrorPreview", default: true)
+        hideVideoPreview = bool("hideVideoPreview", default: false)
 
         cameraID = defaults.string(forKey: "cameraID")
         let storedRotation = defaults.integer(forKey: "rotationDegrees")
