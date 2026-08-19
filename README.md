@@ -1,5 +1,12 @@
 # TrackOSC
 
+<p align="center">
+  <img src="Images/icon-ios-sender.png" width="128" alt="TrackOSC iOS sender app icon">&nbsp;&nbsp;
+  <img src="Images/icon-mac-sender.png" width="128" alt="TrackOSC Sender macOS app icon">&nbsp;&nbsp;
+  <img src="Images/icon-mac-receiver.png" width="128" alt="TrackOSC Receiver macOS app icon">
+</p>
+<p align="center"><em>TrackOSC for iOS&ensp;·&ensp;TrackOSC Sender for macOS&ensp;·&ensp;TrackOSC Receiver for macOS</em></p>
+
 Live camera → Apple Vision tracking → OSC. TrackOSC streams (almost) all of
 Apple's Vision framework detection results — body poses, hand poses, face
 landmarks, text, and animals — over the network as OSC messages, from an
@@ -34,6 +41,25 @@ The Mac apps are downloadable, notarized builds; the iOS app is distributed
 via TestFlight or built from source with your own developer account; the
 Processing sketch just needs the free [Processing](https://processing.org)
 editor.
+
+<p align="center">
+  <img src="Images/screenshot-mac-sender.jpg" width="90%" alt="TrackOSC Sender on macOS tracking a person at 30 fps: body-pose skeleton in green, hand skeleton in orange, face bounding box, jawline contour, and landmark points in blue, with detector toggle chips and the destination address overlaid on the live camera view">
+</p>
+<p align="center"><em>The macOS sender tracking body, hand, and face at 30 fps, streaming OSC to <code>127.0.0.1:9527</code>.</em></p>
+
+<p align="center">
+  <img src="Images/screenshot-mac-receiver.png" width="90%" alt="TrackOSC Receiver on macOS drawing the received skeleton, hand, and face landmarks on a black canvas with coordinate guides, next to a panel of per-address message rates at 30 Hz, camera info, and a live message log">
+</p>
+<p align="center"><em>The macOS receiver drawing the same scene from the OSC stream alone — with per-address
+message rates, camera info, and a live log.</em></p>
+
+<p align="center">
+  <img src="Images/screenshot-ios-sender.jpg" width="28%" alt="TrackOSC on iPhone tracking a person's face and a peace-sign hand gesture, with face box, jawline contour and landmarks in blue, hand skeleton in orange, body pose in green, and the detector chips along the bottom">
+  &nbsp;&nbsp;
+  <img src="Images/screenshot-processing-receiver.png" width="44%" alt="The TrackOSC Processing receiver sketch drawing the received face landmarks, jawline contour, hand skeleton, body pose, and a recognized-text box on a black canvas with coordinate guides">
+</p>
+<p align="center"><em>Left: the iOS sender. Right: the open Processing (oscP5) receiver sketch drawing the
+same wire format — no Apple stack required.</em></p>
 
 ## Quick start without building anything
 
