@@ -1,6 +1,6 @@
 # TrackOSC Privacy Policy
 
-_Last updated: 19 August 2026_
+_Last updated: 24 August 2026_
 
 This policy covers the TrackOSC apps: **TrackOSC** for iOS, **TrackOSC
 Sender** for macOS, and **TrackOSC Receiver** for macOS.
@@ -18,6 +18,32 @@ animals. Camera video is never recorded, never stored, and never leaves the
 device. The only thing derived from the camera that is transmitted is
 numerical tracking data (coordinates and confidence values), described
 below.
+
+## Face data
+
+The sender apps use Apple's Vision framework to detect faces in the camera
+feed, entirely on-device. The face data produced is numerical geometry
+only: facial landmark coordinates (eyes, brows, nose, lips, jawline), a
+face bounding box, and head rotation angles. The apps do not create
+biometric templates or faceprints, do not perform face recognition or
+identification, and cannot determine who a person is.
+
+- **Collection and storage:** Face data is computed in memory for each
+  camera frame and exists only for the duration of that frame — a fraction
+  of a second. It is never written to disk, never saved, and never
+  associated with any identity.
+- **Use:** Face data is used for exactly two things: drawing the tracking
+  overlay on the screen, and encoding numerical coordinates into OSC
+  messages sent to the local-network destination the user has explicitly
+  configured.
+- **Sharing:** Face data is not shared with the developer or with any
+  third party. It is transmitted only as numerical coordinates, only over
+  the local network, and only to the receiving device the user chooses.
+  There are no developer servers, and the data never touches the internet.
+- **Retention and deletion:** Retention is zero. Each frame's face data is
+  discarded as soon as the frame has been processed; closing the app, or
+  simply the arrival of the next frame, removes it. There is nothing
+  stored, and therefore nothing requiring later deletion.
 
 ## Network
 
