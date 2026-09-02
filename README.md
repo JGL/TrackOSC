@@ -12,7 +12,7 @@ Live camera → Apple Vision tracking → OSC. TrackOSC streams (almost) all of
 detection results — body poses, hand poses, face landmarks, text, and
 animals — over the network as
 [OSC (OpenSoundControl)](https://opensoundcontrol.stanford.edu) messages,
-from an iPhone or a Mac, and visualizes them in a companion receiver app.
+from an iPhone or a Mac, and visualises them in a companion receiver app.
 
 TrackOSC (formerly Poseiosc) is a native-Swift successor to
 [VisionOSC](https://github.com/LingDong-/VisionOSC) by LingDong-
@@ -39,7 +39,7 @@ Three apps plus an open receiver sketch:
   same drawing and coordinate guides as the native receiver — so you can
   start making software on any platform without touching the Apple stack.
 
-The Mac apps are downloadable, notarized builds; the iOS app is
+The Mac apps are downloadable, notarised builds; the iOS app is
 [free on the App Store](https://apps.apple.com/app/trackosc/id6795593815)
 (or built from source with your own developer account); the Processing
 sketch just needs the free [Processing](https://processing.org) editor.
@@ -58,14 +58,14 @@ message rates, camera info, and a live log.</em></p>
 <p align="center">
   <img src="Images/screenshot-ios-sender.jpg" width="28%" alt="TrackOSC on iPhone tracking a person's face and a peace-sign hand gesture, with face box, jawline contour and landmarks in blue, hand skeleton in orange, body pose in green, and the detector chips along the bottom">
   &nbsp;&nbsp;
-  <img src="Images/screenshot-processing-receiver.png" width="44%" alt="The TrackOSC Processing receiver sketch drawing the received face landmarks, jawline contour, hand skeleton, body pose, and a recognized-text box on a black canvas with coordinate guides">
+  <img src="Images/screenshot-processing-receiver.png" width="44%" alt="The TrackOSC Processing receiver sketch drawing the received face landmarks, jawline contour, hand skeleton, body pose, and a recognised-text box on a black canvas with coordinate guides">
 </p>
 <p align="center"><em>Left: the iOS sender. Right: the open Processing (oscP5) receiver sketch drawing the
 same wire format — no Apple stack required.</em></p>
 
 ## Quick start without building anything
 
-All downloads are signed and notarized — no Gatekeeper hoops.
+All downloads are signed and notarised — no Gatekeeper hoops.
 
 - **Mac receiver**: download `TrackOSCReceiver-<version>-macOS.zip` from the
   [Releases page](https://github.com/JGL/TrackOSC/releases), unzip, and open.
@@ -167,7 +167,7 @@ click. Send to `127.0.0.1` to feed a receiver on the same Mac.
 ### Camera orientation
 
 Tracking quality is best when the declared orientation matches how the
-camera is actually held, because Vision then analyzes unrotated frames.
+camera is actually held, because Vision then analyses unrotated frames.
 
 - **iPhone — Auto (default)**: follows the device as you rotate it between
   portrait and landscape; the transmitted frame dimensions swap accordingly
@@ -265,7 +265,7 @@ question.
 ## Releasing the macOS apps (maintainers)
 
 `Scripts/release.sh` archives **both** macOS apps (receiver and sender),
-signs them with your Developer ID, notarizes and staples them, and publishes
+signs them with your Developer ID, notarises and staples them, and publishes
 the zips as one GitHub Release — so end users can download and double-click
 with no Gatekeeper friction.
 
@@ -289,7 +289,7 @@ Then, per release — bump `MARKETING_VERSION` in `project.yml`, run
 POSEIOSC_TEAM_ID=YOURTEAMID Scripts/release.sh
 ```
 
-Add `--dry-run` to build/notarize without publishing.
+Add `--dry-run` to build/notarise without publishing.
 
 ## Coordinate system
 
@@ -304,8 +304,8 @@ Everything on the wire uses one convention — the same one VisionOSC uses:
      └───────────────────────────(w,h)
 ```
 
-- **Pixels**, not normalized: divide by the frame width/height from the
-  message header (or `/camerainfo`) to normalize.
+- **Pixels**, not normalised: divide by the frame width/height from the
+  message header (or `/camerainfo`) to normalise.
 - **Origin top-left, y grows downward** (screen convention, not math
   convention).
 - **Never mirrored.** The selfie-mirror option only flips the phone's
@@ -366,7 +366,7 @@ ring …; pinky … .
 (x, y, precisionEstimate), in Vision's constellation order.
 
 **`/texts/arr`** — `float` confidence, `float` left, `float` top,
-`float` width, `float` height, `string` recognized text.
+`float` width, `float` height, `string` recognised text.
 
 **`/animals/arr`** — `float` confidence, `float` left, `float` top,
 `float` width, `float` height, `string` label (`"Cat"` or `"Dog"`).
@@ -410,9 +410,9 @@ SenderCore/            Platform-neutral sender pipeline shared by both
                        senders (Vision processing, OSC, Bonjour, overlay)
 Sender/                iOS sender app shell (camera, rotation, UI)
 SenderMac/             macOS sender app shell (camera picker, rig rotation)
-Receiver/              macOS receiver (OSC server, visualizer, log, Bonjour)
+Receiver/              macOS receiver (OSC server, visualiser, log, Bonjour)
 Examples/              Processing (oscP5) reference receiver sketch
-Scripts/               Notarized-release tooling
+Scripts/               Notarised-release tooling
 PROMPTS_AND_DECISIONS.md   Running record of prompts and design decisions
 ```
 
@@ -442,7 +442,7 @@ contract. Run tests with `cd PoseioscShared && swift test`.
 - **Port 9527 already in use** — Protokol, OSC DataMonitor, or another
   receiver may be bound to it; only one process can listen per port.
 
-## Lineage & license
+## Lineage & licence
 
 Inspired by [VisionOSC](https://github.com/LingDong-/VisionOSC) and
 [PoseOSC](https://github.com/LingDong-/PoseOSC) by LingDong-, which grew out
