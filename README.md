@@ -8,9 +8,11 @@
 <p align="center"><em>TrackOSC for iOS&ensp;·&ensp;TrackOSC Sender for macOS&ensp;·&ensp;TrackOSC Receiver for macOS</em></p>
 
 Live camera → Apple Vision tracking → OSC. TrackOSC streams (almost) all of
-Apple's Vision framework detection results — body poses, hand poses, face
-landmarks, text, and animals — over the network as OSC messages, from an
-iPhone or a Mac, and visualizes them in a companion receiver app.
+[Apple's Vision framework](https://developer.apple.com/documentation/vision)
+detection results — body poses, hand poses, face landmarks, text, and
+animals — over the network as
+[OSC (Open Sound Control)](https://opensoundcontrol.stanford.edu) messages,
+from an iPhone or a Mac, and visualizes them in a companion receiver app.
 
 TrackOSC (formerly Poseiosc) is a native-Swift successor to
 [VisionOSC](https://github.com/LingDong-/VisionOSC) by LingDong-
