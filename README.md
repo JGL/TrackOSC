@@ -37,10 +37,10 @@ Three apps plus an open receiver sketch:
   same drawing and coordinate guides as the native receiver — so you can
   start making software on any platform without touching the Apple stack.
 
-The Mac apps are downloadable, notarized builds; the iOS app is distributed
-via TestFlight or built from source with your own developer account; the
-Processing sketch just needs the free [Processing](https://processing.org)
-editor.
+The Mac apps are downloadable, notarized builds; the iOS app is
+[free on the App Store](https://apps.apple.com/app/trackosc/id6795593815)
+(or built from source with your own developer account); the Processing
+sketch just needs the free [Processing](https://processing.org) editor.
 
 <p align="center">
   <img src="Images/screenshot-mac-sender.jpg" width="90%" alt="TrackOSC Sender on macOS tracking a person at 30 fps: body-pose skeleton in green, hand skeleton in orange, face bounding box, jawline contour, and landmark points in blue, with detector toggle chips and the destination address overlaid on the live camera view">
@@ -76,8 +76,8 @@ All downloads are signed and notarized — no Gatekeeper hoops.
   settings — receivers on the network appear automatically. To try
   everything on one Mac, run sender and receiver together and send to
   `127.0.0.1`.
-- **iPhone sender**: install via the TestFlight link (ask the maintainer),
-  using the free [TestFlight app](https://apps.apple.com/app/testflight/id899247664).
+- **iPhone sender**: get [TrackOSC on the App Store](https://apps.apple.com/app/trackosc/id6795593815)
+  (free, iOS 18+).
 - **Processing receiver**: no Apple anything required — open
   [`Examples/Processing/TrackOSCReceiver`](Examples/Processing/TrackOSCReceiver/TrackOSCReceiver.pde)
   in [Processing](https://processing.org), install the **oscP5** library
@@ -130,7 +130,7 @@ click. Send to `127.0.0.1` to feed a receiver on the same Mac.
    your team. (Target and bundle-ID names keep the historical "Poseiosc" —
    bundle IDs are welded to App Store Connect and to users' granted
    permissions, so they deliberately never changed with the rename.) If
-   you're building from source rather than installing via TestFlight, also
+   you're building from source rather than installing from the App Store, also
    change the bundle identifier prefix `com.joelgethinlewis` to something of
    your own (e.g. `com.yourname.trackosc`) — either in Signing &
    Capabilities, or by editing `bundleIdPrefix` in `project.yml` and running
