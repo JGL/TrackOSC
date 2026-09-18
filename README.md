@@ -42,6 +42,21 @@ Three apps plus open receiver examples for eight creative-coding environments:
   making software on the platform you already use, without touching the
   Apple stack.
 
+> **A note on the receiver examples.** Only the **Processing**, **Python**
+> and **p5.js** examples have been run end-to-end by the maintainer; the
+> TouchDesigner parser is unit-tested but its network recipe hasn't been
+> built in TouchDesigner, and the **Max/MSP**, **Pure Data**,
+> **openFrameworks** and **SuperCollider** examples were written from those
+> platforms' documentation and checked mechanically (valid patch files,
+> consistent wiring) but never opened in the tool itself, because none of
+> them is installed on the development machine. Treat those as careful
+> first drafts: they follow the same parsing pattern as the verified ones,
+> but expect to fix small things. If you try one, please
+> [open an issue or pull request](https://github.com/JGL/TrackOSC/issues)
+> saying which version you used and what changed — that is the most useful
+> contribution this repository can get right now. The per-platform status
+> is tabulated in [`Examples/README.md`](Examples/README.md).
+
 The Mac apps are downloadable, notarised builds; the iOS app is
 [free on the App Store](https://apps.apple.com/app/trackosc/id6795593815)
 (or built from source with your own developer account); the Processing
