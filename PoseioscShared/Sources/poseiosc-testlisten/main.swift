@@ -43,6 +43,21 @@ func summarize(_ decoded: DecodedFrame) -> String {
     case .faceContours(let f):
         return "/faces/contour \(f.width)x\(f.height) n=\(f.detections.count)" +
             (f.detections.first.map { d in String(format: " conf=%.2f m=%d", d.confidence, d.points.count) } ?? "")
+    case .poses3D(let f):
+        return "/poses3d/arr \(f.width)x\(f.height) n=\(f.detections.count)" +
+            (f.detections.first.map { d in
+                String(format: " conf=%.2f height=%.2fm root=(%.2f,%.2f,%.2f)m px=(%.0f,%.0f)",
+                       d.confidence, d.bodyHeight, d.joints[0].x, d.joints[0].y, d.joints[0].z, d.joints[0].px, d.joints[0].py)
+            } ?? "")
+    case .barcodes(let f):
+        return "/barcodes/arr \(f.width)x\(f.height) n=\(f.detections.count)" +
+            (f.detections.first.map { d in " \(d.symbology) \"\(d.payload)\"" } ?? "")
+    case .animalPoses(let f):
+        return "/animalposes/arr \(f.width)x\(f.height) n=\(f.detections.count)" +
+            (f.detections.first.map { d in String(format: " conf=%.2f nose=(%.0f,%.0f)", d.confidence, d.joints[0].x, d.joints[0].y) } ?? "")
+    case .humans(let f):
+        return "/humans/arr  \(f.width)x\(f.height) n=\(f.detections.count)" +
+            (f.detections.first.map { d in String(format: " conf=%.2f box=(%.0f,%.0f %.0fx%.0f)", d.confidence, d.box.left, d.box.top, d.box.width, d.box.height) } ?? "")
     }
 }
 

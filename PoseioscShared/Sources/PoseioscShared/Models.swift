@@ -139,6 +139,94 @@ public struct BoxDetection: Sendable, Equatable {
     }
 }
 
+/// One joint of a 3D body pose (additive /poses3d/arr message, v1.4): its
+/// position in metres in Vision's camera-relative space, plus its 2D
+/// projection in wire pixels (origin top-left) so 2D-only receivers can draw
+/// it without projecting. Vision's camera space is right-handed with y up;
+/// x, y, z are the translation of the joint relative to the camera.
+public struct WirePoint3D: Sendable, Equatable {
+    public var x: Float
+    public var y: Float
+    public var z: Float
+    /// Projected pixel x (origin top-left).
+    public var px: Float
+    /// Projected pixel y (origin top-left).
+    public var py: Float
+
+    public init(x: Float, y: Float, z: Float, px: Float, py: Float) {
+        self.x = x
+        self.y = y
+        self.z = z
+        self.px = px
+        self.py = py
+    }
+}
+
+/// One detected 3D body pose: overall confidence, estimated body height in
+/// metres, and exactly 17 joints in `JointOrder.body3D17` order. Vision always
+/// reports all 17 joints, so there is no missing-joint sentinel.
+public struct Pose3DDetection: Sendable, Equatable {
+    public var confidence: Float
+    /// Estimated body height in metres (measured from camera intrinsics when
+    /// available, otherwise a reference estimate).
+    public var bodyHeight: Float
+    public var joints: [WirePoint3D]
+
+    public init(confidence: Float, bodyHeight: Float, joints: [WirePoint3D]) {
+        precondition(joints.count == WireCounts.body3DJoints, "Pose3DDetection requires exactly \(WireCounts.body3DJoints) joints")
+        self.confidence = confidence
+        self.bodyHeight = bodyHeight
+        self.joints = joints
+    }
+}
+
+/// One detected animal (cat/dog) pose: overall confidence + exactly 25 joints
+/// in `JointOrder.animal25` order. Missing joints use `WirePoint.missing`.
+public struct AnimalPoseDetection: Sendable, Equatable {
+    public var confidence: Float
+    public var joints: [WirePoint]
+
+    public init(confidence: Float, joints: [WirePoint]) {
+        precondition(joints.count == WireCounts.animalJoints, "AnimalPoseDetection requires exactly \(WireCounts.animalJoints) joints")
+        self.confidence = confidence
+        self.joints = joints
+    }
+}
+
+/// One detected human (whole-body rectangle, no skeleton), for the additive
+/// /humans/arr message.
+public struct HumanDetection: Sendable, Equatable {
+    public var confidence: Float
+    public var box: WireRect
+
+    public init(confidence: Float, box: WireRect) {
+        self.confidence = confidence
+        self.box = box
+    }
+}
+
+/// One detected barcode or QR code, for the additive /barcodes/arr message:
+/// axis-aligned bounding box, the four quadrilateral corners (top-left,
+/// top-right, bottom-right, bottom-left, in the code's own orientation), the
+/// symbology name (e.g. "QR", "EAN13", "Code128") and the decoded payload
+/// ("" when Vision reports none).
+public struct BarcodeDetection: Sendable, Equatable {
+    public var confidence: Float
+    public var box: WireRect
+    public var corners: [WireXY]
+    public var symbology: String
+    public var payload: String
+
+    public init(confidence: Float, box: WireRect, corners: [WireXY], symbology: String, payload: String) {
+        precondition(corners.count == WireCounts.barcodeCorners, "BarcodeDetection requires exactly \(WireCounts.barcodeCorners) corners")
+        self.confidence = confidence
+        self.box = box
+        self.corners = corners
+        self.symbology = symbology
+        self.payload = payload
+    }
+}
+
 /// A full frame of detections of one kind, with the camera frame dimensions
 /// (oriented pixels) that all coordinates are expressed in.
 public struct DetectionFrame<Detection: Sendable & Equatable>: Sendable, Equatable {
@@ -195,6 +283,10 @@ public enum DecodedFrame: Sendable {
     case cameraInfo(CameraInfo)
     case faceBoxes(DetectionFrame<FaceBoxDetection>)
     case faceContours(DetectionFrame<FaceContourDetection>)
+    case poses3D(DetectionFrame<Pose3DDetection>)
+    case barcodes(DetectionFrame<BarcodeDetection>)
+    case animalPoses(DetectionFrame<AnimalPoseDetection>)
+    case humans(DetectionFrame<HumanDetection>)
 
     /// The OSC address this frame kind corresponds to.
     public var address: String {
@@ -207,6 +299,10 @@ public enum DecodedFrame: Sendable {
         case .cameraInfo: OSCAddress.cameraInfo
         case .faceBoxes: OSCAddress.faceBox
         case .faceContours: OSCAddress.faceContour
+        case .poses3D: OSCAddress.poses3D
+        case .barcodes: OSCAddress.barcodes
+        case .animalPoses: OSCAddress.animalPoses
+        case .humans: OSCAddress.humans
         }
     }
 }

@@ -3,8 +3,12 @@
 //  PoseioscShared
 //
 //  Edge lists for drawing skeletons, shared by the iOS overlay and the macOS
-//  visualizer so both render identical geometry. Indices refer to
-//  `JointOrder.body17` / `JointOrder.hand21`.
+//  visualiser so both render identical geometry. Indices refer to
+//  `JointOrder.body17` / `JointOrder.hand21` / `JointOrder.body3D17` /
+//  `JointOrder.animal25`.
+//
+//  Examples/SKELETONS.md is a copy of these lists for non-Swift receivers —
+//  keep it in sync.
 //
 
 public enum Skeleton {
@@ -36,5 +40,41 @@ public enum Skeleton {
         (0, 13), (13, 14), (14, 15), (15, 16),
         // pinky
         (0, 17), (17, 18), (18, 19), (19, 20)
+    ]
+
+    /// Parent → child pairs for Vision's 17-joint 3D body skeleton
+    /// (`JointOrder.body3D17`), matching Vision's own joint hierarchy.
+    public static let body3D17Edges: [(Int, Int)] = [
+        // spine: root → spine → centerShoulder → centerHead → topHead
+        (0, 1), (1, 2), (2, 3), (3, 4),
+        // left arm (5,6,7)
+        (2, 5), (5, 6), (6, 7),
+        // right arm (8,9,10)
+        (2, 8), (8, 9), (9, 10),
+        // left leg (11,12,13)
+        (0, 11), (11, 12), (12, 13),
+        // right leg (14,15,16)
+        (0, 14), (14, 15), (15, 16)
+    ]
+
+    /// Limb pairs for Vision's 25-joint animal (cat/dog) skeleton (`JointOrder.animal25`).
+    public static let animal25Edges: [(Int, Int)] = [
+        // face: nose → eyes
+        (0, 1), (0, 2),
+        // ears: eye → ear bottom → middle → top
+        (1, 5), (5, 4), (4, 3),
+        (2, 8), (8, 7), (7, 6),
+        // nose → neck
+        (0, 9),
+        // front legs: neck → elbow → knee → paw
+        (9, 10), (10, 11), (11, 12),
+        (9, 13), (13, 14), (14, 15),
+        // spine: neck → tailTop
+        (9, 22),
+        // back legs: tailTop → elbow → knee → paw
+        (22, 16), (16, 17), (17, 18),
+        (22, 19), (19, 20), (20, 21),
+        // tail
+        (22, 23), (23, 24)
     ]
 }
