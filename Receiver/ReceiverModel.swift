@@ -1,6 +1,6 @@
 //
 //  ReceiverModel.swift
-//  Poseiosc Receiver (macOS)
+//  TrackOSC Receiver (macOS)
 //
 //  UI-facing state. The OSC server can deliver hundreds of messages per second,
 //  so ReceiverService accumulates off the main thread and this model is
@@ -23,11 +23,13 @@ struct LogEntry: Identifiable, Sendable {
     var address: String
     var detectionCount: Int
     var senderHost: String
+    /// Set for messages the codec rejected (unknown address, truncated…).
+    var note: String? = nil
 }
 
 @Observable @MainActor
 final class ReceiverModel {
-    /// Most recent frame per message kind; the visualizer draws these.
+    /// Most recent frame per message kind; the visualiser draws these.
     var latest: [FrameKind: TimestampedFrame] = [:]
     /// Messages per second per kind, over a 1-second sliding window.
     var rates: [FrameKind: Double] = [:]
@@ -42,9 +44,18 @@ final class ReceiverModel {
 
     /// Total messages received since launch.
     var totalMessages: UInt64 = 0
+    /// Messages the codec rejected since launch (unknown address, malformed).
+    var unknownMessages: UInt64 = 0
 
     /// Latest /camerainfo from the sender (nil until one arrives or when stale).
     var cameraInfo: CameraInfo?
+
+    /// 2D canvas or 3D scene in the left pane; remembered across launches.
+    var visualizerMode: VisualizerMode {
+        didSet { UserDefaults.standard.set(visualizerMode.rawValue, forKey: "visualizerMode") }
+    }
+    /// Bumped by "Reset view" to put the 3D camera back where it started.
+    var resetViewToken = 0
 
     private let service = ReceiverService()
     private var refreshTask: Task<Void, Never>?
@@ -55,6 +66,8 @@ final class ReceiverModel {
 
     init() {
         listenPort = UInt16(UserDefaults.standard.integer(forKey: "listenPort").clamped(to: 1...65535, fallback: 9527))
+        visualizerMode = UserDefaults.standard.string(forKey: "visualizerMode")
+            .flatMap(VisualizerMode.init(rawValue:)) ?? .twoD
         start()
     }
 
@@ -96,11 +109,23 @@ final class ReceiverModel {
         start()
     }
 
+    /// The 3D poses to draw right now: the latest /poses3d/arr frame if it
+    /// is fresh, otherwise nothing.
+    func freshPoses3D(at now: Date = .now) -> [Pose3DDetection] {
+        guard
+            let frame = latest[.poses3D],
+            now.timeIntervalSince(frame.receivedAt) < Self.staleInterval,
+            case .poses3D(let decoded) = frame.decoded
+        else { return [] }
+        return decoded.detections
+    }
+
     private func pullFromService() {
         let snapshot = service.takeSnapshot()
         latest = snapshot.latest
         rates = snapshot.rates
         totalMessages = snapshot.totalMessages
+        unknownMessages = snapshot.unknownMessages
         if let seenAt = snapshot.cameraInfoSeenAt, Date.now.timeIntervalSince(seenAt) < 2.0 {
             cameraInfo = snapshot.cameraInfo
         } else {

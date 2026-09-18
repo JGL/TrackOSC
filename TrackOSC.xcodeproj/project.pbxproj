@@ -18,10 +18,12 @@
 		154BE02374030EA5028CD010 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 22436542D01EAD8CED285668 /* ContentView.swift */; };
 		234ED6836F7141B00F4801A4 /* MacSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3470253A507EB6108BA68854 /* MacSettingsView.swift */; };
 		2D35826915D22DD4C9405753 /* VisualizerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A49223DA900A20D766094DB6 /* VisualizerView.swift */; };
+		361BABAEB93CA23E2EDF35C7 /* VisualizerMode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1C390B6BA36678B01F799334 /* VisualizerMode.swift */; };
 		3679F968B2D87D6E0B404AD3 /* BonjourAdvertiser.swift in Sources */ = {isa = PBXBuildFile; fileRef = D04CB153C381766D7D80DED7 /* BonjourAdvertiser.swift */; };
 		388DDE31CDC20F2CF398E228 /* PoseioscReceiverApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E642C8E274B338B0A9BE95F /* PoseioscReceiverApp.swift */; };
 		43B9D5C8F28A5EE3D4FB3F90 /* VisionProcessor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 25C34A45CD50185556A6E8CF /* VisionProcessor.swift */; };
 		4517204E993973CA44B019A2 /* PoseioscShared in Frameworks */ = {isa = PBXBuildFile; productRef = 3D1DFD7A45B58CCEBD9C5828 /* PoseioscShared */; };
+		4F7C967C1C1159A715BF86EA /* Visualizer3DView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A7A1CCCB19259E80101446F /* Visualizer3DView.swift */; };
 		516A14EDB986870936BF8F24 /* CameraOrientationSetting.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6A8D53A59285A22D1436833A /* CameraOrientationSetting.swift */; };
 		54568B16CDC6357DC59AED35 /* ControlBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BE01430EF3AD6073346F5DA /* ControlBarView.swift */; };
 		54F6A43050021C4C1FF23CDE /* OSCSenderService.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1E70D787D793EDCC6179AEE /* OSCSenderService.swift */; };
@@ -38,6 +40,7 @@
 		7ABF6548D7185A6DEE614E14 /* CameraOrientationSetting.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6A8D53A59285A22D1436833A /* CameraOrientationSetting.swift */; };
 		8DCED549FBF342CAC1D3322C /* BonjourBrowser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5888FFC267ADE3BAE904B39C /* BonjourBrowser.swift */; };
 		8F48C29C69C4B202AF603167 /* PoseioscShared in Frameworks */ = {isa = PBXBuildFile; productRef = D9C35C7B8BEDADE26B92F049 /* PoseioscShared */; };
+		96AE843D0BFC95E3574A7B8D /* Pose3DScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F1ED956EB76AF4D2DF40276 /* Pose3DScene.swift */; };
 		9B985C927B272B65CCD2BFBF /* AppModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4BB6041EDA4F90281819196 /* AppModel.swift */; };
 		9D9179815B38BE422FCD29D2 /* ReceiverModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36EE0DEF3AACC97EF349184D /* ReceiverModel.swift */; };
 		9DED7732D4ABB7EA2600392B /* BonjourBrowser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5888FFC267ADE3BAE904B39C /* BonjourBrowser.swift */; };
@@ -70,6 +73,7 @@
 		11C58630B69B8B431316A046 /* TrackOSC.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = TrackOSC.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		14831F8759CB808A50B99626 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		16BDA48C2E84E59039EAF4B9 /* PoseioscSenderMacApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PoseioscSenderMacApp.swift; sourceTree = "<group>"; };
+		1C390B6BA36678B01F799334 /* VisualizerMode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VisualizerMode.swift; sourceTree = "<group>"; };
 		1E180D1324327865CBF54DB9 /* ObservationMapping.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ObservationMapping.swift; sourceTree = "<group>"; };
 		22436542D01EAD8CED285668 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		25C34A45CD50185556A6E8CF /* VisionProcessor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VisionProcessor.swift; sourceTree = "<group>"; };
@@ -90,8 +94,10 @@
 		6A8D53A59285A22D1436833A /* CameraOrientationSetting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraOrientationSetting.swift; sourceTree = "<group>"; };
 		6B8A575252223D6F4E4880C1 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		6DBA3CC5FB854CD71D3810E4 /* TrackOSCSender.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TrackOSCSender.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		6F1ED956EB76AF4D2DF40276 /* Pose3DScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Pose3DScene.swift; sourceTree = "<group>"; };
 		70447DEDDBD809829F414AB4 /* FrameConveyor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FrameConveyor.swift; sourceTree = "<group>"; };
 		73BF246A8EDA6004AE9CB0CA /* MacCameraPreviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MacCameraPreviewView.swift; sourceTree = "<group>"; };
+		7A7A1CCCB19259E80101446F /* Visualizer3DView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Visualizer3DView.swift; sourceTree = "<group>"; };
 		8BE01430EF3AD6073346F5DA /* ControlBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ControlBarView.swift; sourceTree = "<group>"; };
 		8F01314D4D2BB20D1A9AA995 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		9E642C8E274B338B0A9BE95F /* PoseioscReceiverApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PoseioscReceiverApp.swift; sourceTree = "<group>"; };
@@ -227,6 +233,7 @@
 			children = (
 				22436542D01EAD8CED285668 /* ContentView.swift */,
 				4CE862C0CD72CC6015830132 /* SidebarView.swift */,
+				7A7A1CCCB19259E80101446F /* Visualizer3DView.swift */,
 				A49223DA900A20D766094DB6 /* VisualizerView.swift */,
 			);
 			path = Views;
@@ -239,10 +246,12 @@
 				D04CB153C381766D7D80DED7 /* BonjourAdvertiser.swift */,
 				327A3F09FCE218827863E618 /* FrameKind.swift */,
 				8F01314D4D2BB20D1A9AA995 /* Info.plist */,
+				6F1ED956EB76AF4D2DF40276 /* Pose3DScene.swift */,
 				C41FCC20BC3EE6B8F0930F0E /* PoseioscReceiver.entitlements */,
 				9E642C8E274B338B0A9BE95F /* PoseioscReceiverApp.swift */,
 				36EE0DEF3AACC97EF349184D /* ReceiverModel.swift */,
 				FFB8A3D2E06DFAE74EFD04A8 /* ReceiverService.swift */,
+				1C390B6BA36678B01F799334 /* VisualizerMode.swift */,
 				DCD628C27D5DB0360C392C60 /* Views */,
 			);
 			path = Receiver;
@@ -423,10 +432,13 @@
 				3679F968B2D87D6E0B404AD3 /* BonjourAdvertiser.swift in Sources */,
 				154BE02374030EA5028CD010 /* ContentView.swift in Sources */,
 				E14710A32CB6D23676E6DFFB /* FrameKind.swift in Sources */,
+				96AE843D0BFC95E3574A7B8D /* Pose3DScene.swift in Sources */,
 				388DDE31CDC20F2CF398E228 /* PoseioscReceiverApp.swift in Sources */,
 				9D9179815B38BE422FCD29D2 /* ReceiverModel.swift in Sources */,
 				C96F9BBC99E5FEF6B9403CFE /* ReceiverService.swift in Sources */,
 				0E8A7047DE8E3A93BF9E87A9 /* SidebarView.swift in Sources */,
+				4F7C967C1C1159A715BF86EA /* Visualizer3DView.swift in Sources */,
+				361BABAEB93CA23E2EDF35C7 /* VisualizerMode.swift in Sources */,
 				2D35826915D22DD4C9405753 /* VisualizerView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

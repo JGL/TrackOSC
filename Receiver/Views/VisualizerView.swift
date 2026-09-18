@@ -105,12 +105,62 @@ struct VisualizerView: View {
                         }
                     case .texts(let f), .animals(let f):
                         for box in f.detections {
-                            let rect = mapRect(box.box)
-                            context.stroke(Path(rect), with: .color(kind.color), lineWidth: 2)
-                            let label = Text("\(box.label) \(box.confidence, format: .number.precision(.fractionLength(2)))")
+                            drawLabeledBox(
+                                context: context, rect: mapRect(box.box),
+                                label: "\(box.label) \(formatted(box.confidence))", color: kind.color
+                            )
+                        }
+                    case .poses3D(let f):
+                        // Drawn from the per-joint pixel projections; the
+                        // label at the root shows depth and body height.
+                        for pose in f.detections {
+                            let projected = pose.joints.map { WirePoint(x: $0.px, y: $0.py, confidence: 1) }
+                            drawSkeleton(
+                                context: context, points: projected, edges: Skeleton.body3D17Edges,
+                                color: kind.color, map: mapPoint
+                            )
+                            let rootPoint = mapPoint(projected[0])
+                            let label = Text("z \(formatted(pose.joints[0].z)) m · h \(formatted(pose.bodyHeight)) m")
                                 .font(.footnote.weight(.semibold).monospaced())
                                 .foregroundStyle(kind.color)
-                            context.draw(label, at: CGPoint(x: rect.minX + 4, y: max(rect.minY - 10, 8)), anchor: .leading)
+                            context.draw(label, at: CGPoint(x: rootPoint.x + 8, y: rootPoint.y - 8), anchor: .bottomLeading)
+                        }
+                    case .animalPoses(let f):
+                        for animal in f.detections {
+                            drawSkeleton(
+                                context: context, points: animal.joints, edges: Skeleton.animal25Edges,
+                                color: kind.color, map: mapPoint
+                            )
+                        }
+                    case .humans(let f):
+                        for human in f.detections {
+                            drawLabeledBox(
+                                context: context, rect: mapRect(human.box),
+                                label: "human \(formatted(human.confidence))", color: kind.color
+                            )
+                        }
+                    case .barcodes(let f):
+                        for barcode in f.detections {
+                            let corners = barcode.corners.map(mapXY)
+                            guard corners.count == 4 else { continue }
+                            // The quadrilateral in the code's own orientation,
+                            // closed; a dot marks the wire's first corner (TL).
+                            var path = Path()
+                            path.move(to: corners[0])
+                            for corner in corners.dropFirst() {
+                                path.addLine(to: corner)
+                            }
+                            path.closeSubpath()
+                            context.stroke(path, with: .color(kind.color), lineWidth: 2)
+                            context.fill(
+                                Path(ellipseIn: CGRect(x: corners[0].x - 4, y: corners[0].y - 4, width: 8, height: 8)),
+                                with: .color(kind.color)
+                            )
+                            let top = corners.min { $0.y < $1.y } ?? corners[0]
+                            let label = Text("\(barcode.symbology) \(barcode.payload.prefix(40))")
+                                .font(.footnote.weight(.semibold).monospaced())
+                                .foregroundStyle(kind.color)
+                            context.draw(label, at: CGPoint(x: top.x, y: max(top.y - 10, 8)), anchor: .bottom)
                         }
                     case .cameraInfo:
                         break  // not a drawable frame; shown via coordinate guides
@@ -212,15 +262,31 @@ struct VisualizerView: View {
         }
     }
 
+    private func drawLabeledBox(context: GraphicsContext, rect: CGRect, label: String, color: Color) {
+        context.stroke(Path(rect), with: .color(color), lineWidth: 2)
+        let text = Text(label)
+            .font(.footnote.weight(.semibold).monospaced())
+            .foregroundStyle(color)
+        context.draw(text, at: CGPoint(x: rect.minX + 4, y: max(rect.minY - 10, 8)), anchor: .leading)
+    }
+
+    private func formatted(_ value: Float) -> String {
+        String(format: "%.2f", value)
+    }
+
     private func frameDimensions(of decoded: DecodedFrame) -> (Int32, Int32) {
         switch decoded {
         case .poses(let f): (f.width, f.height)
+        case .poses3D(let f): (f.width, f.height)
         case .hands(let f): (f.width, f.height)
         case .faces(let f): (f.width, f.height)
         case .faceBoxes(let f): (f.width, f.height)
         case .faceContours(let f): (f.width, f.height)
         case .texts(let f): (f.width, f.height)
         case .animals(let f): (f.width, f.height)
+        case .animalPoses(let f): (f.width, f.height)
+        case .humans(let f): (f.width, f.height)
+        case .barcodes(let f): (f.width, f.height)
         case .cameraInfo(let info): (info.width, info.height)
         }
     }

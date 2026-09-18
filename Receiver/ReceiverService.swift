@@ -1,6 +1,6 @@
 //
 //  ReceiverService.swift
-//  Poseiosc Receiver (macOS)
+//  TrackOSC Receiver (macOS)
 //
 //  Owns the OSC UDP server and the Bonjour advertisement. Decoded frames are
 //  accumulated behind a lock; the UI pulls snapshots at display rate.
@@ -16,6 +16,7 @@ struct ReceiverSnapshot: Sendable {
     var rates: [FrameKind: Double]
     var newLogEntries: [LogEntry]
     var totalMessages: UInt64
+    var unknownMessages: UInt64
     var cameraInfo: CameraInfo?
     var cameraInfoSeenAt: Date?
 }
@@ -26,7 +27,9 @@ final class ReceiverService: Sendable {
         var recentTimestamps: [FrameKind: [Date]] = [:]
         var pendingLog: [LogEntry] = []
         var lastLogTimes: [FrameKind: Date] = [:]
+        var lastUnknownLogTimes: [String: Date] = [:]
         var totalMessages: UInt64 = 0
+        var unknownMessages: UInt64 = 0
         var nextLogID: UInt64 = 0
         var cameraInfo: CameraInfo?
         var cameraInfoSeenAt: Date?
@@ -38,6 +41,9 @@ final class ReceiverService: Sendable {
 
     /// Only one log entry per kind per interval, so the log stays readable at 60 Hz.
     private static let logSampleInterval: TimeInterval = 0.25
+    /// Unknown or undecodable addresses are logged at most this often each,
+    /// so a foreign 60 Hz stream is visible without flooding the log.
+    private static let unknownLogInterval: TimeInterval = 5.0
 
     func start(port: UInt16) throws {
         let newServer = OSCUDPServer(port: port)
@@ -84,6 +90,7 @@ final class ReceiverService: Sendable {
                 rates: rates,
                 newLogEntries: entries,
                 totalMessages: s.totalMessages,
+                unknownMessages: s.unknownMessages,
                 cameraInfo: s.cameraInfo,
                 cameraInfoSeenAt: s.cameraInfoSeenAt
             )
@@ -91,8 +98,14 @@ final class ReceiverService: Sendable {
     }
 
     private func handle(message: OSCMessage, from host: String) {
-        guard let decoded = try? WireCodec.decode(message) else { return }
         let now = Date.now
+        let decoded: DecodedFrame
+        do {
+            decoded = try WireCodec.decode(message)
+        } catch {
+            recordUndecodable(address: message.addressPattern.stringValue, error: error, host: host, now: now)
+            return
+        }
 
         guard let kind = FrameKind.from(decoded) else {
             if case .cameraInfo(let info) = decoded {
@@ -126,15 +139,48 @@ final class ReceiverService: Sendable {
         }
     }
 
+    /// Counts and (sparsely) logs messages the codec rejected, so anyone
+    /// bringing up a new sender or a foreign OSC source can see what arrived.
+    private func recordUndecodable(address: String, error: Error, host: String, now: Date) {
+        let note: String = switch error as? WireCodecError {
+        case .unknownAddress: "unknown address"
+        case .truncatedMessage(_, let expected, let got): "truncated: expected ≥ \(expected) values, got \(got)"
+        case .badValue(_, let index): "bad value at argument \(index)"
+        case nil: "undecodable"
+        }
+
+        state.withLock { s in
+            s.totalMessages += 1
+            s.unknownMessages += 1
+            if let last = s.lastUnknownLogTimes[address], now.timeIntervalSince(last) < Self.unknownLogInterval {
+                return
+            }
+            s.lastUnknownLogTimes[address] = now
+            s.pendingLog.append(LogEntry(
+                id: s.nextLogID,
+                time: now,
+                address: address,
+                detectionCount: 0,
+                senderHost: host,
+                note: note
+            ))
+            s.nextLogID += 1
+        }
+    }
+
     private func detectionCount(of decoded: DecodedFrame) -> Int {
         switch decoded {
         case .poses(let f): f.detections.count
+        case .poses3D(let f): f.detections.count
         case .hands(let f): f.detections.count
         case .faces(let f): f.detections.count
         case .faceBoxes(let f): f.detections.count
         case .faceContours(let f): f.detections.count
         case .texts(let f): f.detections.count
         case .animals(let f): f.detections.count
+        case .animalPoses(let f): f.detections.count
+        case .humans(let f): f.detections.count
+        case .barcodes(let f): f.detections.count
         case .cameraInfo: 0
         }
     }
