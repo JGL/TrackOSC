@@ -1,6 +1,6 @@
 //
 //  SettingsStore.swift
-//  Poseiosc Sender (iOS)
+//  TrackOSC Sender (iOS)
 //
 //  Destination + detector settings, persisted in UserDefaults.
 //
@@ -13,11 +13,9 @@ final class SettingsStore {
     var host: String { didSet { defaults.set(host, forKey: "oscHost") } }
     var port: UInt16 { didSet { defaults.set(Int(port), forKey: "oscPort") } }
 
-    var detectPoses: Bool { didSet { defaults.set(detectPoses, forKey: "detectPoses") } }
-    var detectHands: Bool { didSet { defaults.set(detectHands, forKey: "detectHands") } }
-    var detectFaces: Bool { didSet { defaults.set(detectFaces, forKey: "detectFaces") } }
-    var detectTexts: Bool { didSet { defaults.set(detectTexts, forKey: "detectTexts") } }
-    var detectAnimals: Bool { didSet { defaults.set(detectAnimals, forKey: "detectAnimals") } }
+    /// The detectors currently switched on. Persisted one key per detector
+    /// (see `Detector.defaultsKey`); the legacy five keep their v1.0 keys.
+    var enabledDetectors: Set<Detector> { didSet { Detector.store(enabledDetectors, in: defaults) } }
 
     var useFrontCamera: Bool { didSet { defaults.set(useFrontCamera, forKey: "useFrontCamera") } }
 
@@ -44,11 +42,7 @@ final class SettingsStore {
         func bool(_ key: String, default defaultValue: Bool) -> Bool {
             defaults.object(forKey: key) == nil ? defaultValue : defaults.bool(forKey: key)
         }
-        detectPoses = bool("detectPoses", default: true)
-        detectHands = bool("detectHands", default: true)
-        detectFaces = bool("detectFaces", default: true)
-        detectTexts = bool("detectTexts", default: false)
-        detectAnimals = bool("detectAnimals", default: false)
+        enabledDetectors = Detector.loadEnabled(from: defaults)
         useFrontCamera = bool("useFrontCamera", default: true)
         mirrorFrontPreview = bool("mirrorFrontPreview", default: true)
         hideVideoPreview = bool("hideVideoPreview", default: false)
@@ -56,13 +50,19 @@ final class SettingsStore {
         cameraOrientation = storedOrientation.flatMap(CameraOrientationSetting.init(rawValue:)) ?? .auto
     }
 
+    func isEnabled(_ detector: Detector) -> Bool {
+        enabledDetectors.contains(detector)
+    }
+
+    func toggle(_ detector: Detector) {
+        if enabledDetectors.contains(detector) {
+            enabledDetectors.remove(detector)
+        } else {
+            enabledDetectors.insert(detector)
+        }
+    }
+
     var detectorConfig: DetectorConfig {
-        DetectorConfig(
-            poses: detectPoses,
-            hands: detectHands,
-            faces: detectFaces,
-            texts: detectTexts,
-            animals: detectAnimals
-        )
+        DetectorConfig(enabled: enabledDetectors)
     }
 }

@@ -1,6 +1,6 @@
 //
 //  ObservationMapping.swift
-//  Poseiosc Sender (iOS)
+//  TrackOSC Sender (shared)
 //
 //  Vision observations → wire models. All VisionOSC fidelity decisions live
 //  here: joint ordering, coordinate flips, missing-joint sentinels.
@@ -8,9 +8,35 @@
 
 import Foundation
 import Vision
+import simd
 import PoseioscShared
 
 enum ObservationMapping {
+    // MARK: - Keypoint helper
+
+    /// Maps a Vision joint dictionary onto the wire's fixed joint order,
+    /// substituting VisionOSC's missing-joint sentinel for absent or
+    /// zero-confidence joints.
+    private static func wirePoints<Name: Hashable>(
+        _ joints: [Name: Joint],
+        order: [Name],
+        frameWidth w: Float,
+        frameHeight h: Float
+    ) -> [WirePoint] {
+        order.map { name -> WirePoint in
+            guard let joint = joints[name], joint.confidence > 0 else {
+                return .missing(frameHeight: h)
+            }
+            return CoordinateMapper.point(
+                normalizedX: joint.location.x,
+                normalizedY: joint.location.y,
+                confidence: joint.confidence,
+                frameWidth: w,
+                frameHeight: h
+            )
+        }
+    }
+
     // MARK: - Body poses
 
     /// The 17 joints of the wire format, in PoseNet order (JointOrder.body17).
@@ -28,20 +54,62 @@ enum ObservationMapping {
     ) -> DetectionFrame<PoseDetection> {
         let w = Float(width), h = Float(height)
         let detections = observations.prefix(WireCounts.maxDetections).map { observation in
-            let joints = observation.allJoints()
-            let points = bodyJointNames.map { name -> WirePoint in
-                guard let joint = joints[name], joint.confidence > 0 else {
-                    return .missing(frameHeight: h)
-                }
-                return CoordinateMapper.point(
-                    normalizedX: joint.location.x,
-                    normalizedY: joint.location.y,
-                    confidence: joint.confidence,
+            PoseDetection(
+                confidence: observation.confidence,
+                joints: wirePoints(observation.allJoints(), order: bodyJointNames, frameWidth: w, frameHeight: h)
+            )
+        }
+        return DetectionFrame(width: width, height: height, detections: Array(detections))
+    }
+
+    // MARK: - 3D body poses
+
+    /// The 17 joints of /poses3d/arr, root first (JointOrder.body3D17).
+    private static let body3DJointNames: [HumanBodyPose3DObservation.JointName] = [
+        .root, .spine, .centerShoulder, .centerHead, .topHead,
+        .leftShoulder, .leftElbow, .leftWrist,
+        .rightShoulder, .rightElbow, .rightWrist,
+        .leftHip, .leftKnee, .leftAnkle,
+        .rightHip, .rightKnee, .rightAnkle
+    ]
+
+    #if DEBUG
+    nonisolated(unsafe) private static var loggedHeightTechnique = false
+    #endif
+
+    static func mapBodyPoses3D(
+        _ observations: [HumanBodyPose3DObservation],
+        width: Int32,
+        height: Int32
+    ) -> DetectionFrame<Pose3DDetection> {
+        let w = Float(width), h = Float(height)
+        let detections = observations.prefix(WireCounts.maxDetections).map { observation in
+            #if DEBUG
+            if !loggedHeightTechnique {
+                loggedHeightTechnique = true
+                print("[TrackOSC] 3D body height estimation: \(observation.heightEstimationTechnique)")
+            }
+            #endif
+            let joints = body3DJointNames.map { name -> WirePoint3D in
+                // Translation column of the camera-relative transform: metres.
+                let position = observation.cameraRelativePosition(for: name).columns.3
+                // Vision's 2D projection of the joint, normalized, origin
+                // bottom-left like every other Vision point.
+                let image = observation.pointInImage(for: name)
+                let projected = CoordinateMapper.point(
+                    normalizedX: image.x,
+                    normalizedY: image.y,
+                    confidence: 1,
                     frameWidth: w,
                     frameHeight: h
                 )
+                return WirePoint3D(x: position.x, y: position.y, z: position.z, px: projected.x, py: projected.y)
             }
-            return PoseDetection(confidence: observation.confidence, joints: points)
+            return Pose3DDetection(
+                confidence: observation.confidence,
+                bodyHeight: Float(observation.bodyHeight.converted(to: .meters).value),
+                joints: joints
+            )
         }
         return DetectionFrame(width: width, height: height, detections: Array(detections))
     }
@@ -66,20 +134,40 @@ enum ObservationMapping {
     ) -> DetectionFrame<HandDetection> {
         let w = Float(width), h = Float(height)
         let detections = observations.prefix(WireCounts.maxDetections).map { observation in
-            let joints = observation.allJoints()
-            let points = handJointNames.map { name -> WirePoint in
-                guard let joint = joints[name], joint.confidence > 0 else {
-                    return .missing(frameHeight: h)
-                }
-                return CoordinateMapper.point(
-                    normalizedX: joint.location.x,
-                    normalizedY: joint.location.y,
-                    confidence: joint.confidence,
-                    frameWidth: w,
-                    frameHeight: h
-                )
-            }
-            return HandDetection(confidence: observation.confidence, joints: points)
+            HandDetection(
+                confidence: observation.confidence,
+                joints: wirePoints(observation.allJoints(), order: handJointNames, frameWidth: w, frameHeight: h)
+            )
+        }
+        return DetectionFrame(width: width, height: height, detections: Array(detections))
+    }
+
+    // MARK: - Animal poses
+
+    /// The 25 joints of /animalposes/arr (JointOrder.animal25).
+    private static let animalJointNames: [AnimalBodyPoseObservation.JointName] = [
+        .nose, .leftEye, .rightEye,
+        .leftEarTop, .leftEarMiddle, .leftEarBottom,
+        .rightEarTop, .rightEarMiddle, .rightEarBottom,
+        .neck,
+        .leftFrontElbow, .leftFrontKnee, .leftFrontPaw,
+        .rightFrontElbow, .rightFrontKnee, .rightFrontPaw,
+        .leftBackElbow, .leftBackKnee, .leftBackPaw,
+        .rightBackElbow, .rightBackKnee, .rightBackPaw,
+        .tailTop, .tailMiddle, .tailBottom
+    ]
+
+    static func mapAnimalPoses(
+        _ observations: [AnimalBodyPoseObservation],
+        width: Int32,
+        height: Int32
+    ) -> DetectionFrame<AnimalPoseDetection> {
+        let w = Float(width), h = Float(height)
+        let detections = observations.prefix(WireCounts.maxDetections).map { observation in
+            AnimalPoseDetection(
+                confidence: observation.confidence,
+                joints: wirePoints(observation.allJoints(), order: animalJointNames, frameWidth: w, frameHeight: h)
+            )
         }
         return DetectionFrame(width: width, height: height, detections: Array(detections))
     }
@@ -202,5 +290,83 @@ enum ObservationMapping {
             )
         }
         return DetectionFrame(width: width, height: height, detections: Array(detections))
+    }
+
+    // MARK: - Humans
+
+    static func mapHumans(
+        _ observations: [HumanObservation],
+        width: Int32,
+        height: Int32
+    ) -> DetectionFrame<HumanDetection> {
+        let w = Float(width), h = Float(height)
+        let detections = observations.prefix(WireCounts.maxDetections).map { observation in
+            HumanDetection(
+                confidence: observation.confidence,
+                box: CoordinateMapper.rect(
+                    normalized: observation.boundingBox.cgRect,
+                    frameWidth: w,
+                    frameHeight: h
+                )
+            )
+        }
+        return DetectionFrame(width: width, height: height, detections: Array(detections))
+    }
+
+    // MARK: - Barcodes
+
+    static func mapBarcodes(
+        _ observations: [BarcodeObservation],
+        width: Int32,
+        height: Int32
+    ) -> DetectionFrame<BarcodeDetection> {
+        let w = Float(width), h = Float(height)
+        let detections = observations.prefix(WireCounts.maxDetections).map { observation in
+            let corners = [observation.topLeft, observation.topRight, observation.bottomRight, observation.bottomLeft]
+                .map { CoordinateMapper.xy(normalizedX: $0.x, normalizedY: $0.y, frameWidth: w, frameHeight: h) }
+            return BarcodeDetection(
+                confidence: observation.confidence,
+                box: CoordinateMapper.rect(
+                    normalized: observation.boundingBox.cgRect,
+                    frameWidth: w,
+                    frameHeight: h
+                ),
+                corners: corners,
+                symbology: symbologyName(observation.symbology),
+                payload: observation.payloadString ?? ""
+            )
+        }
+        return DetectionFrame(width: width, height: height, detections: Array(detections))
+    }
+
+    /// The wire's symbology string: VNBarcodeSymbology's names without the prefix.
+    static func symbologyName(_ symbology: BarcodeSymbology) -> String {
+        switch symbology {
+        case .aztec: "Aztec"
+        case .code39: "Code39"
+        case .code39Checksum: "Code39Checksum"
+        case .code39FullASCII: "Code39FullASCII"
+        case .code39FullASCIIChecksum: "Code39FullASCIIChecksum"
+        case .code93: "Code93"
+        case .code93i: "Code93i"
+        case .code128: "Code128"
+        case .dataMatrix: "DataMatrix"
+        case .ean8: "EAN8"
+        case .ean13: "EAN13"
+        case .i2of5: "I2of5"
+        case .i2of5Checksum: "I2of5Checksum"
+        case .itf14: "ITF14"
+        case .pdf417: "PDF417"
+        case .qr: "QR"
+        case .upce: "UPCE"
+        case .codabar: "Codabar"
+        case .gs1DataBar: "GS1DataBar"
+        case .gs1DataBarExpanded: "GS1DataBarExpanded"
+        case .gs1DataBarLimited: "GS1DataBarLimited"
+        case .microPDF417: "MicroPDF417"
+        case .microQR: "MicroQR"
+        case .msiPlessey: "MSIPlessey"
+        @unknown default: String(describing: symbology)
+        }
     }
 }
