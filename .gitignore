@@ -73,3 +73,8 @@ build/
 
 # Release build artifacts
 build/
+
+# Receiver examples: local environments and dependencies
+Examples/Python/.venv/
+__pycache__/
+Examples/p5js/bridge/node_modules/
