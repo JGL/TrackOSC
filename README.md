@@ -9,9 +9,9 @@
 
 Live camera → Apple Vision tracking → OSC. TrackOSC streams (almost) all of
 [Apple's Vision framework](https://developer.apple.com/documentation/vision)
-detection results — body poses, hand poses, face landmarks, text, and
-animals — over the network as
-[OSC (OpenSoundControl)](https://opensoundcontrol.stanford.edu) messages,
+detection results — body poses in 2D and 3D, hand poses, face landmarks,
+text, animals (boxes and skeletons), people, and barcodes — over the network
+as [OSC (OpenSoundControl)](https://opensoundcontrol.stanford.edu) messages,
 from an iPhone or a Mac, and visualises them in a companion receiver app.
 
 TrackOSC (formerly Poseiosc) is a native-Swift successor to
@@ -20,7 +20,7 @@ TrackOSC (formerly Poseiosc) is a native-Swift successor to
 speaks **exactly the same OSC wire format**, so existing VisionOSC/PoseOSC
 receivers (Processing, TouchDesigner, Max/MSP, openFrameworks…) work unchanged.
 
-Three apps plus an open receiver sketch:
+Three apps plus open receiver examples for eight creative-coding environments:
 
 - **TrackOSC** for iOS (iOS 18+, SwiftUI): live camera → Vision → OSC over UDP,
   with on-screen tracking overlays, per-detector toggles, front/back camera
@@ -31,13 +31,16 @@ Three apps plus an open receiver sketch:
   Camera — with a camera picker and a rig-rotation setting for cameras
   mounted sideways.
 - **TrackOSC Receiver** (macOS 15+, SwiftUI): listens on UDP (default port
-  9527), draws skeletons/landmarks/boxes with coordinate guides, shows
-  per-address message rates and a log, and advertises itself on the local
-  network so senders can find it.
-- **[Processing receiver sketch](Examples/Processing/TrackOSCReceiver/TrackOSCReceiver.pde)**
-  (Processing 4 + oscP5): a complete FLOSS receiver in one hackable file —
-  same drawing and coordinate guides as the native receiver — so you can
-  start making software on any platform without touching the Apple stack.
+  9527), draws skeletons/landmarks/boxes with coordinate guides, switches to
+  an orbitable 3D view for the 3D body poses, shows per-address message
+  rates and a log, and advertises itself on the local network so senders
+  can find it.
+- **[Receiver examples](Examples/README.md)** for Processing, Python, p5.js,
+  TouchDesigner, Max/MSP, Pure Data, openFrameworks and SuperCollider: each
+  is a complete, hackable receiver of every TrackOSC message — the same
+  drawing (or a sonification) as the native receiver — so you can start
+  making software on the platform you already use, without touching the
+  Apple stack.
 
 The Mac apps are downloadable, notarised builds; the iOS app is
 [free on the App Store](https://apps.apple.com/app/trackosc/id6795593815)
@@ -80,11 +83,13 @@ All downloads are signed and notarised — no Gatekeeper hoops.
   `127.0.0.1`.
 - **iPhone sender**: get [TrackOSC on the App Store](https://apps.apple.com/app/trackosc/id6795593815)
   (free, iOS 18+).
-- **Processing receiver**: no Apple anything required — open
-  [`Examples/Processing/TrackOSCReceiver`](Examples/Processing/TrackOSCReceiver/TrackOSCReceiver.pde)
-  in [Processing](https://processing.org), install the **oscP5** library
-  (Sketch → Import Library… → Manage Libraries), and run. See
-  [Processing receiver example](#processing-receiver-example) for details.
+- **Receiver examples**: no Apple anything required — open the
+  [Processing sketch](Examples/Processing/TrackOSCReceiver/TrackOSCReceiver.pde)
+  in [Processing](https://processing.org) with the **oscP5** library, run
+  the [Python](Examples/Python/) or [p5.js](Examples/p5js/) receiver, or
+  pick TouchDesigner, Max/MSP, Pure Data, openFrameworks or SuperCollider
+  from [`Examples/`](Examples/README.md). See
+  [Receiver examples](#receiver-examples) for details.
 
 Everything below is only needed if you want to build from source.
 
@@ -155,10 +160,13 @@ click. Send to `127.0.0.1` to feed a receiver on the same Mac.
    TouchDesigner, Max/MSP, Processing, etc. on any port.)
 3. Point the camera at a person: a skeleton appears on the sender's overlay
    and, live, on the receiver's canvas.
-4. Toggle detectors with the chips along the bottom (Body / Hand / Face /
-   Text / Animal). More detectors = lower frame rate; body+hand+face is the
-   comfortable default. The status capsule shows destination, transmitted
-   frame size, and processed fps.
+4. Toggle detectors with the chips along the bottom (2D Body / 3D Body /
+   Hand / Face / Text / Animal / Animal Pose / Human / Barcode — the row
+   scrolls sideways on the iPhone). More detectors = lower frame rate;
+   2D Body + Hand + Face is the comfortable default. **3D Body** runs in its
+   own lane at its own, lower rate so it never slows the other detectors;
+   its rate is shown in Settings → Statistics. The status capsule shows
+   destination, transmitted frame size, and processed fps.
 5. Selfie-style previews are mirrored by default (like the Camera app) so
    they feel natural — but the OSC coordinates sent to receivers are
    **always unmirrored**, matching VisionOSC. Turn the mirror off in the
@@ -192,10 +200,13 @@ The shared package includes two CLI tools (run from `PoseioscShared/`):
 swift run poseiosc-testsend 127.0.0.1 9527
 ```
 
-sends synthetic animated frames of all message types — point it at the
-receiver and you should see a walking stick figure, a waving hand, a face
-ring, a "HELLO" text box, and a "Cat" box. Add `--landscape` to send
-landscape-oriented frames instead of portrait.
+sends synthetic animated frames of all twelve message types — point it at
+the receiver and you should see a walking stick figure, a waving hand, a
+face ring with box and jawline, a "HELLO" text box, a "Cat" box, a 3D
+figure two metres from the camera (switch the receiver to **3D**), a QR
+code, a quadruped skeleton, and a human box. Add `--landscape` to send
+landscape-oriented frames instead of portrait. Without Xcode,
+`python3 Examples/Python/trackosc_testsend.py` sends the same scene.
 
 ```bash
 swift run poseiosc-testlisten 9527
@@ -204,20 +215,35 @@ swift run poseiosc-testlisten 9527
 is a headless decoder that prints one line per received message (quit the
 receiver app first — only one process can bind the port).
 
-### Processing receiver example
+### Receiver examples
 
-[`Examples/Processing/TrackOSCReceiver`](Examples/Processing/TrackOSCReceiver/TrackOSCReceiver.pde)
-is a complete [Processing](https://processing.org) receiver sketch — a FLOSS
-starting point for modding and tinkering with no Apple toolchain required.
-It parses every TrackOSC message, draws skeletons, face landmarks, the face
-box + jawline contour, and text/animal boxes, and shows the same coordinate
-guides as the native receiver.
+[`Examples/`](Examples/README.md) holds a complete receiver for every
+TrackOSC message in eight environments — FLOSS starting points for modding
+and tinkering with no Apple toolchain required. Each parses all twelve
+messages, draws (or sonifies) them, and shows the same coordinate guides as
+the native receiver; joint orders and edge lists are shared via
+[`Examples/SKELETONS.md`](Examples/SKELETONS.md).
 
-1. Install the **oscP5** library (Sketch → Import Library… → Manage
-   Libraries → search "oscP5").
-2. Open and run the sketch — it listens on port 9527.
-3. Point a TrackOSC sender at your machine, or use
-   `swift run poseiosc-testsend 127.0.0.1 9527` for a synthetic scene.
+- **[Processing](Examples/Processing/)** (oscP5): the 2D reference sketch,
+  plus a P3D sketch drawing the 3D body poses in real 3D.
+- **[Python](Examples/Python/)** (python-osc + pygame): a parser package, a
+  window, a headless printer, and a synthetic sender.
+- **[p5.js](Examples/p5js/)**: a Node bridge (browsers can't receive UDP)
+  and a sketch; the client works in any web page.
+- **[TouchDesigner](Examples/TouchDesigner/)**: OSC In DAT callbacks that
+  fill Table DATs, a Script SOP, and a network recipe.
+- **[Max/MSP](Examples/Max/)**: a `[js]` parser, a drawing patch, and a
+  sonification.
+- **[Pure Data](Examples/PureData/)** (vanilla): parse and joint-picking
+  abstractions plus a sonification demo.
+- **[openFrameworks](Examples/openFrameworks/)** (ofxOsc): a reusable C++
+  parser with 2D and 3D views.
+- **[SuperCollider](Examples/SuperCollider/)**: OSCdefs, sonification, and a
+  drawing window.
+
+The Processing, Python and p5.js examples were run by the maintainer; the
+others were written from their platforms' documentation and are waiting for
+someone with that tool installed to confirm them — pull requests welcome.
 
 ### Hiding the video
 
@@ -399,6 +425,60 @@ an **open** polyline from ear to chin to ear; don't close it. `m` varies by
 OS version (typically 17) and is 0 when Vision reports no contour for that
 face — always loop on `m`, never hardcode it.
 
+### 3D body, barcode, animal-pose and human messages (TrackOSC addition, v1.4)
+
+Four more additive messages, each behind its own detector chip. VisionOSC
+receivers ignore them; the messages above are untouched. All start with the
+standard width/height/n header, and every coordinate that is a pixel uses
+the same convention as everything else (oriented frame, origin top-left,
+never mirrored).
+
+**`/poses3d/arr`** — per pose (fixed stride: pose *i* starts at argument
+`3 + i×87`; joint *j* of pose *i* at `3 + i×87 + 2 + j×5`):
+
+| Type | Value |
+|------|-------|
+| float | confidence |
+| float | estimated body height in **metres** |
+| 17 × (float x, float y, float z, float px, float py) | per joint: position in **metres** in Vision's camera-relative space, then the same joint projected into the frame in **pixels** |
+
+Joint order (Vision's 3D skeleton, root first — *not* the PoseNet order of
+`/poses/arr`): root, spine, centerShoulder, centerHead, topHead,
+leftShoulder, leftElbow, leftWrist, rightShoulder, rightElbow, rightWrist,
+leftHip, leftKnee, leftAnkle, rightHip, rightKnee, rightAnkle. All 17 joints
+are always present — there is no missing-joint sentinel. The metric space is
+right-handed with the camera at the origin, x to the right and y up; z runs
+along the camera's axis (the receiver's 3D view and the Processing 3D
+sketch each have a single sign constant should your device report it the
+other way). The pixel projections let 2D-only receivers draw the 3D
+skeleton without any projection maths. On iPhone the heights are measured
+using the camera's intrinsics; on a Mac they are estimated from a reference
+height. `/poses3d/arr` is sent at the 3D detector's own rate, typically
+lower than the other messages.
+
+**`/barcodes/arr`** — per code: `float` confidence, `float` left, top,
+width, height (axis-aligned box), then 4 × (`float` x, `float` y) — the
+corners of the code in **its own orientation**, top-left, top-right,
+bottom-right, bottom-left (draw them as a closed quadrilateral) — then
+`string` symbology (`QR`, `EAN13`, `Code128`, `DataMatrix`, `Aztec`,
+`PDF417`, `MicroQR`, …) and `string` payload (empty when none).
+
+**`/animalposes/arr`** — per animal: `float` confidence, then 25 joints ×
+(`float` x, `float` y, `float` confidence), same conventions as
+`/poses/arr` including the missing-joint sentinel. Joint order: nose,
+leftEye, rightEye, leftEarTop, leftEarMiddle, leftEarBottom, rightEarTop,
+rightEarMiddle, rightEarBottom, neck, leftFrontElbow, leftFrontKnee,
+leftFrontPaw, rightFrontElbow, rightFrontKnee, rightFrontPaw,
+leftBackElbow, leftBackKnee, leftBackPaw, rightBackElbow, rightBackKnee,
+rightBackPaw, tailTop, tailMiddle, tailBottom.
+
+**`/humans/arr`** — per person: `float` confidence, `float` left, top,
+width, height. A whole-body box with no skeleton — cheap, and it counts
+people at distances where pose estimation gives up.
+
+Edge lists for drawing all four skeletons, and the colours the apps use,
+are in [`Examples/SKELETONS.md`](Examples/SKELETONS.md).
+
 ## Project layout
 
 ```
@@ -410,8 +490,11 @@ SenderCore/            Platform-neutral sender pipeline shared by both
                        senders (Vision processing, OSC, Bonjour, overlay)
 Sender/                iOS sender app shell (camera, rotation, UI)
 SenderMac/             macOS sender app shell (camera picker, rig rotation)
-Receiver/              macOS receiver (OSC server, visualiser, log, Bonjour)
-Examples/              Processing (oscP5) reference receiver sketch
+Receiver/              macOS receiver (OSC server, 2D + 3D visualisers, log, Bonjour)
+Examples/              Receiver examples: Processing, Python, p5.js, TouchDesigner,
+                       Max/MSP, Pure Data, openFrameworks, SuperCollider — see
+                       Examples/README.md; Examples/SKELETONS.md is the shared
+                       joint-order/edge-list reference
 Scripts/               Notarised-release tooling
 PROMPTS_AND_DECISIONS.md   Running record of prompts and design decisions
 ```
