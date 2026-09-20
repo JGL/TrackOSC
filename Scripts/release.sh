@@ -20,6 +20,13 @@ set -euo pipefail
 
 cd "$(dirname "$0")/.."
 
+# System paths first: Xcode's export step runs /usr/bin/rsync (openrsync),
+# which spawns its server half by looking up `rsync` on PATH. With
+# Homebrew's rsync found first, that server rejects openrsync's flags and
+# xcodebuild fails with only "exportArchive Copy failed". gh and friends
+# are still found further along PATH.
+export PATH="/usr/bin:/bin:/usr/sbin:/sbin:$PATH"
+
 DRY_RUN=0
 [[ "${1:-}" == "--dry-run" ]] && DRY_RUN=1
 
@@ -89,11 +96,11 @@ fi
 echo "--- Publishing GitHub release v$VERSION"
 gh release create "v$VERSION" "${ASSETS[@]}" \
     --title "TrackOSC $VERSION" \
-    --notes "macOS TrackOSC apps, $VERSION — signed and notarized; download, unzip, and open.
+    --notes "macOS TrackOSC apps, $VERSION — signed and notarised; download, unzip, and open.
 
-- **TrackOSCReceiver**: listens for OSC tracking data and visualizes it.
+- **TrackOSCReceiver**: listens for OSC tracking data and visualises it, in 2D and 3D.
 - **TrackOSCSender**: Mac camera (built-in, external, or iPhone via Continuity Camera) → Vision tracking → OSC.
 
-The iOS sender is distributed via TestFlight. To build from source, see the README."
+The iOS sender is free on the App Store: https://apps.apple.com/app/trackosc/id6795593815. To build from source, see the README."
 
 echo "=== Done: https://github.com/JGL/TrackOSC/releases/tag/v$VERSION ==="
