@@ -8,6 +8,7 @@
 //  single pending slot, so latency stays bounded and stale frames are dropped.
 //
 
+import CoreMedia
 import CoreVideo
 import ImageIO
 import os.lock
@@ -15,6 +16,10 @@ import os.lock
 /// One camera frame plus the orientation Vision needs to interpret it, and the
 /// oriented (display-space) pixel dimensions all wire coordinates refer to.
 struct FrameBox: @unchecked Sendable {
+    /// The whole sample buffer: carries the camera-intrinsics attachment (when
+    /// the capture connection delivers it) and the timestamp Vision's
+    /// stateful 3D request keys on. Same backing store as `pixelBuffer`.
+    let sampleBuffer: CMSampleBuffer
     let pixelBuffer: CVPixelBuffer
     let orientation: CGImagePropertyOrientation
     let orientedWidth: Int32

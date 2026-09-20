@@ -46,6 +46,15 @@ struct SidebarView: View {
             .padding(.top, 4)
 
             HStack {
+                Text("Unknown / undecodable")
+                Spacer()
+                Text("\(model.unknownMessages)")
+                    .font(.system(.body, design: .monospaced))
+            }
+            .foregroundStyle(model.unknownMessages > 0 ? .orange : .secondary)
+            .help("Messages whose address or layout the receiver doesn't understand; the log shows one line per address every few seconds.")
+
+            HStack {
                 Text("Camera")
                 Spacer()
                 Text(cameraLabel)
@@ -80,8 +89,13 @@ struct SidebarView: View {
                     Text(entry.time, format: Self.timeFormat)
                         .foregroundStyle(.secondary)
                     Text(entry.address)
-                    Text("n=\(entry.detectionCount)")
-                        .foregroundStyle(.secondary)
+                    if let note = entry.note {
+                        Text(note)
+                            .foregroundStyle(.orange)
+                    } else {
+                        Text("n=\(entry.detectionCount)")
+                            .foregroundStyle(.secondary)
+                    }
                     Spacer()
                     Text(entry.senderHost)
                         .foregroundStyle(.tertiary)

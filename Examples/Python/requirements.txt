@@ -1,0 +1,4 @@
+python-osc>=1.9
+# pygame-ce is the community edition of pygame; it imports as `pygame` and has
+# wheels for current CPython versions (tested: 2.5.8 on Python 3.14).
+pygame-ce>=2.5

@@ -1,0 +1,21 @@
+{
+  "name": "trackosc-bridge",
+  "version": "1.4.0",
+  "description": "Relays TrackOSC OSC messages (UDP) to browsers as JSON over WebSocket, and serves the p5.js sketch.",
+  "license": "MIT",
+  "private": true,
+  "bin": {
+    "trackosc-bridge": "bridge.js"
+  },
+  "scripts": {
+    "start": "node bridge.js",
+    "test": "node --test test/bridge.test.js ../sketch/test/client.test.js"
+  },
+  "dependencies": {
+    "osc": "^2.4.5",
+    "ws": "^8.18.0"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

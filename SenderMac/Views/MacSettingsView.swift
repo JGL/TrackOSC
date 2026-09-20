@@ -88,6 +88,7 @@ struct MacSettingsView: View {
                 Section("Statistics") {
                     LabeledContent("Messages sent", value: "\(model.sentCount)")
                     LabeledContent("Processed", value: "\(Int(model.processedFPS)) fps")
+                    LabeledContent("3D body", value: model.settings.isEnabled(.poses3D) ? "\(Int(model.pose3DFPS)) fps" : "off")
                     LabeledContent("Frame", value: frameDescription)
                     LabeledContent("App version", value: appVersion)
                 }

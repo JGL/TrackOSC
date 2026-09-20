@@ -36,8 +36,8 @@ settings:
     STRING_CATALOG_GENERATE_SYMBOLS: YES
     # Shared by both apps. Bump CURRENT_PROJECT_VERSION for every TestFlight
     # upload; MARKETING_VERSION is the user-facing version and release tag.
-    MARKETING_VERSION: "1.3.0"
-    CURRENT_PROJECT_VERSION: "8"
+    MARKETING_VERSION: "1.4.0"
+    CURRENT_PROJECT_VERSION: "9"
 
 targets:
   PoseioscSender:
@@ -64,7 +64,7 @@ targets:
         # Standard-encryption-only exemption: skips the export compliance
         # question on every TestFlight upload.
         ITSAppUsesNonExemptEncryption: false
-        NSCameraUsageDescription: "Camera frames are analyzed on-device to detect bodies, hands, faces, text, and animals. No video leaves the phone — only OSC tracking data."
+        NSCameraUsageDescription: "Camera frames are analyzed on-device to detect bodies (2D and 3D), hands, faces, text, animals, and barcodes. No video leaves the phone — only OSC tracking data."
         NSLocalNetworkUsageDescription: "TrackOSC sends OSC tracking data to receivers on your local network and browses for them via Bonjour."
         NSBonjourServices: ["_osc._udp"]
         UILaunchScreen: {}
@@ -98,7 +98,7 @@ targets:
         CFBundleDisplayName: TrackOSC Sender
         CFBundleShortVersionString: $(MARKETING_VERSION)
         CFBundleVersion: $(CURRENT_PROJECT_VERSION)
-        NSCameraUsageDescription: "Camera frames are analyzed on-device to detect bodies, hands, faces, text, and animals. No video leaves this Mac — only OSC tracking data."
+        NSCameraUsageDescription: "Camera frames are analyzed on-device to detect bodies (2D and 3D), hands, faces, text, animals, and barcodes. No video leaves this Mac — only OSC tracking data."
         NSLocalNetworkUsageDescription: "TrackOSC Sender sends OSC tracking data to receivers on your local network and browses for them via Bonjour."
         NSBonjourServices: ["_osc._udp"]
     settings:

@@ -13,27 +13,9 @@ struct ControlBarView: View {
 
     var body: some View {
         VStack(spacing: 12) {
-            HStack(spacing: 8) {
-                DetectorChip(label: "Body", color: .green, isOn: model.settings.detectPoses) {
-                    model.settings.detectPoses.toggle()
-                    model.applySettings()
-                }
-                DetectorChip(label: "Hand", color: .orange, isOn: model.settings.detectHands) {
-                    model.settings.detectHands.toggle()
-                    model.applySettings()
-                }
-                DetectorChip(label: "Face", color: .cyan, isOn: model.settings.detectFaces) {
-                    model.settings.detectFaces.toggle()
-                    model.applySettings()
-                }
-                DetectorChip(label: "Text", color: .yellow, isOn: model.settings.detectTexts) {
-                    model.settings.detectTexts.toggle()
-                    model.applySettings()
-                }
-                DetectorChip(label: "Animal", color: .pink, isOn: model.settings.detectAnimals) {
-                    model.settings.detectAnimals.toggle()
-                    model.applySettings()
-                }
+            DetectorChipRow(isOn: model.settings.isEnabled) { detector in
+                model.settings.toggle(detector)
+                model.applySettings()
             }
 
             HStack {

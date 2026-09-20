@@ -175,6 +175,110 @@ func syntheticAnimal(time t: Double) -> BoxDetection {
     )
 }
 
+/// A 1.75 m figure walking on the spot about 2 m from the camera, in metres
+/// (Vision camera-relative space: x right, y up), with each joint's pixel
+/// projection computed by a simple pinhole model so the 2D and 3D pictures
+/// agree. The sign of z is provisional until confirmed on device.
+func syntheticPose3D(time t: Double) -> Pose3DDetection {
+    let w = Float(frameWidth), h = Float(frameHeight)
+    let tf = Float(t)
+    let drift = sinf(tf * 0.5) * 0.4          // sway left/right
+    let swing = sinf(tf * 4) * 0.15           // arm/leg swing along z
+    let distance: Float = 2.0                 // metres from the camera
+    let focal = h * 0.7                       // pinhole focal length in pixels
+    let ry: Float = -0.2                      // root (hip) height relative to the camera
+
+    func j(_ x: Float, _ y: Float, _ dz: Float = 0) -> WirePoint3D {
+        let z = distance + dz
+        return WirePoint3D(x: x, y: y, z: z, px: w / 2 + x * focal / z, py: h / 2 - y * focal / z)
+    }
+
+    return Pose3DDetection(confidence: 0.93, bodyHeight: 1.75, joints: [
+        j(drift, ry),                                   // root
+        j(drift, ry + 0.25),                            // spine
+        j(drift, ry + 0.50),                            // centerShoulder
+        j(drift, ry + 0.65),                            // centerHead
+        j(drift, ry + 0.78),                            // topHead
+        j(drift - 0.20, ry + 0.50),                     // leftShoulder
+        j(drift - 0.25, ry + 0.25, swing),              // leftElbow
+        j(drift - 0.28, ry, swing * 2),                 // leftWrist
+        j(drift + 0.20, ry + 0.50),                     // rightShoulder
+        j(drift + 0.25, ry + 0.25, -swing),             // rightElbow
+        j(drift + 0.28, ry, -swing * 2),                // rightWrist
+        j(drift - 0.10, ry),                            // leftHip
+        j(drift - 0.12, ry - 0.45, -swing),             // leftKnee
+        j(drift - 0.12, ry - 0.90, -swing * 1.5),       // leftAnkle
+        j(drift + 0.10, ry),                            // rightHip
+        j(drift + 0.12, ry - 0.45, swing),              // rightKnee
+        j(drift + 0.12, ry - 0.90, swing * 1.5)         // rightAnkle
+    ])
+}
+
+/// A QR code held in the lower-right quarter, rocking gently so the corner
+/// order (TL, TR, BR, BL) is visible on screen.
+func syntheticBarcode(time t: Double) -> BarcodeDetection {
+    let w = Float(frameWidth), h = Float(frameHeight)
+    let cx = w * 0.62, cy = h * 0.58
+    let half: Float = 90
+    let angle = sinf(Float(t) * 0.8) * 0.2
+    func corner(_ dx: Float, _ dy: Float) -> WireXY {
+        WireXY(
+            x: cx + dx * cosf(angle) - dy * sinf(angle),
+            y: cy + dx * sinf(angle) + dy * cosf(angle)
+        )
+    }
+    let corners = [corner(-half, -half), corner(half, -half), corner(half, half), corner(-half, half)]
+    let xs = corners.map(\.x), ys = corners.map(\.y)
+    return BarcodeDetection(
+        confidence: 1.0,
+        box: WireRect(left: xs.min()!, top: ys.min()!, width: xs.max()! - xs.min()!, height: ys.max()! - ys.min()!),
+        corners: corners,
+        symbology: "QR",
+        payload: "https://github.com/JGL/TrackOSC"
+    )
+}
+
+/// A side-view quadruped in the lower-right, legs stepping and tail wagging,
+/// with one joint (the far eye) missing to exercise the sentinel.
+func syntheticAnimalPose(time t: Double) -> AnimalPoseDetection {
+    let w = Float(frameWidth), h = Float(frameHeight)
+    let cx = w * 0.7 + cosf(Float(t) * 0.8) * w * 0.08, cy = h * 0.82
+    let step = sinf(Float(t) * 4) * 18
+    let wag = sinf(Float(t) * 6) * 12
+    func p(_ x: Float, _ y: Float) -> WirePoint { WirePoint(x: cx + x, y: cy + y, confidence: 0.85) }
+    let missing = WirePoint.missing(frameHeight: h)
+
+    return AnimalPoseDetection(confidence: 0.88, joints: [
+        p(110, -40),                 // nose
+        p(85, -60),                  // leftEye
+        missing,                     // rightEye (occluded in side view)
+        p(60, -95), p(65, -80), p(70, -65),     // leftEarTop/Middle/Bottom
+        p(48, -92), p(53, -78), p(58, -64),     // rightEarTop/Middle/Bottom
+        p(50, -40),                  // neck
+        p(45, 5), p(45 + step, 40), p(45 + step * 1.5, 75),          // left front leg
+        p(57, 5), p(57 - step, 40), p(57 - step * 1.5, 75),          // right front leg
+        p(-55, 5), p(-55 - step, 40), p(-55 - step * 1.5, 75),       // left back leg
+        p(-43, 5), p(-43 + step, 40), p(-43 + step * 1.5, 75),       // right back leg
+        p(-80, -30), p(-115, -45 + wag), p(-145, -40 + wag * 2)      // tailTop/Middle/Bottom
+    ])
+}
+
+/// A whole-body box hugging the synthetic 2D pose.
+func syntheticHuman(time t: Double) -> HumanDetection {
+    let joints = syntheticPose(time: t).joints
+    let xs = joints.map(\.x), ys = joints.map(\.y)
+    let margin: Float = 40
+    return HumanDetection(
+        confidence: 0.97,
+        box: WireRect(
+            left: xs.min()! - margin,
+            top: ys.min()! - margin,
+            width: xs.max()! - xs.min()! + margin * 2,
+            height: ys.max()! - ys.min()! + margin * 2
+        )
+    )
+}
+
 let start = Date()
 while true {
     let t = Date().timeIntervalSince(start)
@@ -186,7 +290,11 @@ while true {
         WireCodec.encodeFaceBoxes(DetectionFrame(width: frameWidth, height: frameHeight, detections: [syntheticFaceBox(time: t)])),
         WireCodec.encodeFaceContours(DetectionFrame(width: frameWidth, height: frameHeight, detections: [syntheticFaceContour(time: t)])),
         WireCodec.encodeTexts(DetectionFrame(width: frameWidth, height: frameHeight, detections: [syntheticText(time: t)])),
-        WireCodec.encodeAnimals(DetectionFrame(width: frameWidth, height: frameHeight, detections: [syntheticAnimal(time: t)]))
+        WireCodec.encodeAnimals(DetectionFrame(width: frameWidth, height: frameHeight, detections: [syntheticAnimal(time: t)])),
+        WireCodec.encodePoses3D(DetectionFrame(width: frameWidth, height: frameHeight, detections: [syntheticPose3D(time: t)])),
+        WireCodec.encodeBarcodes(DetectionFrame(width: frameWidth, height: frameHeight, detections: [syntheticBarcode(time: t)])),
+        WireCodec.encodeAnimalPoses(DetectionFrame(width: frameWidth, height: frameHeight, detections: [syntheticAnimalPose(time: t)])),
+        WireCodec.encodeHumans(DetectionFrame(width: frameWidth, height: frameHeight, detections: [syntheticHuman(time: t)]))
     ]
     for message in messages {
         do {

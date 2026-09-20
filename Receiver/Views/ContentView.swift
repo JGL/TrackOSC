@@ -1,6 +1,6 @@
 //
 //  ContentView.swift
-//  Poseiosc Receiver (macOS)
+//  TrackOSC Receiver (macOS)
 //
 
 import SwiftUI
@@ -11,13 +11,32 @@ struct ContentView: View {
 
     var body: some View {
         HSplitView {
-            VisualizerView(model: model)
-                .frame(minWidth: 400, maxWidth: .infinity, maxHeight: .infinity)
+            Group {
+                switch model.visualizerMode {
+                case .twoD:
+                    VisualizerView(model: model)
+                case .threeD:
+                    Visualizer3DView(model: model)
+                }
+            }
+            .frame(minWidth: 400, maxWidth: .infinity, maxHeight: .infinity)
             SidebarView(model: model)
                 .frame(minWidth: 300, idealWidth: 340, maxWidth: 460)
         }
         .toolbar {
             ToolbarItemGroup {
+                Picker("View", selection: $model.visualizerMode) {
+                    ForEach(VisualizerMode.allCases) { mode in
+                        Text(mode.rawValue).tag(mode)
+                    }
+                }
+                .pickerStyle(.segmented)
+                .help("2D: every message in wire pixels. 3D: /poses3d/arr in metres.")
+
+                if model.visualizerMode == .threeD {
+                    Button("Reset view") { model.resetViewToken += 1 }
+                }
+
                 Circle()
                     .fill(model.isListening ? .green : .red)
                     .frame(width: 10, height: 10)

@@ -134,6 +134,7 @@ extension MacCameraManager: AVCaptureVideoDataOutputSampleBufferDelegate {
         let swapped = VisionAngle.isQuarterTurn(angle)
 
         conveyor.submit(FrameBox(
+            sampleBuffer: sampleBuffer,
             pixelBuffer: pixelBuffer,
             orientation: VisionAngle.orientation(forDegrees: angle),
             orientedWidth: swapped ? bufferHeight : bufferWidth,

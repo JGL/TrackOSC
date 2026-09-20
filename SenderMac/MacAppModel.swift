@@ -18,12 +18,16 @@ final class MacAppModel {
 
     private(set) var overlay = OverlaySnapshot()
     private(set) var processedFPS: Double = 0
+    /// Rate of the 3D body lane, which runs independently of the main pipeline.
+    private(set) var pose3DFPS: Double = 0
     private(set) var cameras: [CameraOption] = []
 
     var sentCount: UInt64 { oscSender.counters.sent }
 
     private var processor: VisionProcessor?
     private var recentProcessTimes: [Date] = []
+    private var recentPose3DTimes: [Date] = []
+    private var lastPose3DSequence: UInt64 = 0
 
     func start() {
         oscSender.setDestination(host: settings.host, port: settings.port)
@@ -75,5 +79,12 @@ final class MacAppModel {
         recentProcessTimes.append(now)
         recentProcessTimes.removeAll { now.timeIntervalSince($0) > 1.0 }
         processedFPS = Double(recentProcessTimes.count)
+
+        if snapshot.poses3DSequence != lastPose3DSequence {
+            lastPose3DSequence = snapshot.poses3DSequence
+            recentPose3DTimes.append(now)
+        }
+        recentPose3DTimes.removeAll { now.timeIntervalSince($0) > 1.0 }
+        pose3DFPS = Double(recentPose3DTimes.count)
     }
 }

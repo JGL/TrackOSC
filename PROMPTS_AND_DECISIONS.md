@@ -378,6 +378,105 @@ Joel's own.
   sketch is a reference *consumer* for tinkering, not a replacement.
 - Versions to 1.3.0 (build 8).
 
+## v1.4 — 3D tracking, more detectors, receiver examples (2026-09-18)
+
+Joel's brief: 3D body tracking (`VNDetectHumanBodyPose3DRequest`) on both
+senders with 3D visualisation in the receiver and Processing; "are there
+other things you could track? barcodes and QR codes?"; receiver demos for
+openFrameworks, TouchDesigner, Max/MSP and Pure Data — "let's plan
+together". Planned in plan mode, then built phase by phase on
+`feature/v1.4`.
+
+- **Wire format — four additive messages**, on the v1.3 precedent; the five
+  VisionOSC addresses and the v1.1/v1.3 additions are byte-for-byte
+  unchanged (their golden tests untouched).
+  - `/poses3d/arr` carries **metres and pixels per joint** (conf,
+    bodyHeight, 17 × (x, y, z, px, py)). Chosen over metres-only or two
+    messages so that 2D-only consumers can draw it without projection
+    maths, and 3D consumers get depth — one self-contained message. The 3D
+    joint set is Vision's (root-first, no eyes/ears), so it has its own
+    joint order and edge list rather than reusing PoseNet's.
+  - `/barcodes/arr`: box + the four corners in the code's own orientation
+    (TL, TR, BR, BL) + symbology + payload. Corners because a rotated QR's
+    axis-aligned box is not enough for anything spatial.
+  - `/animalposes/arr` (25 joints, a curated order grouped head → neck →
+    legs → tail rather than the SDK's declaration order) and `/humans/arr`
+    (box only) — Joel chose all three of the offered extra detectors.
+  - Decoders now reject negative counts instead of trapping, and clamp
+    up-front allocations to the 32-detection cap (retrofitted to the
+    existing decoders too; encodings unchanged).
+- **Senders — a `Detector` enum** (`SenderCore/Detector.swift`) replaced
+  the five flat toggle fields duplicated across ~14 sites; chips, overlay
+  colours, defaults and UserDefaults keys all derive from it. The legacy
+  five keys keep their names so an upgrade preserves settings. Nine chips
+  ("2D Body", "3D Body", "Hand", "Face", "Text", "Animal", "Animal Pose",
+  "Human", "Barcode") in a horizontally scrolling row.
+- **3D runs in its own lane.** `DetectHumanBodyPose3DRequest` is a stateful
+  class and ~50–100 ms per frame; in the per-frame `async let` batch it
+  would have dragged every other detector down to its rate. It now gets the
+  latest frame parked for it and sends `/poses3d/arr` whenever it finishes
+  — the same latest-frame-wins idea as the FrameConveyor. Consequence,
+  documented: the 3D message has its own, lower rate, shown in Settings.
+- **Camera intrinsics (iOS only).** `FrameBox` now carries the
+  `CMSampleBuffer`; the iOS capture connection enables intrinsic-matrix
+  delivery (stabilisation off) and the 3D lane performs on the sample
+  buffer, so Vision measures heights instead of estimating them. The API
+  is unavailable on macOS, so Mac heights are reference estimates.
+- **Receiver 3D view — RealityKit, not SceneKit.** The plan started with
+  SceneKit; switched to RealityKit (`RealityView` + `PerspectiveCamera`,
+  macOS 15+) because Apple announced SceneKit's deprecation at WWDC 2025.
+  Finding: `.realityViewCameraControls(.orbit)` moves an explicit camera
+  entity to the origin (everything clipped to black), so the view drives
+  its own orbit from drag/pinch gestures and "Reset view" is a state reset.
+  Floor grid and bones are thin boxes/cylinders (RealityKit has no line
+  primitives); entities are pooled per pose index, nothing allocated per
+  tick; the floor eases to the lowest ankle.
+- **Receiver surfaces unknown/undecodable messages** (counter + one log
+  line per address every 5 s with the reason) instead of dropping them
+  silently — the single most useful affordance for anyone bringing up a
+  new receiver or sender.
+- **Receiver examples** for seven more platforms, all sharing the
+  running-argument-cursor parsing idiom from the Processing sketch and one
+  reference block (`Examples/SKELETONS.md`, marker `TRACKOSC SKELETON
+  REFERENCE v1.4`) so stale copies are greppable. Decisions per platform:
+  Max uses a `[js]` parser rather than `[zl]`/`[route]` chains (76-point
+  faces and count-prefixed contours) and `[jit.lcd]` for drawing; Pd stays
+  vanilla (`[netreceive -u -b]` → `[oscparse]`); TouchDesigner ships text
+  only (OSC In DAT callbacks + recipe) because `.toe` is binary; p5.js
+  needs a Node bridge because browsers can't receive UDP; the Python
+  example includes `trackosc_testsend.py` so receivers can be tested with
+  no Xcode. Honesty rule: each README states whether the author ran it
+  (Processing, Python, p5.js: yes; TouchDesigner: parser only; Max, Pd,
+  openFrameworks, SuperCollider: written from documentation, validated
+  mechanically) and asks for version reports.
+- **Axis convention** of Vision's camera-relative z is deliberately left as
+  a single flip constant in the receiver (`Pose3DScene.axisSign`), the
+  Processing 3D sketch (`Z_SIGN`) and the synthetic senders, to be set once
+  after the on-device check (stand 2 m away: read z; step sideways: x;
+  crouch: y) and then written into the README.
+- Versions to 1.4.0 (build 9); camera purpose strings mention barcodes.
+
+### Verification record (2026-09-18)
+
+- `swift test` in `PoseioscShared`: 49 tests in 5 suites green (26 existing
+  + 23 new: round-trips, golden bytes with exact type tags, malformed and
+  negative-count input, skeleton index checks).
+- `xcodebuild` clean for `TrackOSCSender` (generic iOS, signing off),
+  `TrackOSCSenderMac` and `TrackOSCReceiver`.
+- Loopback: `poseiosc-testsend` → `poseiosc-testlisten` decodes all twelve
+  addresses; → receiver 2D (all four new kinds drawn) and 3D (mint figure
+  walking on the grid, hides within 0.5 s of the sender stopping);
+  120 bogus/truncated datagrams → counter 240, two throttled log lines.
+- Processing 2D and 3D sketches compiled and run with the Processing 4.5.6
+  CLI against `poseiosc-testsend`; Python (11 unit tests, both senders →
+  printer, pygame window) and p5.js (13 node tests, page in a browser)
+  likewise; TouchDesigner callbacks pass 4 mock tests; Max patch JSON and
+  Pd patches machine-validated.
+- Pending on Joel's hardware: the 3D axis check on iPhone and Mac, barcode
+  corner order under rotation, animal skeleton on a real cat, fps/thermal
+  with 3D on, settings persistence across the upgrade; then merge, notarised
+  Mac release and App Store 1.4.0.
+
 ## Verification record (2026-07-28)
 
 - `swift test` in `PoseioscShared`: 18 tests green, including round-trips for

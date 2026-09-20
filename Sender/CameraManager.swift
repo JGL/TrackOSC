@@ -141,6 +141,15 @@ final class CameraManager: NSObject, @unchecked Sendable {
                 connection.automaticallyAdjustsVideoMirroring = false
                 connection.isVideoMirrored = false
             }
+            // Camera intrinsics ride along on each sample buffer so the 3D
+            // body request can measure heights instead of estimating them.
+            // Delivery is only supported with stabilisation off.
+            if connection.isVideoStabilizationSupported {
+                connection.preferredVideoStabilizationMode = .off
+            }
+            if connection.isCameraIntrinsicMatrixDeliverySupported {
+                connection.isCameraIntrinsicMatrixDeliveryEnabled = true
+            }
         }
 
         // The preview connection now exists (session has an input) and was
@@ -191,6 +200,7 @@ extension CameraManager: AVCaptureVideoDataOutputSampleBufferDelegate {
 
         let swapped = VisionAngle.isQuarterTurn(angle)
         conveyor.submit(FrameBox(
+            sampleBuffer: sampleBuffer,
             pixelBuffer: pixelBuffer,
             orientation: orientation,
             orientedWidth: swapped ? bufferHeight : bufferWidth,

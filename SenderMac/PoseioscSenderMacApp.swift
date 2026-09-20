@@ -14,7 +14,7 @@ struct PoseioscSenderMacApp: App {
     var body: some Scene {
         WindowGroup {
             MacContentView(model: model)
-                .frame(minWidth: 560, minHeight: 420)
+                .frame(minWidth: 760, minHeight: 420)
         }
     }
 }
