@@ -540,6 +540,35 @@ contract. Run tests with `cd PoseioscShared && swift test`.
 - **Port 9527 already in use** — Protokol, OSC DataMonitor, or another
   receiver may be bound to it; only one process can listen per port.
 
+## Related projects
+
+Two other free tools turn cameras into OSC-speaking people sensors for
+creative coding; each covers ground TrackOSC doesn't, and vice versa.
+
+- **[openTSPS](https://github.com/labatrockwell/openTSPS)** — the "Toolkit
+  for Sensing People in Spaces" from the LAB at Rockwell Group. A desktop
+  openFrameworks/OpenCV app that runs blob and person tracking on webcams,
+  **Kinect and other depth sensors**, or video files, and broadcasts the
+  results as OSC, TUIO, TCP, or JSON over WebSockets. The classic choice
+  for overhead or depth-camera installations that need presence, position
+  and size of people rather than skeletons; it is in maintenance mode
+  (built on openFrameworks 0.8), but still works and is well documented.
+- **[tramontanaCV](https://tramontana.xyz)** — by Pierluigi Dalla Rosa,
+  part of the Tramontana platform for prototyping interactive spaces with
+  phones. An iOS app that uses the phone as a sensor, running **blob
+  detection or face tracking** on its camera and sending the results over
+  Wi-Fi to Processing (and, through Tramontana's libraries, to p5.js,
+  JavaScript and openFrameworks). The closest precedent for TrackOSC's
+  phone-as-tracker idea, with a lighter, blob-oriented output.
+
+TrackOSC's niche next to them: Apple Vision's richer detectors — full body
+skeletons in 2D and 3D, hand and face landmarks, animal skeletons, text
+and barcodes — from any iPhone or Mac camera, speaking the VisionOSC wire
+format so existing receivers keep working. If you need depth-camera
+tracking of a whole room, reach for openTSPS; if you need the simplest
+possible blob-from-a-phone, tramontanaCV; if you need skeletons and
+landmarks, TrackOSC.
+
 ## Lineage & licence
 
 Inspired by [VisionOSC](https://github.com/LingDong-/VisionOSC) and
