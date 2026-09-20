@@ -578,3 +578,12 @@ McDonald. OSC via [swift-osc](https://github.com/orchetect/swift-osc) by
 Steffan Andrews.
 
 MIT — see [LICENSE](LICENSE).
+
+## Thanks
+
+TrackOSC exists because [Golan Levin](https://flong.com) suggested building
+it in the first place — a native, freely available successor to VisionOSC
+that students could point at any receiver — and then test-drove every
+release, sending the feedback that shaped the face boundary messages, the
+Processing example, the screenshots, and the receiver examples for other
+platforms. Thank you, Golan.
