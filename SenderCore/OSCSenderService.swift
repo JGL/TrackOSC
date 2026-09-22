@@ -3,7 +3,7 @@
 //  Poseiosc Sender (iOS)
 //
 //  Thread-safe wrapper around the SwiftOSC UDP client. Send errors are counted,
-//  not thrown — dropping a frame of tracking data is fine, blocking the Vision
+//  not thrown – dropping a frame of tracking data is fine, blocking the Vision
 //  pipeline is not.
 //
 

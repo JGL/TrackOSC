@@ -86,7 +86,7 @@ struct OverlayView: View {
                 context.stroke(Path(map(faceBox.box)), with: .color(Detector.faces.color), lineWidth: 2)
             }
             for contour in snapshot.faceContours where !contour.points.isEmpty {
-                // The jawline is an open polyline — mapped per-vertex so
+                // The jawline is an open polyline – mapped per-vertex so
                 // selfie mirroring lands correctly, and never closed.
                 var path = Path()
                 path.move(to: map(contour.points[0]))

@@ -10,7 +10,7 @@
 1. Keep both files in the same folder and open `TrackOSCReceiver.maxpat`
    (Max 8.6 or newer).
 2. Turn on audio (`ezdac~`) and raise the `gain~` slider.
-3. Point a TrackOSC sender at this machine's IP, port 9527 — or send the
+3. Point a TrackOSC sender at this machine's IP, port 9527 – or send the
    synthetic scene from a terminal:
 
 ```bash
@@ -30,8 +30,8 @@ lines and hands you tidy lists instead:
 | Outlet | Stream | Example |
 |---|---|---|
 | 0 | camera info | `camerainfo 720 1280 90 1` (width, height, orientation, facing) |
-| 1 | keypoints | `pose 0 nose 0.52 0.31 0.94` — kind, detection index, joint name, x and y **normalised 0…1** (origin top-left), confidence. Kinds: `pose`, `hand`, `face` (joints numbered 0–75), `animalpose`, and `pose3d 0 root xN yN x y z` with x/y/z in **metres**. Missing keypoints (confidence 0) are not sent. |
-| 2 | boxes | `text 0 0.1 0.65 0.35 0.05 HELLO` — kind, index, left/top/width/height normalised, then the label (`animal`, `human`, `facebox` with roll/yaw/pitch degrees, `barcode` with symbology and payload) |
+| 1 | keypoints | `pose 0 nose 0.52 0.31 0.94` – kind, detection index, joint name, x and y **normalised 0…1** (origin top-left), confidence. Kinds: `pose`, `hand`, `face` (joints numbered 0–75), `animalpose`, and `pose3d 0 root xN yN x y z` with x/y/z in **metres**. Missing keypoints (confidence 0) are not sent. |
+| 2 | boxes | `text 0 0.1 0.65 0.35 0.05 HELLO` – kind, index, left/top/width/height normalised, then the label (`animal`, `human`, `facebox` with roll/yaw/pitch degrees, `barcode` with symbology and payload) |
 | 3 | drawing | `[jit.lcd]` commands on each `bang` |
 
 So `[route pose] → [route 0] → [route nose] → [unpack f f f]` gives you the
@@ -46,5 +46,5 @@ Joint names: [`Examples/SKELETONS.md`](../SKELETONS.md); wire format: the
 The `.maxpat` is generated JSON, checked automatically for valid syntax and
 for every patch cord pointing at an existing outlet/inlet. Max isn't
 installed on the development machine, so neither file has been run in Max
-by the author — if you try it, please open an issue or pull request with
+by the author – if you try it, please open an issue or pull request with
 your Max version and anything that needed changing.

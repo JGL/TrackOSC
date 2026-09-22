@@ -32,6 +32,15 @@ DRY_RUN=0
 
 : "${POSEIOSC_TEAM_ID:?Set POSEIOSC_TEAM_ID to your Apple Developer team ID}"
 
+# House style: en dashes (U+2013), never em dashes (U+2014), anywhere in the
+# repository. Refuse to release while any tracked text file has one.
+if OFFENDERS=$(git grep -Il $'\xe2\x80\x94' -- .); then
+    echo "Em dashes found in tracked files; replace them with en dashes before releasing:" >&2
+    echo "$OFFENDERS" | sed 's/^/    /' >&2
+    echo "Fix:  git grep -Ilz \$'\\xe2\\x80\\x94' | xargs -0 perl -CSD -pi -e 's/\\x{2014}/\\x{2013}/g'" >&2
+    exit 1
+fi
+
 VERSION=$(sed -n 's/.*MARKETING_VERSION: "\(.*\)"/\1/p' project.yml | head -1)
 [[ -n "$VERSION" ]] || { echo "Could not read MARKETING_VERSION from project.yml"; exit 1; }
 
@@ -96,7 +105,7 @@ fi
 echo "--- Publishing GitHub release v$VERSION"
 gh release create "v$VERSION" "${ASSETS[@]}" \
     --title "TrackOSC $VERSION" \
-    --notes "macOS TrackOSC apps, $VERSION — signed and notarised; download, unzip, and open.
+    --notes "macOS TrackOSC apps, $VERSION – signed and notarised; download, unzip, and open.
 
 - **TrackOSCReceiver**: listens for OSC tracking data and visualises it, in 2D and 3D.
 - **TrackOSCSender**: Mac camera (built-in, external, or iPhone via Continuity Camera) → Vision tracking → OSC.

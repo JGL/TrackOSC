@@ -7,7 +7,7 @@
 //  `JointOrder.body17` / `JointOrder.hand21` / `JointOrder.body3D17` /
 //  `JointOrder.animal25`.
 //
-//  Examples/SKELETONS.md is a copy of these lists for non-Swift receivers —
+//  Examples/SKELETONS.md is a copy of these lists for non-Swift receivers –
 //  keep it in sync.
 //
 

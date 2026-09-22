@@ -1,4 +1,4 @@
-// node --test — raw OSC bytes → osc.js → the JSON shape the browser receives.
+// node --test – raw OSC bytes → osc.js → the JSON shape the browser receives.
 "use strict";
 
 const test = require("node:test");

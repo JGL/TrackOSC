@@ -67,7 +67,7 @@ final class AppModel {
     }
 
     /// Reads the current interface orientation and feeds it to the camera as
-    /// the Auto-mode angle. Triggered from the view layer on size changes —
+    /// the Auto-mode angle. Triggered from the view layer on size changes –
     /// the interface orientation is the single source of truth for Auto, so
     /// what's on screen and what's sent can never disagree.
     func refreshInterfaceOrientation() {

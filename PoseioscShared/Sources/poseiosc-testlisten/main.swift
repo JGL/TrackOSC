@@ -4,7 +4,7 @@
 //
 //  Headless OSC listener that decodes Poseiosc/VisionOSC messages and prints a
 //  one-line summary per message. Useful for verifying a sender without the
-//  receiver GUI. Note: only one process can bind the port at a time — quit the
+//  receiver GUI. Note: only one process can bind the port at a time – quit the
 //  Poseiosc Receiver app first.
 //
 //  Usage: swift run poseiosc-testlisten [port]

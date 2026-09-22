@@ -9,10 +9,10 @@ to be copied and hacked. Pick the tool you already use.
 
 | Platform | Folder | Demonstrates | Needs | Verified by the author |
 |---|---|---|---|---|
-| Processing | [`Processing/`](Processing/) | 2D drawing of everything with coordinate guides; a second sketch draws `/poses3d/arr` in real 3D (P3D) | Processing 4, oscP5 | **Yes** — both sketches run against the synthetic senders |
-| Python | [`Python/`](Python/) | A parser package, a pygame window (2D + top-down 3D minimap), a headless printer, and `trackosc_testsend.py` — a synthetic sender of all twelve messages | Python 3, python-osc, pygame-ce | **Yes** — unit tests, loopback, window |
-| p5.js | [`p5js/`](p5js/) | A Node **bridge** (UDP → WebSocket, browsers can't do UDP) and a p5.js sketch; `trackosc-client.js` works in any web page | Node 20+ | **Yes** — tests and browser |
-| TouchDesigner | [`TouchDesigner/`](TouchDesigner/) | OSC In DAT callbacks that fill Table DATs per message; optional Script SOP drawing skeletons; step-by-step network recipe (`.toe` is binary, so text only) | TouchDesigner 2023+ | Parser only (mock tests) — recipe not run in TD |
+| Processing | [`Processing/`](Processing/) | 2D drawing of everything with coordinate guides; a second sketch draws `/poses3d/arr` in real 3D (P3D) | Processing 4, oscP5 | **Yes** – both sketches run against the synthetic senders |
+| Python | [`Python/`](Python/) | A parser package, a pygame window (2D + top-down 3D minimap), a headless printer, and `trackosc_testsend.py` – a synthetic sender of all twelve messages | Python 3, python-osc, pygame-ce | **Yes** – unit tests, loopback, window |
+| p5.js | [`p5js/`](p5js/) | A Node **bridge** (UDP → WebSocket, browsers can't do UDP) and a p5.js sketch; `trackosc-client.js` works in any web page | Node 20+ | **Yes** – tests and browser |
+| TouchDesigner | [`TouchDesigner/`](TouchDesigner/) | OSC In DAT callbacks that fill Table DATs per message; optional Script SOP drawing skeletons; step-by-step network recipe (`.toe` is binary, so text only) | TouchDesigner 2023+ | Parser only (mock tests) – recipe not run in TD |
 | Max/MSP | [`Max/`](Max/) | A `[js]` parser emitting `[route]`-friendly streams and `[jit.lcd]` drawing; a patch that draws and sonifies | Max 8.6+ | Generated patch validated; not run in Max |
 | Pure Data | [`PureData/`](PureData/) | Vanilla abstractions `[trackosc-parse]` and `[trackosc-joint]`, plus a sonification demo | Pd 0.51+ (no externals) | Generated patches linted; not run in Pd |
 | openFrameworks | [`openFrameworks/`](openFrameworks/) | A reusable C++ parser, 2D drawing, and a 3D `ofEasyCam` view of `/poses3d/arr` | openFrameworks 0.11+ (ofxOsc) | Read carefully; not compiled |
@@ -21,7 +21,7 @@ to be copied and hacked. Pick the tool you already use.
 The "not run" examples were written from each environment's documentation
 because those tools aren't installed on the development machine. If you run
 one, please open an issue or pull request saying which version you used and
-what (if anything) needed changing — that is the most useful contribution
+what (if anything) needed changing – that is the most useful contribution
 this folder can get.
 
 ## Testing without a camera
@@ -48,7 +48,7 @@ port, so quit the native TrackOSC Receiver first.
   int32 n`; `/camerainfo` has no `n`. Coordinates are **pixels** in that
   frame, origin top-left, never mirrored; frame size follows orientation
   (portrait 720×1280, landscape 1280×720).
-- **Missing keypoints** arrive as `x=0, y=frameHeight, confidence=0` — skip
+- **Missing keypoints** arrive as `x=0, y=frameHeight, confidence=0` – skip
   edges that touch one.
 - **Freshness:** a message kind is drawn only if received in the last 0.5 s
   (2 s for `/camerainfo`), so a switched-off detector disappears rather than
@@ -70,4 +70,4 @@ default to. Where it matters the examples raise it:
 | python-osc | 8 KB | `server.max_packet_size = 65536` |
 | Max `[udpreceive]` | 4 KB | `@maxpacketsize 65536` |
 | ofxOsc (oscpack) | 4 KB in some releases | see the openFrameworks README |
-| oscP5, osc.js, sclang, Pd `[netreceive]`, TouchDesigner | large enough / configurable | — |
+| oscP5, osc.js, sclang, Pd `[netreceive]`, TouchDesigner | large enough / configurable | – |

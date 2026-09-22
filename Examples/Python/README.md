@@ -4,9 +4,9 @@ Three small scripts and a parser package:
 
 | File | What it does |
 |---|---|
-| [`trackosc_receiver.py`](trackosc_receiver.py) | A pygame window drawing all twelve TrackOSC messages — skeletons, landmarks, boxes, barcode quads, the 3D skeleton (via its pixel projections) — with the same coordinate guides as the native receiver, plus a top-down minimap of the 3D poses. |
+| [`trackosc_receiver.py`](trackosc_receiver.py) | A pygame window drawing all twelve TrackOSC messages – skeletons, landmarks, boxes, barcode quads, the 3D skeleton (via its pixel projections) – with the same coordinate guides as the native receiver, plus a top-down minimap of the 3D poses. |
 | [`trackosc_print.py`](trackosc_print.py) | Headless: one line per message. The smallest possible starting point for your own receiver. |
-| [`trackosc_testsend.py`](trackosc_testsend.py) | Sends a synthetic scene of all twelve messages at 30 fps — test any receiver in this repository without a camera or Xcode. |
+| [`trackosc_testsend.py`](trackosc_testsend.py) | Sends a synthetic scene of all twelve messages at 30 fps – test any receiver in this repository without a camera or Xcode. |
 | [`trackosc/`](trackosc/) | `parse_message(address, args)` → dataclasses (`Keypoints`, `Box`, `FaceBox`, `Contour`, `Pose3D`, `Barcode`, `CameraInfo`), and the joint orders / edge lists / colours. |
 
 ## Setup
@@ -27,7 +27,7 @@ python3 trackosc_receiver.py          # window, port 9527
 python3 trackosc_print.py             # headless
 ```
 
-Point a TrackOSC sender at this machine's IP, port 9527 — or, in another
+Point a TrackOSC sender at this machine's IP, port 9527 – or, in another
 terminal, send the synthetic scene:
 
 ```bash

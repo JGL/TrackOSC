@@ -15,7 +15,7 @@
 //  detector down to its rate if it sat in the same batch. It therefore runs in
 //  its own latest-frame-wins lane: each frame is parked for it, and it
 //  processes whatever is newest when it comes free, sending /poses3d/arr at
-//  its own — typically lower — rate.
+//  its own – typically lower – rate.
 //
 
 import Foundation

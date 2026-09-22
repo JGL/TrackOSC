@@ -2,7 +2,7 @@
 
 [`TrackOSCReceiver.scd`](TrackOSCReceiver.scd) parses all twelve TrackOSC
 messages with one `OSCdef` per address, **sonifies** the tracking (one saw
-voice per detected body — nose x → pitch, nose y → loudness — and a
+voice per detected body – nose x → pitch, nose y → loudness – and a
 band-passed noise voice per hand whose cutoff follows the wrist height), and
 **draws** everything in a `UserView` with the same colours and coordinate
 guides as the native receiver.
@@ -10,11 +10,11 @@ guides as the native receiver.
 ## Run
 
 1. Open the file in the SuperCollider IDE (3.12 or newer).
-2. Boot the server (`Cmd/Ctrl-B`) for sound — parsing and drawing work
+2. Boot the server (`Cmd/Ctrl-B`) for sound – parsing and drawing work
    without it.
 3. Select all and evaluate (`Cmd/Ctrl-Enter`). A window opens and sclang
    starts listening on UDP **9527** in addition to its usual 57120.
-4. Point a TrackOSC sender at this machine's IP, port 9527 — or send the
+4. Point a TrackOSC sender at this machine's IP, port 9527 – or send the
    synthetic scene from a terminal:
 
 ```bash

@@ -1,7 +1,7 @@
 // Joint orders, edge lists and colours for TrackOSC messages.
 //
-// TRACKOSC SKELETON REFERENCE v1.4 — source: PoseioscShared/Sources/PoseioscShared/Skeleton.swift
-// (full table in Examples/SKELETONS.md — keep this file in sync with it)
+// TRACKOSC SKELETON REFERENCE v1.4 – source: PoseioscShared/Sources/PoseioscShared/Skeleton.swift
+// (full table in Examples/SKELETONS.md – keep this file in sync with it)
 #pragma once
 
 #include "ofColor.h"

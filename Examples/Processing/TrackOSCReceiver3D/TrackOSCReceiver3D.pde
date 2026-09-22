@@ -1,10 +1,10 @@
 /**
- * TrackOSCReceiver3D — the /poses3d/arr message drawn in real 3D.
+ * TrackOSCReceiver3D – the /poses3d/arr message drawn in real 3D.
  *
  * Listens for TrackOSC's 3D body poses (metres, Vision camera space) and
  * draws them as skeletons over a floor grid, with the camera at the origin
  * and an orbit you drive with the mouse. Everything else TrackOSC sends is
- * ignored here — see TrackOSCReceiver (next to this sketch) for the 2D
+ * ignored here – see TrackOSCReceiver (next to this sketch) for the 2D
  * picture of all twelve messages.
  *
  * Requires the oscP5 library: Sketch → Import Library… → Manage Libraries →
@@ -20,12 +20,12 @@
  * /poses3d/arr layout (TrackOSC v1.4 additive message):
  *   int32 frameWidth, int32 frameHeight, int32 n, then per pose:
  *   float conf, float bodyHeight (metres), then 17 × (float x, y, z, px, py)
- *   — x, y, z in METRES in Vision's camera-relative space (x right, y up),
+ *   – x, y, z in METRES in Vision's camera-relative space (x right, y up),
  *     px, py the same joint projected into the frame in pixels.
  *   Pose i starts at argument 3 + i*87; joint j of pose i at 3 + i*87 + 2 + j*5.
  *   All 17 joints are always present (no missing-joint sentinel).
  *
- * TRACKOSC SKELETON REFERENCE v1.4 — source: PoseioscShared/Sources/PoseioscShared/Skeleton.swift
+ * TRACKOSC SKELETON REFERENCE v1.4 – source: PoseioscShared/Sources/PoseioscShared/Skeleton.swift
  * 3D body joint order (17): 0 root, 1 spine, 2 centerShoulder, 3 centerHead,
  *   4 topHead, 5 leftShoulder, 6 leftElbow, 7 leftWrist, 8 rightShoulder,
  *   9 rightElbow, 10 rightWrist, 11 leftHip, 12 leftKnee, 13 leftAnkle,
@@ -71,7 +71,7 @@ PFont hudFont;
 
 void setup() {
   size(960, 720, P3D);
-  surface.setTitle("TrackOSC Receiver 3D (Processing) — listening on " + PORT);
+  surface.setTitle("TrackOSC Receiver 3D (Processing) – listening on " + PORT);
   POSE3D_COLOR = color(99, 230, 226);
   GUIDE_COLOR = color(90);
   HUD_COLOR = color(160);

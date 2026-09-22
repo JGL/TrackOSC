@@ -95,7 +95,7 @@ struct VisualizerView: View {
                         }
                     case .faceContours(let f):
                         for contour in f.detections where !contour.points.isEmpty {
-                            // Open polyline (jawline) — never closed.
+                            // Open polyline (jawline) – never closed.
                             var path = Path()
                             path.move(to: mapXY(contour.points[0]))
                             for point in contour.points.dropFirst() {
@@ -172,7 +172,7 @@ struct VisualizerView: View {
     }
 
     /// Origin marker, axis arrows, transmitted dimensions, and camera
-    /// orientation — so "which way is up" is answered at a glance.
+    /// orientation – so "which way is up" is answered at a glance.
     private func drawCoordinateGuides(
         context: GraphicsContext,
         frameRect: CGRect,

@@ -13,8 +13,8 @@
  *
  * Wire format: every detection message starts with int32 width, int32
  * height, int32 n (pixels of the sent frame, origin top-left, never
- * mirrored), then n detections — see the root README "OSC wire format".
- * A keypoint with c === 0 is missing (VisionOSC's sentinel) — skip it.
+ * mirrored), then n detections – see the root README "OSC wire format".
+ * A keypoint with c === 0 is missing (VisionOSC's sentinel) – skip it.
  */
 (function (root, factory) {
   if (typeof module === "object" && module.exports) module.exports = factory();
@@ -79,7 +79,7 @@
         frame.detections.push({ confidence: cur.float(), box: cur.rect(), roll: cur.float(), yaw: cur.float(), pitch: cur.float() });
       } else if (address === "/faces/contour") {
         const confidence = cur.float();
-        const m = cur.count();  // varies per face — always loop on m
+        const m = cur.count();  // varies per face – always loop on m
         const points = [];
         for (let j = 0; j < m; j++) points.push({ x: cur.float(), y: cur.float() });
         frame.detections.push({ confidence, points });

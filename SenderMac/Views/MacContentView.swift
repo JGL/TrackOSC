@@ -74,7 +74,7 @@ struct MacContentView: View {
     }
 
     private var destinationLabel: String {
-        let host = model.settings.host.isEmpty ? "—" : model.settings.host
+        let host = model.settings.host.isEmpty ? "–" : model.settings.host
         return "→ \(host):\(String(model.settings.port))"
     }
 

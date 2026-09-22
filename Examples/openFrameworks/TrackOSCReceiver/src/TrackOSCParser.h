@@ -1,10 +1,10 @@
-// TrackOSC message parsing for openFrameworks (ofxOsc) — no drawing here.
+// TrackOSC message parsing for openFrameworks (ofxOsc) – no drawing here.
 //
 // Every detection message starts with int32 width, int32 height, int32 n
 // (pixels of the sent frame, origin top-left, never mirrored), then n
-// detections whose layout depends on the address — see the root README
+// detections whose layout depends on the address – see the root README
 // "OSC wire format". A keypoint with c == 0 is missing (VisionOSC's
-// sentinel) — skip it.
+// sentinel) – skip it.
 #pragma once
 
 #include "ofVectorMath.h"

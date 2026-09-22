@@ -22,7 +22,7 @@ Keys: `2` / `3` switch views, `G` toggles the guides, `R` resets the 3D camera.
 cd <openFrameworks>/apps/myApps/TrackOSCReceiver && make -j && make RunRelease
 ```
 
-3. Point a TrackOSC sender at this machine's IP, port 9527 — or send the
+3. Point a TrackOSC sender at this machine's IP, port 9527 – or send the
    synthetic scene from a terminal:
 
 ```bash

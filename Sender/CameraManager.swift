@@ -10,7 +10,7 @@
 //  pixels, we tell Vision how the buffer is oriented, derived from an
 //  AVCaptureDevice.RotationCoordinator in Auto mode or from the user's
 //  orientation lock (for mounted rigs, where gravity-based detection is
-//  unreliable — e.g. a phone lying flat). Angle → Vision mapping: 90° =
+//  unreliable – e.g. a phone lying flat). Angle → Vision mapping: 90° =
 //  .right (the empirically verified portrait case for both cameras), 0° =
 //  .up, 180° = .down, 270° = .left.
 //
@@ -26,7 +26,7 @@ final class CameraManager: NSObject, @unchecked Sendable {
     let session = AVCaptureSession()
 
     /// Owned here (not by the SwiftUI view) so mirroring can be re-disabled
-    /// inside every session reconfiguration — the layer's connection does not
+    /// inside every session reconfiguration – the layer's connection does not
     /// exist until the session has inputs, and it is recreated (with
     /// mirroring re-enabled by default) on every camera switch.
     let previewLayer: AVCaptureVideoPreviewLayer
@@ -45,7 +45,7 @@ final class CameraManager: NSObject, @unchecked Sendable {
     /// angles proved unreliable on device (stuck at 0° with the system
     /// rotation lock engaged). Driving everything from the interface
     /// orientation makes preview, overlay, and OSC data agree by
-    /// construction — what you see is what is sent.
+    /// construction – what you see is what is sent.
     private let autoAngle = OSAllocatedUnfairLock<Int32>(initialState: 90)
 
     /// The user's orientation setting (.auto follows the interface).

@@ -7,7 +7,7 @@
 //
 
 /// The five OSC address patterns emitted by VisionOSC (and by Poseiosc),
-/// plus TrackOSC's additive messages (unknown to — and safely ignored by —
+/// plus TrackOSC's additive messages (unknown to – and safely ignored by –
 /// original VisionOSC receivers): /camerainfo (v1.1), /faces/box and
 /// /faces/contour (v1.3), /poses3d/arr, /barcodes/arr, /animalposes/arr and
 /// /humans/arr (v1.4).
@@ -47,7 +47,7 @@ public enum WireCounts {
     public static let maxDetections = 32
 }
 
-/// Joint name orderings. The wire format carries no names — order is the contract.
+/// Joint name orderings. The wire format carries no names – order is the contract.
 public enum JointOrder {
     /// PoseNet/PoseOSC body joint order used by VisionOSC.
     public static let body17: [String] = [

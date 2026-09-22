@@ -3,7 +3,7 @@
 //  Poseiosc Sender (macOS)
 //
 //  Owns the AVCaptureSession for the Mac sender. Unlike the iPhone, Mac
-//  cameras don't rotate with an interface — the rotation setting exists for
+//  cameras don't rotate with an interface – the rotation setting exists for
 //  rotated external camera rigs, and there can be several cameras (built-in,
 //  external webcams, iPhone Continuity Camera), so devices are discovered and
 //  selectable by uniqueID.

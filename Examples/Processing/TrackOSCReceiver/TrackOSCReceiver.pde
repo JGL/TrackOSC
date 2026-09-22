@@ -1,10 +1,10 @@
 /**
- * TrackOSCReceiver — a Processing reference receiver for TrackOSC.
+ * TrackOSCReceiver – a Processing reference receiver for TrackOSC.
  *
  * Draws everything the TrackOSC senders emit: body-pose skeletons (2D and
  * the pixel projections of 3D), hand skeletons, face landmark dots, face
  * bounding boxes + jawline contours, text and animal boxes, animal
- * skeletons, human boxes and barcode quads — plus the same coordinate guides
+ * skeletons, human boxes and barcode quads – plus the same coordinate guides
  * the native macOS receiver shows (origin, axes, frame dimensions, camera
  * orientation). For the 3D skeleton in real 3D, see the TrackOSCReceiver3D
  * sketch next to this one.
@@ -36,21 +36,21 @@
  *   /camerainfo   int32 width, height, orientationDegrees, facing (no n header)
  *   /faces/box    per face:  float conf, left, top, width, height, roll°, yaw°, pitch°
  *   /faces/contour per face: float conf, int32 m, then m × (float x, float y)
- *                  — an OPEN polyline (jawline, ear → chin → ear); m varies by
+ *                  – an OPEN polyline (jawline, ear → chin → ear); m varies by
  *                  OS version (typically 17) and is 0 when unavailable.
- *   A keypoint with conf == 0 is "missing" — skip it.
+ *   A keypoint with conf == 0 is "missing" – skip it.
  *   /faces/box and /faces/contour list the same faces in the same order;
  *   /faces/arr may (rarely) contain fewer.
  *   TrackOSC v1.4 additions (same header):
  *   /poses3d/arr  per pose:  float conf, float bodyHeight (metres), then
  *                  17 × (float x, y, z [metres, Vision camera space], px, py [pixels])
- *                  — all 17 joints are always present (no missing sentinel)
+ *                  – all 17 joints are always present (no missing sentinel)
  *   /barcodes/arr per code:  float conf, left, top, width, height,
  *                  4 × (float x, y) corners TL, TR, BR, BL, string symbology, string payload
  *   /animalposes/arr per animal: float conf, then 25 × (x, y, conf)
  *   /humans/arr   per human: float conf, left, top, width, height
  *
- * TRACKOSC SKELETON REFERENCE v1.4 — source: PoseioscShared/Sources/PoseioscShared/Skeleton.swift
+ * TRACKOSC SKELETON REFERENCE v1.4 – source: PoseioscShared/Sources/PoseioscShared/Skeleton.swift
  * (full table in Examples/SKELETONS.md)
  * Body joint order (17): nose, leftEye, rightEye, leftEar, rightEar,
  *   leftShoulder, rightShoulder, leftElbow, rightElbow, leftWrist, rightWrist,
@@ -75,7 +75,7 @@ final int PORT = 9527;
 final int STALE_MS = 500;
 final int CAMERA_INFO_STALE_MS = 2000;
 
-// Edge lists — keep in sync with PoseioscShared/Sources/PoseioscShared/Skeleton.swift.
+// Edge lists – keep in sync with PoseioscShared/Sources/PoseioscShared/Skeleton.swift.
 final int[][] BODY_EDGES = {
   {0, 1}, {0, 2}, {1, 3}, {2, 4},            // head
   {5, 6}, {5, 11}, {6, 12}, {11, 12},        // torso
@@ -131,7 +131,7 @@ OscP5 osc;
 
 void setup() {
   size(720, 960);
-  surface.setTitle("TrackOSC Receiver (Processing) — listening on " + PORT);
+  surface.setTitle("TrackOSC Receiver (Processing) – listening on " + PORT);
   POSE_COLOR = color(48, 209, 88);
   POSE3D_COLOR = color(99, 230, 226);
   HAND_COLOR = color(255, 159, 10);
@@ -174,7 +174,7 @@ class FaceBoxFrame {
 class ContourFrame {
   int frameW, frameH;
   float[] conf;                          // [n]
-  float[][] x, y;                        // [n][m_i] — m varies per face!
+  float[][] x, y;                        // [n][m_i] – m varies per face!
   long at;
 }
 
@@ -324,7 +324,7 @@ ContourFrame parseFaceContours(OscMessage msg) {
   int arg = 3;
   for (int i = 0; i < n; i++) {
     f.conf[i] = msg.get(arg++).floatValue();
-    int m = msg.get(arg++).intValue();  // varies per face — always loop on m
+    int m = msg.get(arg++).intValue();  // varies per face – always loop on m
     f.x[i] = new float[m];
     f.y[i] = new float[m];
     for (int j = 0; j < m; j++) {
@@ -490,7 +490,7 @@ void draw() {
       for (int j = 0; j < fc.x[i].length; j++) {
         vertex(ox + fc.x[i][j] * sc, oy + fc.y[i][j] * sc);
       }
-      endShape();  // open polyline — deliberately no CLOSE
+      endShape();  // open polyline – deliberately no CLOSE
     }
   }
 
@@ -577,7 +577,7 @@ void drawLabeledBoxes(BoxFrame f, color col, float sc, float ox, float oy) {
   }
 }
 
-/// Origin marker, axis arrows, and a dimensions/orientation caption —
+/// Origin marker, axis arrows, and a dimensions/orientation caption –
 /// mirrors the native receiver's drawCoordinateGuides.
 void drawCoordinateGuides(int frameW, int frameH, float sc, float ox, float oy, CameraInfo info) {
   float fw = frameW * sc, fh = frameH * sc;

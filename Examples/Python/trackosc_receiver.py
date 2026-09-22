@@ -126,7 +126,7 @@ def main() -> None:
 
     pygame.init()
     screen = pygame.display.set_mode(WINDOW)
-    pygame.display.set_caption(f"TrackOSC Receiver (Python) — listening on {args.port}")
+    pygame.display.set_caption(f"TrackOSC Receiver (Python) – listening on {args.port}")
     font = pygame.font.SysFont("menlo,monospace", 13)
     clock = pygame.time.Clock()
     show_guides = True

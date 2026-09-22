@@ -29,7 +29,7 @@ biometric templates or faceprints, do not perform face recognition or
 identification, and cannot determine who a person is.
 
 - **Collection and storage:** Face data is computed in memory for each
-  camera frame and exists only for the duration of that frame — a fraction
+  camera frame and exists only for the duration of that frame – a fraction
   of a second. It is never written to disk, never saved, and never
   associated with any identity.
 - **Use:** Face data is used for exactly two things: drawing the tracking
@@ -48,7 +48,7 @@ identification, and cannot determine who a person is.
 ## Network
 
 The sender apps transmit tracking data as OSC (Open Sound Control) messages
-over UDP **only to the destination you explicitly configure** — typically a
+over UDP **only to the destination you explicitly configure** – typically a
 computer on your own local network. Nothing is sent anywhere by default,
 and nothing is ever sent to the developer or to any third party.
 

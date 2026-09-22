@@ -2,13 +2,13 @@
 
 Every detection message starts with ``int32 width, int32 height, int32 n``
 (pixels of the sent frame; n detections, at most 32), followed by n
-detections whose layout depends on the address — see the root README's
+detections whose layout depends on the address – see the root README's
 "OSC wire format". ``parse_message`` takes what python-osc hands a handler
 (the address and the argument tuple) and returns a ``Frame`` (or a
 ``CameraInfo`` for ``/camerainfo``), or ``None`` for an unknown address.
 
 A keypoint with ``c == 0`` is *missing* (VisionOSC's sentinel, sent as
-``x=0, y=frameHeight``) — skip it when drawing.
+``x=0, y=frameHeight``) – skip it when drawing.
 """
 
 from __future__ import annotations
@@ -210,7 +210,7 @@ def parse_message(address: str, args: Sequence[Any]) -> Frame | CameraInfo | Non
         frame = _header(cur, address)
         for _ in range(frame_count(frame, cur)):
             conf = cur.f()
-            m = cur.count()  # varies per face — always loop on m
+            m = cur.count()  # varies per face – always loop on m
             frame.detections.append(Contour(conf, [(cur.f(), cur.f()) for _ in range(m)]))
         return frame
 

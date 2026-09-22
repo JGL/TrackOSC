@@ -48,7 +48,7 @@ struct MacSettingsView: View {
                         .buttonStyle(.plain)
                     }
                     if resolveFailed {
-                        Text("Could not resolve that receiver — enter its address manually below.")
+                        Text("Could not resolve that receiver – enter its address manually below.")
                             .font(.callout)
                             .foregroundStyle(.red)
                     }
@@ -76,7 +76,7 @@ struct MacSettingsView: View {
                         .font(.callout)
                         .foregroundStyle(.secondary)
                     Toggle("Mirror preview", isOn: $settings.mirrorPreview)
-                    Text("Display-only — OSC coordinates are always unmirrored.")
+                    Text("Display-only – OSC coordinates are always unmirrored.")
                         .font(.callout)
                         .foregroundStyle(.secondary)
                     Toggle("Hide video preview", isOn: $settings.hideVideoPreview)
@@ -132,7 +132,7 @@ struct MacSettingsView: View {
 
     private var frameDescription: String {
         let snapshot = model.overlay
-        guard snapshot.width > 0 else { return "—" }
+        guard snapshot.width > 0 else { return "–" }
         let info = CameraInfo(
             width: snapshot.width, height: snapshot.height,
             orientationDegrees: snapshot.rotationDegrees,

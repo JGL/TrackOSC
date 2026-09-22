@@ -66,7 +66,7 @@ struct SidebarView: View {
     }
 
     private var cameraLabel: String {
-        guard let info = model.cameraInfo else { return "—" }
+        guard let info = model.cameraInfo else { return "–" }
         return "\(info.width)×\(info.height) \(info.orientationName), \(info.isFrontCamera ? "front" : "back")"
     }
 

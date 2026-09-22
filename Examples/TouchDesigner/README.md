@@ -1,8 +1,8 @@
 # TrackOSC receiver example for TouchDesigner
 
 TouchDesigner's `.toe` files are binary, so this example ships the parts that
-can live in a text repository — a Python callbacks script and a recipe for the
-network — rather than a project file. Building it takes about five minutes.
+can live in a text repository – a Python callbacks script and a recipe for the
+network – rather than a project file. Building it takes about five minutes.
 
 | File | Paste into |
 |---|---|
@@ -17,13 +17,13 @@ TrackOSC messages have a variable number of arguments (n detections, and
 animal labels, barcode payloads). An OSC In **CHOP** flattens each message
 into fixed channels and drops strings, which works only for `/camerainfo`.
 The OSC In **DAT** hands the raw argument list to Python, where the same
-running-cursor parser as every other example turns it into tables — and
+running-cursor parser as every other example turns it into tables – and
 tables convert to CHOPs, SOPs or anything else.
 
 ## Recipe
 
 1. **OSC In DAT** (`oscin1`): Network Port `9527`, Address Scope `*`,
-   Bundle Timestamp off. Only one program can listen on a port — quit the
+   Bundle Timestamp off. Only one program can listen on a port – quit the
    native TrackOSC Receiver first.
 2. **Text DAT** named exactly `trackosc_skeletons`: paste
    `trackosc_skeletons.py` into it.
@@ -50,12 +50,12 @@ tables convert to CHOPs, SOPs or anything else.
 
 | Table | Columns |
 |---|---|
-| `poses`, `hands`, `faces`, `animalposes` | `det joint name x y c conf` — pixels in the sent frame, origin top-left; `c == 0` means missing |
+| `poses`, `hands`, `faces`, `animalposes` | `det joint name x y c conf` – pixels in the sent frame, origin top-left; `c == 0` means missing |
 | `texts`, `animals` | `det conf left top width height label` |
 | `humans` | `det conf left top width height` |
 | `faces_box` | `det conf left top width height roll yaw pitch` (degrees) |
-| `faces_contour` | `det point x y conf` — an open jawline polyline; a face with no contour has no rows |
-| `poses3d` | `det joint name x y z px py conf bodyHeight` — x/y/z metres (Vision camera space), px/py pixels |
+| `faces_contour` | `det point x y conf` – an open jawline polyline; a face with no contour has no rows |
+| `poses3d` | `det joint name x y z px py conf bodyHeight` – x/y/z metres (Vision camera space), px/py pixels |
 | `barcodes` | `det conf left top width height tl_x tl_y tr_x tr_y br_x br_y bl_x bl_y symbology payload` |
 | `camerainfo` | `key value` rows: width, height, orientation (0/90/180/270), facing (0 back, 1 front), time |
 | `frames` | `address width height n time` |
@@ -68,6 +68,6 @@ Wire format: the [root README](../../README.md#osc-wire-format).
 The parser is exercised outside TouchDesigner by
 `python3 -m unittest discover tests` (stubbing `op()` and `mod`). The network
 recipe was written from TouchDesigner's documentation, not run in
-TouchDesigner by the author — if you build it, please open an issue or pull
+TouchDesigner by the author – if you build it, please open an issue or pull
 request with the TouchDesigner version you used (and a `.toe` would be very
 welcome).

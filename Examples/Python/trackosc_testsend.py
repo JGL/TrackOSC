@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Send a synthetic TrackOSC scene — all twelve messages — for testing receivers
+"""Send a synthetic TrackOSC scene – all twelve messages – for testing receivers
 without a camera or the Swift toolchain. Mirrors ``poseiosc-testsend``.
 
     python3 trackosc_testsend.py [host] [port] [--landscape] [--rate 30] [--only poses,hands]

@@ -1,4 +1,4 @@
-# TrackOSC — XcodeGen project spec (source of truth for TrackOSC.xcodeproj).
+# TrackOSC – XcodeGen project spec (source of truth for TrackOSC.xcodeproj).
 #
 # The generated TrackOSC.xcodeproj is committed so end users only need Xcode.
 # After adding/removing source files, regenerate with:
@@ -64,7 +64,7 @@ targets:
         # Standard-encryption-only exemption: skips the export compliance
         # question on every TestFlight upload.
         ITSAppUsesNonExemptEncryption: false
-        NSCameraUsageDescription: "Camera frames are analyzed on-device to detect bodies (2D and 3D), hands, faces, text, animals, and barcodes. No video leaves the phone — only OSC tracking data."
+        NSCameraUsageDescription: "Camera frames are analyzed on-device to detect bodies (2D and 3D), hands, faces, text, animals, and barcodes. No video leaves the phone – only OSC tracking data."
         NSLocalNetworkUsageDescription: "TrackOSC sends OSC tracking data to receivers on your local network and browses for them via Bonjour."
         NSBonjourServices: ["_osc._udp"]
         UILaunchScreen: {}
@@ -84,7 +84,7 @@ targets:
     type: application
     platform: macOS
     # Product renamed; target name (bundle ID, TCC grants) unchanged.
-    # Paired with PRODUCT_NAME in settings — see the iOS sender note.
+    # Paired with PRODUCT_NAME in settings – see the iOS sender note.
     productName: TrackOSCSender
     sources: [SenderMac, SenderCore]
     dependencies:
@@ -98,7 +98,7 @@ targets:
         CFBundleDisplayName: TrackOSC Sender
         CFBundleShortVersionString: $(MARKETING_VERSION)
         CFBundleVersion: $(CURRENT_PROJECT_VERSION)
-        NSCameraUsageDescription: "Camera frames are analyzed on-device to detect bodies (2D and 3D), hands, faces, text, animals, and barcodes. No video leaves this Mac — only OSC tracking data."
+        NSCameraUsageDescription: "Camera frames are analyzed on-device to detect bodies (2D and 3D), hands, faces, text, animals, and barcodes. No video leaves this Mac – only OSC tracking data."
         NSLocalNetworkUsageDescription: "TrackOSC Sender sends OSC tracking data to receivers on your local network and browses for them via Bonjour."
         NSBonjourServices: ["_osc._udp"]
     settings:
@@ -112,7 +112,7 @@ targets:
       properties:
         com.apple.security.device.camera: true
         com.apple.security.network.client: true
-        # Required to BIND the UDP socket the OSC client sends from —
+        # Required to BIND the UDP socket the OSC client sends from –
         # without it the sandbox silently blocks sending entirely.
         com.apple.security.network.server: true
 
@@ -120,7 +120,7 @@ targets:
     type: application
     platform: macOS
     # Product renamed; target name (bundle ID, TCC grants) unchanged.
-    # Paired with PRODUCT_NAME in settings — see the iOS sender note.
+    # Paired with PRODUCT_NAME in settings – see the iOS sender note.
     productName: TrackOSCReceiver
     sources: [Receiver]
     dependencies:

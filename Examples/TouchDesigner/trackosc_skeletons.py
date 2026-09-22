@@ -1,8 +1,8 @@
-"""Joint orders and edge lists for TrackOSC messages — paste into a Text DAT
+"""Joint orders and edge lists for TrackOSC messages – paste into a Text DAT
 named ``trackosc_skeletons`` and import it with ``mod.trackosc_skeletons``.
 
-TRACKOSC SKELETON REFERENCE v1.4 — source: PoseioscShared/Sources/PoseioscShared/Skeleton.swift
-(full table in Examples/SKELETONS.md — keep this file in sync with it)
+TRACKOSC SKELETON REFERENCE v1.4 – source: PoseioscShared/Sources/PoseioscShared/Skeleton.swift
+(full table in Examples/SKELETONS.md – keep this file in sync with it)
 """
 
 BODY_JOINTS = [

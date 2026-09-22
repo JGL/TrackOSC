@@ -1,4 +1,4 @@
-"""OSC In DAT callbacks for TrackOSC — paste into the Callbacks DAT of an
+"""OSC In DAT callbacks for TrackOSC – paste into the Callbacks DAT of an
 OSC In DAT (see README.md for the network recipe).
 
 Every TrackOSC message is parsed here and written into a Table DAT named
@@ -12,10 +12,10 @@ Written for TouchDesigner's Python 3.11 (no 3.12+ syntax).
 
 Wire format: every detection message starts with int32 width, int32 height,
 int32 n (pixels of the sent frame, origin top-left, never mirrored), then n
-detections — see the root README "OSC wire format". A keypoint with c == 0
-is missing (VisionOSC's sentinel) — skip it.
+detections – see the root README "OSC wire format". A keypoint with c == 0
+is missing (VisionOSC's sentinel) – skip it.
 
-TRACKOSC SKELETON REFERENCE v1.4 — joint orders live in trackosc_skeletons.py.
+TRACKOSC SKELETON REFERENCE v1.4 – joint orders live in trackosc_skeletons.py.
 """
 
 import time
@@ -32,7 +32,7 @@ TABLES = {
 
 def _joint_names(address):
     try:
-        sk = mod.trackosc_skeletons  # noqa: F821 — TouchDesigner's module accessor
+        sk = mod.trackosc_skeletons  # noqa: F821 – TouchDesigner's module accessor
     except Exception:
         return None
     return {"/poses/arr": sk.BODY_JOINTS, "/hands/arr": sk.HAND_JOINTS,
@@ -42,7 +42,7 @@ def _joint_names(address):
 def _table(name):
     """The Table DAT with this name, or None (so missing tables are simply skipped)."""
     try:
-        return op(name)  # noqa: F821 — TouchDesigner builtin
+        return op(name)  # noqa: F821 – TouchDesigner builtin
     except NameError:
         return None
 
@@ -140,7 +140,7 @@ def parse(address, args):
     elif address == "/faces/contour":
         for det in range(n):
             conf = cur.f()
-            m = cur.count()  # varies per face — always loop on m
+            m = cur.count()  # varies per face – always loop on m
             for point in range(m):
                 rows.append([det, point, cur.f(), cur.f(), conf])
         _fill(_table(table_name), ["det", "point", "x", "y", "conf"], rows)

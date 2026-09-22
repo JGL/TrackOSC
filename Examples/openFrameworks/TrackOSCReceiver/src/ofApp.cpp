@@ -8,7 +8,7 @@
 using namespace trackosc;
 
 void ofApp::setup() {
-    ofSetWindowTitle("TrackOSC Receiver (openFrameworks) — listening on " + ofToString(PORT));
+    ofSetWindowTitle("TrackOSC Receiver (openFrameworks) – listening on " + ofToString(PORT));
     ofSetFrameRate(60);
     ofBackground(0);
     receiver.setup(PORT);
@@ -83,7 +83,7 @@ void ofApp::draw2D() {
             for (const auto& c : frame.contours) {
                 ofPolyline line;
                 for (const auto& p : c.points) line.addVertex(X(p.x), Y(p.y));
-                line.draw();   // open jawline — never close it
+                line.draw();   // open jawline – never close it
             }
         }
         if (address == "/poses3d/arr") {

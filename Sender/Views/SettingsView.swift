@@ -45,7 +45,7 @@ struct SettingsView: View {
                         .foregroundStyle(.primary)
                     }
                     if resolveFailed {
-                        Text("Could not resolve that receiver — enter its address manually below.")
+                        Text("Could not resolve that receiver – enter its address manually below.")
                             .font(.footnote)
                             .foregroundStyle(.red)
                     }
@@ -69,7 +69,7 @@ struct SettingsView: View {
                             Text(setting.label).tag(setting)
                         }
                     }
-                    Text("Lock the orientation when the phone is mounted (tripod, flat rig) — automatic detection relies on gravity and fails when the phone lies flat. If a locked landscape preview appears upside down, pick the other landscape option.")
+                    Text("Lock the orientation when the phone is mounted (tripod, flat rig) – automatic detection relies on gravity and fails when the phone lies flat. If a locked landscape preview appears upside down, pick the other landscape option.")
                         .font(.footnote)
                         .foregroundStyle(.secondary)
                 }
@@ -79,7 +79,7 @@ struct SettingsView: View {
 
                 Section("Preview") {
                     Toggle("Mirror selfie preview", isOn: $settings.mirrorFrontPreview)
-                    Text("Front camera only. Display-only — the OSC coordinates sent to receivers are always unmirrored.")
+                    Text("Front camera only. Display-only – the OSC coordinates sent to receivers are always unmirrored.")
                         .font(.footnote)
                         .foregroundStyle(.secondary)
                     Toggle("Hide video preview", isOn: $settings.hideVideoPreview)
@@ -126,10 +126,10 @@ struct SettingsView: View {
         return "\(version) (\(build))"
     }
 
-    /// e.g. "720×1280 · 90° portrait" — mirrors what /camerainfo broadcasts.
+    /// e.g. "720×1280 · 90° portrait" – mirrors what /camerainfo broadcasts.
     private var frameDescription: String {
         let snapshot = model.overlay
-        guard snapshot.width > 0 else { return "—" }
+        guard snapshot.width > 0 else { return "–" }
         let info = CameraInfo(
             width: snapshot.width, height: snapshot.height,
             orientationDegrees: snapshot.rotationDegrees,

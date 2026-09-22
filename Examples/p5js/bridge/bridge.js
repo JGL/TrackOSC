@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * trackosc-bridge — browsers can't open UDP sockets, so this small Node
+ * trackosc-bridge – browsers can't open UDP sockets, so this small Node
  * program listens for TrackOSC's OSC messages on UDP and relays every one to
  * connected browsers as JSON over a WebSocket:
  *

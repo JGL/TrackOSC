@@ -1,4 +1,4 @@
-# Poseiosc — Prompts and Decisions
+# Poseiosc – Prompts and Decisions
 
 A running record of the prompts that drove this project and the technical
 decisions made along the way, as requested in the original brief.
@@ -51,14 +51,14 @@ the leading slash on addresses; the code is authoritative).
 
 - Addresses: `/poses/arr`, `/hands/arr`, `/faces/arr`, `/texts/arr`,
   `/animals/arr`. Messages are unbundled, sent per enabled detector per
-  processed frame — including when zero detections (header-only message).
+  processed frame – including when zero detections (header-only message).
 - Every message starts `int32 width, int32 height, int32 count`, followed per
   detection by the payloads documented in README.md.
 - **Coordinates are pixels, origin top-left** (`y = (1 − visionY) × height`),
   unmirrored. Vision's normalized bottom-left coordinates are converted in
   `PoseioscShared/Sources/PoseioscShared/CoordinateMapper.swift`.
 - **Body joint order is PoseNet order** (nose, eyes, ears, shoulders, elbows,
-  wrists, hips, knees, ankles — left before right), NOT the order Vision
+  wrists, hips, knees, ankles – left before right), NOT the order Vision
   returns. Hand order is wrist, then thumb→pinky, 4 joints per finger
   (Apple's "little" finger = VisionOSC's "pinky").
 - **Face**: 76 landmark points in Vision's own constellation order. Vision
@@ -66,11 +66,11 @@ the leading slash on addresses; the code is authoritative).
   into image pixels exactly as VisionOSC does. The per-point third value is
   the precision estimate (not confidence), falling back to the observation
   confidence if Vision omits estimates.
-- **Missing joints** are sent as `(0, frameHeight, 0)` — the exact values
+- **Missing joints** are sent as `(0, frameHeight, 0)` – the exact values
   VisionOSC emits (vision-space origin run through the y-flip). Consumers
   filter on `confidence == 0`.
 - **Animals** uses `RecognizeAnimalsRequest` (bounding box + "Cat"/"Dog"
-  label), matching VisionOSC's animal *detection* — not animal body pose.
+  label), matching VisionOSC's animal *detection* – not animal body pose.
 - **OSC types are strictly int32/float32/string**, pinned by a golden-bytes
   unit test that asserts the raw packet encoding (type tags, big-endian
   layout) so drift from VisionOSC compatibility fails CI-style.
@@ -93,7 +93,7 @@ the leading slash on addresses; the code is authoritative).
   `from: 3.1.0` (which pulls swift-osc-core and the SwiftNIO-based
   swift-osc-io-nio). No vendored code.
 - **Signing**: `CODE_SIGN_STYLE = Automatic` with an intentionally empty
-  `DEVELOPMENT_TEAM` — each user selects their own team in Xcode.
+  `DEVELOPMENT_TEAM` – each user selects their own team in Xcode.
 
 ### iOS sender pipeline
 
@@ -104,12 +104,12 @@ the leading slash on addresses; the code is authoritative).
   testing 2026-07-28 showed all front-camera detections rotated 180°, so both
   sensors are mounted identically and `.right` is correct everywhere.)
   Transmitted frame dimensions are the *oriented* dims (e.g. 720×1280).
-- The sender defaults to the **front (selfie) camera** on first launch —
+- The sender defaults to the **front (selfie) camera** on first launch –
   pointing the phone at yourself is the natural first test.
 - **Selfie-mirror option** (user request after on-device testing, default ON):
   in front-camera mode the preview is flipped with a display transform and the
   overlay flips its own x-coordinates (keeping label text readable), so the
-  screen feels like a mirror. Strictly display-only — OSC output remains
+  screen feels like a mirror. Strictly display-only – OSC output remains
   unmirrored regardless of the toggle (Settings → Preview).
 - **Frame policy: latest-frame-wins.** One Vision batch in flight; newer
   frames overwrite a single pending slot (`FrameConveyor`). Latency stays
@@ -120,23 +120,23 @@ the leading slash on addresses; the code is authoritative).
 - **Front camera preview and data are unmirrored** (preview mirroring
   disabled) so preview, overlay, and OSC coordinates all agree with
   VisionOSC's unmirrored convention. The selfie preview therefore looks
-  "un-selfie-like" — deliberate. Implementation note (found on device
+  "un-selfie-like" – deliberate. Implementation note (found on device
   2026-07-28): the preview layer's connection doesn't exist until the session
-  has inputs and is recreated — with mirroring re-enabled by default — on
+  has inputs and is recreated – with mirroring re-enabled by default – on
   every camera switch, so disabling mirroring from the SwiftUI view was
   ineffective. `CameraManager` owns the preview layer and re-disables
   mirroring inside every session reconfiguration instead.
 - **Text recognition uses `.fast`** level, prioritizing frame rate, matching
   VisionOSC's philosophy (its text detector ran ~10 fps).
 - The new Vision API has **no constellation setting** for face landmarks
-  (revision 3 always yields 76 points) — discovered at build time; the
+  (revision 3 always yields 76 points) – discovered at build time; the
   request is used as-is and the mapper asserts the 76-point count.
 - Default detector toggles: body/hand/face ON, text/animal OFF (running all
   five at once costs frame rate, as VisionOSC's README also notes).
 
 ### macOS receiver
 
-- SwiftOSC's `OSCUDPServer` owns the UDP socket (default port 9527 —
+- SwiftOSC's `OSCUDPServer` owns the UDP socket (default port 9527 –
   VisionOSC's default). Bonjour advertising therefore uses the **`dnssd` C API
   (`DNSServiceRegister`)**, which registers the mDNS record without needing to
   own the socket. `NetService` would work but is deprecated; an `NWListener`
@@ -155,7 +155,7 @@ the leading slash on addresses; the code is authoritative).
   Two bugs in the sender's resolver: (1) after a successful resolve it
   cancelled the throwaway connection, and the resulting `.cancelled` state
   fired the completion a second time with `nil`, surfacing the error UI;
-  (2) no result pinning to IPv4 — the receiver's OSC server binds IPv4-only
+  (2) no result pinning to IPv4 – the receiver's OSC server binds IPv4-only
   (SwiftOSC default), so an IPv6/link-local resolution would silently fail.
   Rewritten as a one-shot async resolve with a 4-second timeout and forced
   IPv4.
@@ -163,32 +163,32 @@ the leading slash on addresses; the code is authoritative).
 ## App icons (2026-07-28)
 
 - Both icons show a waving pose-skeleton (green joints/limbs, echoing the
-  overlay colors) emitting cyan signal arcs from the raised hand — pose
+  overlay colors) emitting cyan signal arcs from the raised hand – pose
   tracking + OSC broadcast in one image. iOS gets the full-bleed square;
   macOS gets the same art inside the traditional margin + squircle + shadow.
-- Icons are rendered programmatically with CoreGraphics —
+- Icons are rendered programmatically with CoreGraphics –
   `Design/render_icons.swift` regenerates both 1024px masters
   (`swift Design/render_icons.swift <outputDir>`), and `sips` downscales the
   macOS size set. No binary-only design sources.
 
-## v1.1 — Beta feedback round from Golan Levin (2026-07-29)
+## v1.1 – Beta feedback round from Golan Levin (2026-07-29)
 
 Golan's TestFlight feedback (paraphrased): (1) wants a software option to
-declare the expected camera orientation — trackers do much better without a
-90° rotation to compensate — and the OSC should communicate orientation and
+declare the expected camera orientation – trackers do much better without a
+90° rotation to compensate – and the OSC should communicate orientation and
 dimensions; (2) uses LingDong-'s Processing receiver because he has no Xcode
 toolchain, suggested forking it; (3) general coordinate friction (orientation,
-the mirror option, unknown dimensions — he reported a puzzling "2436×1126").
+the mirror option, unknown dimensions – he reported a puzzling "2436×1126").
 
 Decisions (with Joel):
 
 - **Orientation**: auto-rotating UI via `AVCaptureDevice.RotationCoordinator`
   plus a manual lock (Portrait/Landscape Left/Landscape Right) in Settings.
   The lock exists because gravity-based auto-detection fails when the phone
-  is mounted flat — precisely the installation rig case. Locked mode also
+  is mounted flat – precisely the installation rig case. Locked mode also
   drives the preview rotation, so a mounted phone previews upright.
   Angle → Vision mapping extends the verified portrait case (90° = .right;
-  0 = .up, 180 = .down, 270 = .left) — to be confirmed on device.
+  0 = .up, 180 = .down, 270 = .left) – to be confirmed on device.
 - **`/camerainfo` message** (additive; VisionOSC receivers ignore unknown
   addresses): `int32 width, height, orientationDegrees (0/90/180/270),
   facing (0 back / 1 front)`, sent every processed frame. Pinned by its own
@@ -206,20 +206,20 @@ Decisions (with Joel):
   normalized-coordinates mode was considered and **rejected** (diverges from
   VisionOSC's format).
 - Golan's "2436×1126" doesn't match any capture format we request (720p);
-  with dims now visible on sender, receiver, and wire, he can re-check —
+  with dims now visible on sender, receiver, and wire, he can re-check –
   if a device really reports it, investigate session-preset fallback then.
 - Versions bumped to 1.1.0 (build 2), now shared project-wide settings.
 
 ### v1.1 on-device fix round (2026-07-29)
 
 Joel's first device test: portrait-locked selfie showed the overlay (and the
-receiver's skeleton) rotated 90°, with the status capsule reading 1280×720 —
+receiver's skeleton) rotated 90°, with the status capsule reading 1280×720 –
 i.e. the lock never reached the capture pipeline; Vision analyzed frames as
 landscape while the preview correctly displayed portrait. The lock value had
 flowed through cached state + KVO callbacks, where a race could leave the
 default landscape angle in place. Fixes:
 
-- The orientation lock is now read **directly in the frame callback** — with
+- The orientation lock is now read **directly in the frame callback** – with
   a lock set, no callback ordering can produce a wrong angle.
 - Auto mode caches `videoRotationAngleForHorizonLevelCapture` (not the
   *preview* angle, which can differ for the front camera) via KVO; the
@@ -246,7 +246,7 @@ window scene on every root-view size change): portrait 90°, landscapeRight
 0°, landscapeLeft 180°, upside-down 270°. The same value drives the preview
 connection rotation and the per-frame Vision interpretation, so what is on
 screen and what is sent cannot disagree by construction. With the system
-rotation lock on, the UI stays portrait and so does the data — the correct
+rotation lock on, the UI stays portrait and so does the data – the correct
 outcome. Flat-mounted rigs use the manual lock as designed. Settings →
 Statistics gained an "App version" row (e.g. "1.1.0 (3)") to make
 which-binary-is-this unambiguous during test rounds; build bumped to 3.
@@ -255,12 +255,12 @@ which-binary-is-this unambiguous during test rounds; build bumped to 3.
 
 Joel's retest with build 3: data pipeline fully correct (720×1280 portrait
 everywhere, receiver perfect, overlay registered) but the sender's *video*
-displayed rotated 90° — the explicit `videoRotationAngle` write on the
+displayed rotated 90° – the explicit `videoRotationAngle` write on the
 preview connection did not take effect on device, despite carrying the
 correct value.
 
 **Decision: never touch the preview connection's rotation.** Its default
-renders upright portrait — verified across every build since v1.0. For
+renders upright portrait – verified across every build since v1.0. For
 non-portrait orientations the preview is counter-rotated in SwiftUI view
 space instead (`rotationEffect` + swapped framing so aspect-fill still covers
 the screen); in portrait this applies no transform at all, i.e. exactly the
@@ -270,14 +270,14 @@ historically-verified path. Build bumped to 4.
 
 Build 4 on device: portrait fully correct (video, overlay, receiver, mirror
 toggle behavior all verified by Joel). Both landscape directions showed video
-and overlay consistent with each other but 180° from reality — the tell that
+and overlay consistent with each other but 180° from reality – the tell that
 the pipeline was self-consistent and only the interface→angle mapping had
 the two landscape cases swapped (Apple's device vs interface landscape
 naming crosses over: a device rotated anticlockwise reports interface
 .landscapeRight). Fixed: .landscapeRight → 180°, .landscapeLeft → 0°.
 Build 5.
 
-## v1.2 — macOS sender app (2026-07-30)
+## v1.2 – macOS sender app (2026-07-30)
 
 Joel's request after v1.1.0 shipped: a macOS version of the sender, notarized
 like the receiver and downloadable from GitHub Releases. Decisions:
@@ -287,7 +287,7 @@ like the receiver and downloadable from GitHub Releases. Decisions:
   OverlayView, DetectorChip, VisionAngle helpers) was already
   platform-neutral and moved verbatim out of `Sender/`; both sender targets
   compile it directly. The iOS app is unchanged by construction.
-- **Mac camera model**: no auto-orientation (Mac interfaces don't rotate) —
+- **Mac camera model**: no auto-orientation (Mac interfaces don't rotate) –
   instead a **rig rotation** setting (0/90/180/270°, default 0°) for cameras
   mounted sideways, plus a **camera picker** covering built-in, external
   webcams, and iPhone Continuity Camera, persisted by device uniqueID.
@@ -299,7 +299,7 @@ like the receiver and downloadable from GitHub Releases. Decisions:
 - Icon: same skeleton artwork on a plum background (receiver stays blue) so
   the two Dock icons are distinguishable; `Design/render_icons.swift` renders
   all three variants.
-- **Release**: `Scripts/release.sh` replaces `release-receiver.sh` — builds,
+- **Release**: `Scripts/release.sh` replaces `release-receiver.sh` – builds,
   notarizes, staples, and publishes BOTH mac apps as one GitHub release
   (v1.2.0, builds bumped to 6).
 
@@ -309,20 +309,20 @@ From Joel's mac-to-mac testing:
 
 - **Mac sender sent nothing** (receiver total 0): the sandbox blocks
   *binding* the UDP socket the OSC client sends from unless the app has the
-  `network.server` entitlement — `network.client` alone silently kills
+  `network.server` entitlement – `network.client` alone silently kills
   sending. Added to the mac sender's entitlements.
 - **Face landmarks were systematically distorted on every platform.** Two
   wrong attempts before the right answer: (1) the original code hand-rolled
-  the legacy bbox double-mapping — slightly off; (2) an "image-normalized"
+  the legacy bbox double-mapping – slightly off; (2) an "image-normalized"
   theory (argued from `Landmarks2D.Region` storing no *public* bounding box)
-  scattered the constellation across the whole frame — swiftinterface files
+  scattered the constellation across the whole frame – swiftinterface files
   hide internal storage, so the argument was unsound. Final fix: make no
   assumption at all and use Vision's own
   `Region.pointsInImageCoordinates(imageSize:origin:)` with `.upperLeft`,
   which lands directly in wire space. Lesson recorded: when a framework
   provides its own coordinate converter, use it.
 - **Receiver icon redesigned**: waves now arrive from beyond the corner with
-  an inbound arrow — the mirror of the senders' outgoing broadcast — so
+  an inbound arrow – the mirror of the senders' outgoing broadcast – so
   send/receive Dock icons read differently at a glance.
 - **Project renamed Poseiosc → TrackOSC** (Joel's pick; honors the FaceOSC →
   PoseOSC → VisionOSC lineage; no GitHub collision). Renamed: repo,
@@ -333,7 +333,7 @@ From Joel's mac-to-mac testing:
   the bundle IDs), the PoseioscShared package, the poseiosc-* CLI tools, and
   the `poseiosc-notary` keychain profile.
 
-## v1.3 — Second feedback round from Golan Levin (2026-08-10)
+## v1.3 – Second feedback round from Golan Levin (2026-08-10)
 
 Golan's feedback on the v1.2 TestFlight/notarized builds, plus one feature of
 Joel's own.
@@ -342,16 +342,16 @@ Joel's own.
   (Settings switch + on-screen eye button) that removes the camera video and
   shows just the tracking overlay on black. The capture session and OSC
   output keep running; the preview view simply isn't instantiated. Safe
-  because preview and overlay were already transformed independently — the
+  because preview and overlay were already transformed independently – the
   overlay's coordinates are oriented-frame pixels and its mirroring is
   arithmetic, not a canvas transform.
 - **Face boundary** (Golan: "you're not displaying (or tracking?) the
-  boundary of the face — only the eyes/nose/mouth features within it").
+  boundary of the face – only the eyes/nose/mouth features within it").
   Investigation confirmed this was a **format-fidelity decision, not a
   Vision limitation**: `DetectFaceLandmarksRequest` already returns
   `boundingBox`, `roll`/`yaw`/`pitch`, and the `faceContour` region, but
   VisionOSC's `/faces/arr` (conf + 76×(x,y,precision)) has no slot for them
-  — VisionOSC itself computed the box and angles internally and never sent
+  – VisionOSC itself computed the box and angles internally and never sent
   them. Resolution: **two additive messages** on the `/camerainfo`
   precedent, five VisionOSC messages untouched.
   - `/faces/box`: fixed stride, per face conf + box(l,t,w,h) +
@@ -363,14 +363,14 @@ Joel's own.
     m=0 when unavailable. Documented as an OPEN polyline.
   - Both messages are built ungated from the same observation list so their
     indices always correlate with each other; `/faces/arr` keeps its
-    defensive 76-point gate and may (theoretically) contain fewer faces —
+    defensive 76-point gate and may (theoretically) contain fewer faces –
     documented rather than "fixed", since gating the new messages would
     drop boxes for faces the legacy message can't carry anyway.
   - Both pinned by their own golden-bytes tests; angle sign convention to
     be confirmed on device and documented.
 - **Processing receiver example** (Golan: "a widely-used FLOSS pathway …
   so that students can immediately start making software without knowing
-  the Apple stack"): `Examples/Processing/TrackOSCReceiver/` — a single-file
+  the Apple stack"): `Examples/Processing/TrackOSCReceiver/` – a single-file
   oscP5 sketch parsing all eight messages and replicating the native
   receiver's drawing, including the coordinate-dimension guides. This
   partially revisits the v1.1 "don't fork the Processing receiver" decision
@@ -378,22 +378,22 @@ Joel's own.
   sketch is a reference *consumer* for tinkering, not a replacement.
 - Versions to 1.3.0 (build 8).
 
-## v1.4 — 3D tracking, more detectors, receiver examples (2026-09-18)
+## v1.4 – 3D tracking, more detectors, receiver examples (2026-09-18)
 
 Joel's brief: 3D body tracking (`VNDetectHumanBodyPose3DRequest`) on both
 senders with 3D visualisation in the receiver and Processing; "are there
 other things you could track? barcodes and QR codes?"; receiver demos for
-openFrameworks, TouchDesigner, Max/MSP and Pure Data — "let's plan
+openFrameworks, TouchDesigner, Max/MSP and Pure Data – "let's plan
 together". Planned in plan mode, then built phase by phase on
 `feature/v1.4`.
 
-- **Wire format — four additive messages**, on the v1.3 precedent; the five
+- **Wire format – four additive messages**, on the v1.3 precedent; the five
   VisionOSC addresses and the v1.1/v1.3 additions are byte-for-byte
   unchanged (their golden tests untouched).
   - `/poses3d/arr` carries **metres and pixels per joint** (conf,
     bodyHeight, 17 × (x, y, z, px, py)). Chosen over metres-only or two
     messages so that 2D-only consumers can draw it without projection
-    maths, and 3D consumers get depth — one self-contained message. The 3D
+    maths, and 3D consumers get depth – one self-contained message. The 3D
     joint set is Vision's (root-first, no eyes/ears), so it has its own
     joint order and edge list rather than reusing PoseNet's.
   - `/barcodes/arr`: box + the four corners in the code's own orientation
@@ -401,11 +401,11 @@ together". Planned in plan mode, then built phase by phase on
     axis-aligned box is not enough for anything spatial.
   - `/animalposes/arr` (25 joints, a curated order grouped head → neck →
     legs → tail rather than the SDK's declaration order) and `/humans/arr`
-    (box only) — Joel chose all three of the offered extra detectors.
+    (box only) – Joel chose all three of the offered extra detectors.
   - Decoders now reject negative counts instead of trapping, and clamp
     up-front allocations to the 32-detection cap (retrofitted to the
     existing decoders too; encodings unchanged).
-- **Senders — a `Detector` enum** (`SenderCore/Detector.swift`) replaced
+- **Senders – a `Detector` enum** (`SenderCore/Detector.swift`) replaced
   the five flat toggle fields duplicated across ~14 sites; chips, overlay
   colours, defaults and UserDefaults keys all derive from it. The legacy
   five keys keep their names so an upgrade preserves settings. Nine chips
@@ -415,14 +415,14 @@ together". Planned in plan mode, then built phase by phase on
   class and ~50–100 ms per frame; in the per-frame `async let` batch it
   would have dragged every other detector down to its rate. It now gets the
   latest frame parked for it and sends `/poses3d/arr` whenever it finishes
-  — the same latest-frame-wins idea as the FrameConveyor. Consequence,
+  – the same latest-frame-wins idea as the FrameConveyor. Consequence,
   documented: the 3D message has its own, lower rate, shown in Settings.
 - **Camera intrinsics (iOS only).** `FrameBox` now carries the
   `CMSampleBuffer`; the iOS capture connection enables intrinsic-matrix
   delivery (stabilisation off) and the 3D lane performs on the sample
   buffer, so Vision measures heights instead of estimating them. The API
   is unavailable on macOS, so Mac heights are reference estimates.
-- **Receiver 3D view — RealityKit, not SceneKit.** The plan started with
+- **Receiver 3D view – RealityKit, not SceneKit.** The plan started with
   SceneKit; switched to RealityKit (`RealityView` + `PerspectiveCamera`,
   macOS 15+) because Apple announced SceneKit's deprecation at WWDC 2025.
   Finding: `.realityViewCameraControls(.orbit)` moves an explicit camera
@@ -433,7 +433,7 @@ together". Planned in plan mode, then built phase by phase on
   tick; the floor eases to the lowest ankle.
 - **Receiver surfaces unknown/undecodable messages** (counter + one log
   line per address every 5 s with the reason) instead of dropping them
-  silently — the single most useful affordance for anyone bringing up a
+  silently – the single most useful affordance for anyone bringing up a
   new receiver or sender.
 - **Receiver examples** for seven more platforms, all sharing the
   running-argument-cursor parsing idiom from the Processing sketch and one
@@ -455,6 +455,11 @@ together". Planned in plan mode, then built phase by phase on
   after the on-device check (stand 2 m away: read z; step sideways: x;
   crouch: y) and then written into the README.
 - Versions to 1.4.0 (build 9); camera purpose strings mention barcodes.
+- **No em dashes (2026-09-22).** Joel asked for every em dash (U+2014) in the
+  repository and the App Store copy to become an en dash (U+2013); 294
+  occurrences in 59 files were converted and `Scripts/release.sh` now refuses
+  to release while any tracked file contains one. The check is repeated
+  before every App Store upload.
 
 ### Verification record (2026-09-18)
 

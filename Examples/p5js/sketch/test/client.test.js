@@ -1,4 +1,4 @@
-// node --test — parseMessage on every message shape (the browser-only class is not exercised here).
+// node --test – parseMessage on every message shape (the browser-only class is not exercised here).
 "use strict";
 
 const test = require("node:test");

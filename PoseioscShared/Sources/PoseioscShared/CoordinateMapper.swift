@@ -41,7 +41,7 @@ public enum CoordinateMapper {
     }
 
     /// Convert a Vision normalized point (origin bottom-left) to a bare wire
-    /// coordinate pair (pixels, origin top-left) — for points that carry no
+    /// coordinate pair (pixels, origin top-left) – for points that carry no
     /// per-point confidence, such as barcode corners.
     public static func xy(
         normalizedX x: CGFloat,

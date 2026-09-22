@@ -175,7 +175,7 @@ final class Pose3DScene {
     }
 
     /// Positions a unit cylinder (along +y) between two points by moving,
-    /// rotating and stretching it — no geometry rebuilds.
+    /// rotating and stretching it – no geometry rebuilds.
     private static func place(bone: ModelEntity, from a: SIMD3<Float>, to b: SIMD3<Float>) {
         let delta = b - a
         let length = simd_length(delta)

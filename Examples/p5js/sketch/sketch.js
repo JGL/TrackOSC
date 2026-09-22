@@ -1,5 +1,5 @@
 /**
- * TrackOSC receiver in p5.js — draws all twelve messages, mirroring the
+ * TrackOSC receiver in p5.js – draws all twelve messages, mirroring the
  * Processing reference sketch: skeletons (2D body, hand, animal, and the 3D
  * body via its pixel projections), face landmarks, boxes and contours,
  * text/animal/human boxes, barcode quads, and the coordinate guides.
@@ -30,7 +30,7 @@ function draw() {
 
   if (addresses.length === 0) {
     fill(128); noStroke(); textAlign(CENTER, CENTER);
-    text(client.connected ? "Connected to the bridge — waiting for OSC messages…" : `Connecting to ${BRIDGE_URL}… (is trackosc-bridge running?)`, width / 2, height / 2);
+    text(client.connected ? "Connected to the bridge – waiting for OSC messages…" : `Connecting to ${BRIDGE_URL}… (is trackosc-bridge running?)`, width / 2, height / 2);
     return;
   }
 
@@ -69,7 +69,7 @@ function draw() {
       if (d.points.length === 0) continue;
       beginShape();
       for (const p of d.points) vertex(X(p.x), Y(p.y));
-      endShape();  // open polyline — never CLOSE the jawline
+      endShape();  // open polyline – never CLOSE the jawline
     }
   }
 

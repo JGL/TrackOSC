@@ -1,6 +1,6 @@
 # TrackOSC receiver example for Pure Data
 
-Pd **vanilla** only — no externals. Three patches, kept in one folder:
+Pd **vanilla** only – no externals. Three patches, kept in one folder:
 
 | Patch | What it does |
 |---|---|
@@ -11,7 +11,7 @@ Pd **vanilla** only — no externals. Three patches, kept in one folder:
 ## Run
 
 1. Open `trackosc-receiver.pd` in Pd 0.51 or newer and turn DSP on.
-2. Point a TrackOSC sender at this machine's IP, port 9527 — or send the
+2. Point a TrackOSC sender at this machine's IP, port 9527 – or send the
    synthetic scene from a terminal:
 
 ```bash
@@ -35,10 +35,10 @@ format: `w h n` then the detections. Outlets, left to right:
 | 2 | `/hands/arr` | conf, 21 × (x y c) |
 | 3 | `/faces/arr` | conf, 76 × (x y c) |
 | 4 | `/faces/box` | conf l t w h roll yaw pitch |
-| 5 | `/faces/contour` | conf m, m × (x y) — open jawline |
+| 5 | `/faces/contour` | conf m, m × (x y) – open jawline |
 | 6 | `/texts/arr` | conf l t w h text |
 | 7 | `/animals/arr` | conf l t w h label |
-| 8 | `/poses3d/arr` | conf bodyHeight, 17 × (x y z px py) — metres then pixels |
+| 8 | `/poses3d/arr` | conf bodyHeight, 17 × (x y z px py) – metres then pixels |
 | 9 | `/barcodes/arr` | conf l t w h, 4 × (x y), symbology payload |
 | 10 | `/animalposes/arr` | conf, 25 × (x y c) |
 | 11 | `/humans/arr` | conf l t w h |
@@ -59,7 +59,7 @@ Joint orders: [`Examples/SKELETONS.md`](../SKELETONS.md); wire format: the
 The patches are generated text, checked automatically so every `connect`
 refers to existing objects and no comment is wired. Pure Data isn't
 installed on the development machine, so they have not been opened in Pd by
-the author — if you run them, please open an issue or pull request with
+the author – if you run them, please open an issue or pull request with
 your Pd version and anything that needed changing. One known caveat to
 test: with several faces on screen `/faces/arr` exceeds 4 KB per datagram,
 which some `[netreceive]` builds truncate.

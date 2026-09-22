@@ -3,7 +3,7 @@
 //  Poseiosc Receiver (macOS)
 //
 //  Registers an "_osc._udp" Bonjour service via the dnssd C API.
-//  mDNS registration is just a name/type/port record — it does not need to own
+//  mDNS registration is just a name/type/port record – it does not need to own
 //  the UDP socket, so it coexists with SwiftOSC's server binding the port.
 //  (NetService could do the same but has been deprecated since macOS 10.15.)
 //

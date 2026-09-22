@@ -1,5 +1,5 @@
 /*
-TrackOSCReceiver.scd — a SuperCollider receiver for TrackOSC.
+TrackOSCReceiver.scd – a SuperCollider receiver for TrackOSC.
 
 Parses all twelve TrackOSC messages, sonifies the body and hand poses, and
 draws every kind in a window. Evaluate the whole file (select all, then
@@ -12,15 +12,15 @@ without it.
 
 sclang listens on port 57120 by default; TrackOSC senders use 9527, so this
 file opens that port too (thisProcess.openUDPPort). Only one program can
-listen on a port at a time — quit the native TrackOSC Receiver first.
+listen on a port at a time – quit the native TrackOSC Receiver first.
 
 Wire format: every detection message starts with int32 width, int32 height,
 int32 n (pixels of the sent frame, origin top-left, never mirrored), then n
 detections. In an OSCdef handler msg[0] is the address, so the header is
 msg[1..3] and the first detection starts at msg[4]. A keypoint with
-confidence 0 is missing (VisionOSC's sentinel) — skip it.
+confidence 0 is missing (VisionOSC's sentinel) – skip it.
 
-TRACKOSC SKELETON REFERENCE v1.4 — source: PoseioscShared/Sources/PoseioscShared/Skeleton.swift
+TRACKOSC SKELETON REFERENCE v1.4 – source: PoseioscShared/Sources/PoseioscShared/Skeleton.swift
 (full table in Examples/SKELETONS.md)
 */
 
@@ -85,7 +85,7 @@ var staleSeconds = 0.5;
 			'/faces/box', { n.do { frame.detections = frame.detections.add((conf: next.value, box: Array.fill(4, { next.value }), roll: next.value, yaw: next.value, pitch: next.value)) } },
 			'/faces/contour', { n.do {
 				var conf = next.value;
-				var m = next.value;   // varies per face — always loop on m
+				var m = next.value;   // varies per face – always loop on m
 				frame.detections = frame.detections.add((conf: conf, points: Array.fill(m, { [next.value, next.value] })));
 			} },
 			'/poses3d/arr', { n.do {
@@ -174,7 +174,7 @@ s.waitForBoot {
 };
 
 // ---- Drawing ----
-~trackoscWindow = Window("TrackOSC Receiver (SuperCollider) — listening on " ++ port, Rect(100, 100, 720, 960)).front;
+~trackoscWindow = Window("TrackOSC Receiver (SuperCollider) – listening on " ++ port, Rect(100, 100, 720, 960)).front;
 ~trackoscWindow.view.background = Color.black;
 ~trackoscWindow.onClose = {
 	~trackoscSoundRoutine !? { ~trackoscSoundRoutine.stop };
@@ -245,7 +245,7 @@ s.waitForBoot {
 						Pen.strokeColor = colour; Pen.width = 2;
 						Pen.moveTo(Point(px.(d.points[0][0]), py.(d.points[0][1])));
 						d.points.drop(1).do { |p| Pen.lineTo(Point(px.(p[0]), py.(p[1]))) };
-						Pen.stroke;   // open jawline — never closed
+						Pen.stroke;   // open jawline – never closed
 					};
 				} },
 				'/texts/arr', { frame.detections.do { |d| drawBox.(d.box, d.label ++ " " ++ d.conf.round(0.01), colour) } },

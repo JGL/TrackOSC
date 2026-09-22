@@ -1,5 +1,5 @@
 /*
-trackosc.parse.js — a [js] parser for TrackOSC messages in Max.
+trackosc.parse.js – a [js] parser for TrackOSC messages in Max.
 
 Connect [udpreceive 9527 @maxpacketsize 65536] to the inlet. Each OSC message
 arrives with its address as the selector ("/poses/arr 720 1280 1 0.95 …"), so
@@ -23,9 +23,9 @@ Outlets:
 
 Wire format: every detection message starts with int32 width, int32 height,
 int32 n (pixels of the sent frame, origin top-left, never mirrored), then n
-detections — see the root README "OSC wire format".
+detections – see the root README "OSC wire format".
 
-TRACKOSC SKELETON REFERENCE v1.4 — source: PoseioscShared/Sources/PoseioscShared/Skeleton.swift
+TRACKOSC SKELETON REFERENCE v1.4 – source: PoseioscShared/Sources/PoseioscShared/Skeleton.swift
 (full table in Examples/SKELETONS.md)
 */
 
@@ -135,7 +135,7 @@ function parse(address, args) {
 	} else if (address === "/faces/contour") {
 		for (i = 0; i < n; i++) {
 			d = { conf: cur.next(), points: [] };
-			var m = cur.count();   // varies per face — always loop on m
+			var m = cur.count();   // varies per face – always loop on m
 			for (j = 0; j < m; j++) d.points.push({ x: cur.next(), y: cur.next() });
 			frame.detections.push(d);
 		}

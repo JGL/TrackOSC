@@ -9,7 +9,7 @@
 import Foundation
 
 /// A single keypoint in pixel coordinates (origin top-left).
-/// `confidence` carries Vision's per-point confidence — except for face points,
+/// `confidence` carries Vision's per-point confidence – except for face points,
 /// where it carries the per-point precision estimate, matching VisionOSC.
 public struct WirePoint: Sendable, Equatable {
     public var x: Float
@@ -244,7 +244,7 @@ public struct DetectionFrame<Detection: Sendable & Equatable>: Sendable, Equatab
 /// Camera geometry broadcast alongside detection frames so receivers don't
 /// have to infer orientation. `orientationDegrees` is the rotation of the
 /// phone relative to its sensor-native landscape position: 0 = landscape,
-/// 90 = portrait, 180 = opposite landscape, 270 = portrait upside down —
+/// 90 = portrait, 180 = opposite landscape, 270 = portrait upside down –
 /// the same values as AVFoundation's video rotation angles.
 public struct CameraInfo: Sendable, Equatable {
     public var width: Int32

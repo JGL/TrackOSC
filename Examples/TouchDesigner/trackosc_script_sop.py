@@ -1,5 +1,5 @@
 """Optional Script SOP callbacks: turns the ``poses`` table (filled by
-trackosc_callbacks.py) into line geometry — one open polyline per skeleton
+trackosc_callbacks.py) into line geometry – one open polyline per skeleton
 edge, in normalised coordinates (x across -0.5…0.5, y up), so a Geometry COMP
 with a Line MAT draws the skeleton in 3D space.
 

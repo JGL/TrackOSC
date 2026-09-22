@@ -3,7 +3,7 @@
 //  Poseiosc Sender (iOS)
 //
 //  Hosts the CameraManager's AVCaptureVideoPreviewLayer. The layer (and its
-//  unmirrored configuration) is owned by CameraManager — see the note there
+//  unmirrored configuration) is owned by CameraManager – see the note there
 //  about why mirroring cannot be configured from this view.
 //
 

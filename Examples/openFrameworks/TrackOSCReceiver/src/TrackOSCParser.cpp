@@ -120,7 +120,7 @@ Frame parseFrame(const ofxOscMessage& message) {
         for (int32_t i = 0; i < n; i++) {
             Contour c;
             c.confidence = cur.f();
-            const int32_t m = cur.count();   // varies per face — always loop on m
+            const int32_t m = cur.count();   // varies per face – always loop on m
             for (int32_t j = 0; j < m; j++) { float x = cur.f(); float y = cur.f(); c.points.emplace_back(x, y); }
             frame.contours.push_back(std::move(c));
         }
