@@ -9,12 +9,16 @@
 /* Begin PBXBuildFile section */
 		0061615187CED3AD9B794012 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A47E5298E4628C7ED98EC8ED /* Assets.xcassets */; };
 		0201500FD434F7A12CD0301E /* FrameConveyor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 70447DEDDBD809829F414AB4 /* FrameConveyor.swift */; };
+		0303E773711B02D6398180B7 /* PresenceTracker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 21B07BAA4F2A2D9245E9C48F /* PresenceTracker.swift */; };
+		06103C4A68625AAC9F8EA98D /* ConnectionToolbar.swift in Sources */ = {isa = PBXBuildFile; fileRef = BD1672789D4FA22707FEB23F /* ConnectionToolbar.swift */; };
 		065997331362EE3A416D8917 /* TransportStrip.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B72D2F8BFF3353D566F7781 /* TransportStrip.swift */; };
 		06DB1B3847D50A2CE777A2D7 /* Detector.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA84CAF9BCFB6A2ECD2C6FD4 /* Detector.swift */; };
 		08E957E717DF675F8D28C75B /* MacContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BD3C524FDFE54A15AF2F4FE7 /* MacContentView.swift */; };
 		098CB90A7F581FDCF41BBD10 /* FrameKind.swift in Sources */ = {isa = PBXBuildFile; fileRef = 62B1966A401470721FB1A3D1 /* FrameKind.swift */; };
 		0C0483E3EACE1C90D5E0B365 /* VisualizerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B80AF4C5BF98CDC03EE3608D /* VisualizerView.swift */; };
 		0E369A5CB6DB7265E65DDC2C /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 044FC8024A8B6744C7E677C2 /* SettingsView.swift */; };
+		0E6873D5401F9B5FB189E121 /* PoseioscShared in Frameworks */ = {isa = PBXBuildFile; productRef = 5C3F2A6130FD8CB81F2ECE3C /* PoseioscShared */; };
+		107DE9896DFEEC728A85CE48 /* BonjourAdvertiser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51B215B8051B936FB54F092A /* BonjourAdvertiser.swift */; };
 		12F40DAD2A3F30C7C98E80F0 /* ConnectionToolbar.swift in Sources */ = {isa = PBXBuildFile; fileRef = BD1672789D4FA22707FEB23F /* ConnectionToolbar.swift */; };
 		1460E3D24DA7255D2B70369A /* MacAppModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 40B24378FCA4958CC6C67878 /* MacAppModel.swift */; };
 		1506EB84B34A9582A5F556F0 /* MacCameraPreviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73BF246A8EDA6004AE9CB0CA /* MacCameraPreviewView.swift */; };
@@ -26,10 +30,14 @@
 		25353A904B02823C05DDE577 /* ReceiverSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAF52B1CBDA503640E633BD6 /* ReceiverSettings.swift */; };
 		25CF2C1B5FB7D54588432F6B /* ReceiverStatusView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F7488305980AB07FCBF5019 /* ReceiverStatusView.swift */; };
 		2CDB8BB9E645A22EA93DDA56 /* BonjourAdvertiser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51B215B8051B936FB54F092A /* BonjourAdvertiser.swift */; };
+		30D4C8D93143F5A1CBA84362 /* SwiftOSC in Frameworks */ = {isa = PBXBuildFile; productRef = 4A0457A8826DA7893B178F2D /* SwiftOSC */; };
+		3146B0A31CC0CB11D2247BF2 /* Frames.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D3ADE61D12C0668D0A6E837 /* Frames.swift */; };
 		35991AC4FD9ACBA506145957 /* DatagramForwarder.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAEDF8B3FC84CE765D22B9E9 /* DatagramForwarder.swift */; };
 		361BABAEB93CA23E2EDF35C7 /* VisualizerMode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1C390B6BA36678B01F799334 /* VisualizerMode.swift */; };
 		375D975B268E95FF3591E0FC /* Frames.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D3ADE61D12C0668D0A6E837 /* Frames.swift */; };
 		388DDE31CDC20F2CF398E228 /* PoseioscReceiverApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E642C8E274B338B0A9BE95F /* PoseioscReceiverApp.swift */; };
+		3B2CD8F6D3FEC735ACB6546A /* UDPDatagramServer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57FB75629F78B834244A206C /* UDPDatagramServer.swift */; };
+		3B31D2459F773EE7D8B203CC /* FrameMetrics.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12994EFE58D0AA53CDDA7858 /* FrameMetrics.swift */; };
 		43B9D5C8F28A5EE3D4FB3F90 /* VisionProcessor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 25C34A45CD50185556A6E8CF /* VisionProcessor.swift */; };
 		4517204E993973CA44B019A2 /* PoseioscShared in Frameworks */ = {isa = PBXBuildFile; productRef = 3D1DFD7A45B58CCEBD9C5828 /* PoseioscShared */; };
 		4712F326B630D8839CCB313C /* PresentationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92C3225D9C6159A528F51AF9 /* PresentationController.swift */; };
@@ -38,28 +46,39 @@
 		54568B16CDC6357DC59AED35 /* ControlBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BE01430EF3AD6073346F5DA /* ControlBarView.swift */; };
 		54F6A43050021C4C1FF23CDE /* OSCSenderService.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1E70D787D793EDCC6179AEE /* OSCSenderService.swift */; };
 		57A71BF5377190CB84C6ECE0 /* PoseioscShared in Frameworks */ = {isa = PBXBuildFile; productRef = 5B931CA9CDAA003997500C7A /* PoseioscShared */; };
+		59F9224E1D9190B7FF4DAA74 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 0753DB548F3DF6C5D1D1C379 /* Assets.xcassets */; };
+		5B3AF6BCD32E6D366FF324DC /* SpeakerStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D08F9F13ACB14920A7CF2F9 /* SpeakerStore.swift */; };
 		5BCC9E56D9FDE7DDD72A397F /* ReceiverSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAF52B1CBDA503640E633BD6 /* ReceiverSettings.swift */; };
 		5BE9834BF9E35309AFE2F240 /* UDPDatagramSender.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F78E5BE87BEE448723FA096 /* UDPDatagramSender.swift */; };
+		5DE4E9F002F31A05FBBD480A /* ReceiverService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95326C0030E92840B79FFB79 /* ReceiverService.swift */; };
 		5EF6D1A8DB671C9B3F9B1C8F /* ObservationMapping.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E180D1324327865CBF54DB9 /* ObservationMapping.swift */; };
 		5F049B65713EDDC3E4BBBB77 /* OSCSenderService.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1E70D787D793EDCC6179AEE /* OSCSenderService.swift */; };
 		6032F85D894C12A60B29F472 /* PlayPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43282895DC1339D8266A10EA /* PlayPanel.swift */; };
 		61C17E2198891967C2932D6A /* ObservationMapping.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E180D1324327865CBF54DB9 /* ObservationMapping.swift */; };
+		64BEC73579E1987FCCB5CBF9 /* ReceiverSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAF52B1CBDA503640E633BD6 /* ReceiverSettings.swift */; };
 		651E569EB4AE580C9484FBAB /* MacSettingsStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 632C0DB0542BE2D695BC5D2E /* MacSettingsStore.swift */; };
 		65BAF786EFFCD8D229E6C565 /* ReceiverCommands.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3C4BC66F76FEFBB8603E7E0 /* ReceiverCommands.swift */; };
+		66E746BAFC57F805402D8AFF /* TrackOSCSpeakerApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69C514213960AC3A423DE307 /* TrackOSCSpeakerApp.swift */; };
 		67ABEAD99EC5483D6B0517C1 /* ReceiverCommands.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3C4BC66F76FEFBB8603E7E0 /* ReceiverCommands.swift */; };
 		67AE95A055A7C66D77AD107D /* ReceiverService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95326C0030E92840B79FFB79 /* ReceiverService.swift */; };
 		67CC0F99B758ED66715CF35A /* FrameKind.swift in Sources */ = {isa = PBXBuildFile; fileRef = 62B1966A401470721FB1A3D1 /* FrameKind.swift */; };
+		6AF30C2364F12514F735653B /* NarrationEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = D173872C268611042B1A905F /* NarrationEngine.swift */; };
+		6EE59014EDA40B2EC3A1DA64 /* ReceiverModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E3432CAF33DF6D383F95379 /* ReceiverModel.swift */; };
 		7065FC9A71EAE5575CF461C4 /* ReceiverService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95326C0030E92840B79FFB79 /* ReceiverService.swift */; };
 		70E3CAF9B00A43FB7843CAA0 /* OverlayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 530A6F40C76AC8E1B770F370 /* OverlayView.swift */; };
 		7177FAC0496F048EA8EA7926 /* MacCameraManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5811FE8746B64C33EE554C13 /* MacCameraManager.swift */; };
 		73DDCDB3284FB36FF0A1DB24 /* SwiftOSC in Frameworks */ = {isa = PBXBuildFile; productRef = E52C334B871E6E0B89351DCC /* SwiftOSC */; };
+		7592AA04984B3E010A5DE121 /* DatagramForwarder.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAEDF8B3FC84CE765D22B9E9 /* DatagramForwarder.swift */; };
 		771769B673223646394BDA1C /* SwiftOSC in Frameworks */ = {isa = PBXBuildFile; productRef = 1D63DFC8FDB7C642ED346B13 /* SwiftOSC */; };
 		7841C0CA538D65F7C996ECB3 /* DatagramForwarder.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAEDF8B3FC84CE765D22B9E9 /* DatagramForwarder.swift */; };
+		788ED95140F43824761442D8 /* FrameMetrics.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12994EFE58D0AA53CDDA7858 /* FrameMetrics.swift */; };
 		798691BAD52116D0B404E522 /* PoseioscSenderApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 018F41691E7A33C8E6E98248 /* PoseioscSenderApp.swift */; };
 		799FC02BE8C1C7830141A28E /* SettingsStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = B819CD68EA4B13B83875A8FE /* SettingsStore.swift */; };
 		7ABF6548D7185A6DEE614E14 /* CameraOrientationSetting.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6A8D53A59285A22D1436833A /* CameraOrientationSetting.swift */; };
+		7D06738F0F929A8E64E9C767 /* FrameKind.swift in Sources */ = {isa = PBXBuildFile; fileRef = 62B1966A401470721FB1A3D1 /* FrameKind.swift */; };
 		822E91F58075F1CCB720600A /* ReceiverWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD3D69738B300368D39B7247 /* ReceiverWindow.swift */; };
 		833FDB81E7FDAC46127AD5A9 /* RecordPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00B2712563D79B97364EBBC0 /* RecordPanel.swift */; };
+		84DAD7D385E358A5F2C6DD9C /* VoicesPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5444409F02A098639556785F /* VoicesPanel.swift */; };
 		891D8C7E98D0DE5CF16D898C /* BonjourAdvertiser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51B215B8051B936FB54F092A /* BonjourAdvertiser.swift */; };
 		8F48C29C69C4B202AF603167 /* PoseioscShared in Frameworks */ = {isa = PBXBuildFile; productRef = D9C35C7B8BEDADE26B92F049 /* PoseioscShared */; };
 		8FBA47031FE2007B5FCD74B1 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A63A90E30A5B66DF5EBCA520 /* Assets.xcassets */; };
@@ -67,29 +86,43 @@
 		945099898B7A7E7B762ED60F /* VisualizerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B80AF4C5BF98CDC03EE3608D /* VisualizerView.swift */; };
 		96AE843D0BFC95E3574A7B8D /* Pose3DScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F1ED956EB76AF4D2DF40276 /* Pose3DScene.swift */; };
 		96B29DAB8F0F88451D075A1B /* PlayerController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E62AF89FF5B3124465FB8223 /* PlayerController.swift */; };
+		990952998BB2C277274247AD /* FrameMetrics.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12994EFE58D0AA53CDDA7858 /* FrameMetrics.swift */; };
 		9B985C927B272B65CCD2BFBF /* AppModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4BB6041EDA4F90281819196 /* AppModel.swift */; };
+		9C19766A94EF0EB87B204A13 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1BD75A601554697C774DDF73 /* ContentView.swift */; };
 		9FC8F5E728667D4EDB433DD6 /* ReceiverStatusView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F7488305980AB07FCBF5019 /* ReceiverStatusView.swift */; };
 		A75ADBF8805F97330A27454D /* VisionProcessor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 25C34A45CD50185556A6E8CF /* VisionProcessor.swift */; };
 		AA4182149E871179D668AF93 /* UDPDatagramSender.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F78E5BE87BEE448723FA096 /* UDPDatagramSender.swift */; };
 		ACB313DA30EF8DBEA42707FE /* PoseioscSenderMacApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16BDA48C2E84E59039EAF4B9 /* PoseioscSenderMacApp.swift */; };
 		AEABBE9BF19749DD8870268B /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 3502EA0A0767C242BEB50EE3 /* Assets.xcassets */; };
 		AFF96C82C535F8F6909C3294 /* PresentationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92C3225D9C6159A528F51AF9 /* PresentationController.swift */; };
+		B455BCF1E743470E3760C931 /* PresenceTracker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 21B07BAA4F2A2D9245E9C48F /* PresenceTracker.swift */; };
 		B62C06DF4C2018A9A252AE3F /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B8A575252223D6F4E4880C1 /* ContentView.swift */; };
 		B85029810F8224D6C4B274EA /* ReceiverModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E3432CAF33DF6D383F95379 /* ReceiverModel.swift */; };
 		B8863921CB448D84E38293CC /* FrameConveyor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 70447DEDDBD809829F414AB4 /* FrameConveyor.swift */; };
 		BB6DC60B314897D6626E8B3A /* TrackOSCApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46489669183A3C4C3DCB5ACD /* TrackOSCApp.swift */; };
 		BC08F94DD2246500B7E3FAA0 /* PoseioscShared in Frameworks */ = {isa = PBXBuildFile; productRef = DC8182587B6E0AEAD535D789 /* PoseioscShared */; };
+		BCACDEF08044A344E83EB98E /* VisualizerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B80AF4C5BF98CDC03EE3608D /* VisualizerView.swift */; };
 		BD6E86BD33A33250D7B12141 /* DetectorChip.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3FEFBCE031E1972E63A30199 /* DetectorChip.swift */; };
+		BFCBD5C9B9F9723BB323E54A /* TrackOSCApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46489669183A3C4C3DCB5ACD /* TrackOSCApp.swift */; };
 		C1A6C84FFF888AC89BB7B8D2 /* RecorderStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = C63795CD28888EE9C3BF9598 /* RecorderStore.swift */; };
 		C29E086CD24439798F4CDBC0 /* RecorderController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74F48E3554BF3F95CD73A9CB /* RecorderController.swift */; };
+		C3FF1671F58FD2587C916EEF /* ReceiverStatusView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F7488305980AB07FCBF5019 /* ReceiverStatusView.swift */; };
 		C4625786DBF05E2476775185 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 0FCA4347894328D3107380D0 /* Assets.xcassets */; };
 		C66E4AC917F178503C3472CA /* SwiftOSC in Frameworks */ = {isa = PBXBuildFile; productRef = 42F1AF401C0C38A407BD7005 /* SwiftOSC */; };
 		C75E8DA24396C3FED330B67F /* Detector.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA84CAF9BCFB6A2ECD2C6FD4 /* Detector.swift */; };
+		C78B00EC22381E93B3B4CBB9 /* UDPDatagramSender.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F78E5BE87BEE448723FA096 /* UDPDatagramSender.swift */; };
 		C8BB858C0F5CBB946E62A8A2 /* VisionAngle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3873AC66AD6991EB0F5F89B5 /* VisionAngle.swift */; };
 		C966898D7147A40AFF57088C /* CameraManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAB2651F0CD22279ABBAE118 /* CameraManager.swift */; };
 		D7363CC71E58EC679C7AB72E /* ConnectionToolbar.swift in Sources */ = {isa = PBXBuildFile; fileRef = BD1672789D4FA22707FEB23F /* ConnectionToolbar.swift */; };
 		D76C73989A4FDCABBAFAE3E0 /* RecordingsFolder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 614F3F49A94F2D49C0D9EE8D /* RecordingsFolder.swift */; };
+		DADB1368376C6A57ECDA4812 /* SpeechPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32858728A18EB858742EDF15 /* SpeechPanel.swift */; };
 		DBFC1FB82E0AC96F3071981A /* OverlayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 530A6F40C76AC8E1B770F370 /* OverlayView.swift */; };
+		DFC8579E7A7868E479EDC441 /* SpeakerStage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6250C4AF817BF7046AFD497A /* SpeakerStage.swift */; };
+		E1208FDE00AC221CAC4441A2 /* ReceiverCommands.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3C4BC66F76FEFBB8603E7E0 /* ReceiverCommands.swift */; };
+		E285A3116CA3232C7C4A31AF /* PresenceTracker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 21B07BAA4F2A2D9245E9C48F /* PresenceTracker.swift */; };
+		E50F8A206C4C1FED559FE313 /* ReceiverWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD3D69738B300368D39B7247 /* ReceiverWindow.swift */; };
+		E87BD50FD2E878A9C8477C2D /* TranscriptPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B76186093CC3DE3EFF697723 /* TranscriptPanel.swift */; };
+		E98FF1422B444CD9563F243D /* SpeakerSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 222BAEE6D4120E88E261CE7C /* SpeakerSettings.swift */; };
 		E9BD062CC91A23059C224414 /* TrackOSCRecorderApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB16DDD72423BB4B655CBB9F /* TrackOSCRecorderApp.swift */; };
 		EA56466231D75F01FD30F5DB /* CameraPreviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03807F39A230F25D975DAC80 /* CameraPreviewView.swift */; };
 		EF9F38831DC420C08CEC5F3D /* Frames.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D3ADE61D12C0668D0A6E837 /* Frames.swift */; };
@@ -97,9 +130,13 @@
 		F1A387CAFC75B8A5A945C0B0 /* SwiftOSC in Frameworks */ = {isa = PBXBuildFile; productRef = FBC2805A38555F74868050CE /* SwiftOSC */; };
 		F1E91F3F9E8287B80709282F /* VisionAngle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3873AC66AD6991EB0F5F89B5 /* VisionAngle.swift */; };
 		F444235649C10EFC90AED5F0 /* ReceiverModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E3432CAF33DF6D383F95379 /* ReceiverModel.swift */; };
+		F481C808947F0798A9B9C16C /* NarrationPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB8C8AFBC6031D76213D73AF /* NarrationPanel.swift */; };
+		F4FE70E58625878BDFAA7755 /* VoiceCatalog.swift in Sources */ = {isa = PBXBuildFile; fileRef = E72EA9E4C1713C047D4A28AA /* VoiceCatalog.swift */; };
 		F6FF5C17EE66C9679ED0C9DB /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E771A674751535E40EA2F0A9 /* ContentView.swift */; };
 		F76EBB593BE1B414658CE10F /* DetectorChip.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3FEFBCE031E1972E63A30199 /* DetectorChip.swift */; };
+		F7DFF8363E9A00697BA05091 /* PresentationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92C3225D9C6159A528F51AF9 /* PresentationController.swift */; };
 		FE1761B4BE215281FABCF24D /* ReceiverStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = DFFE2C0EA189D5506841584E /* ReceiverStore.swift */; };
+		FEFD22362600B41622719B2B /* SpeechController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB780461C44279EB6CE93D9F /* SpeechController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -107,18 +144,24 @@
 		018F41691E7A33C8E6E98248 /* PoseioscSenderApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PoseioscSenderApp.swift; sourceTree = "<group>"; };
 		03807F39A230F25D975DAC80 /* CameraPreviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraPreviewView.swift; sourceTree = "<group>"; };
 		044FC8024A8B6744C7E677C2 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		0753DB548F3DF6C5D1D1C379 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		0FCA4347894328D3107380D0 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		11C58630B69B8B431316A046 /* TrackOSC.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = TrackOSC.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		12994EFE58D0AA53CDDA7858 /* FrameMetrics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FrameMetrics.swift; sourceTree = "<group>"; };
 		14831F8759CB808A50B99626 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		1520D8868E75894A2698E10D /* TrackOSCRecorder.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = TrackOSCRecorder.entitlements; sourceTree = "<group>"; };
 		16BDA48C2E84E59039EAF4B9 /* PoseioscSenderMacApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PoseioscSenderMacApp.swift; sourceTree = "<group>"; };
+		1BD75A601554697C774DDF73 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		1C390B6BA36678B01F799334 /* VisualizerMode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VisualizerMode.swift; sourceTree = "<group>"; };
 		1E180D1324327865CBF54DB9 /* ObservationMapping.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ObservationMapping.swift; sourceTree = "<group>"; };
 		1F7488305980AB07FCBF5019 /* ReceiverStatusView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReceiverStatusView.swift; sourceTree = "<group>"; };
+		21B07BAA4F2A2D9245E9C48F /* PresenceTracker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PresenceTracker.swift; sourceTree = "<group>"; };
+		222BAEE6D4120E88E261CE7C /* SpeakerSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeakerSettings.swift; sourceTree = "<group>"; };
 		22436542D01EAD8CED285668 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		25C34A45CD50185556A6E8CF /* VisionProcessor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VisionProcessor.swift; sourceTree = "<group>"; };
 		2E3432CAF33DF6D383F95379 /* ReceiverModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReceiverModel.swift; sourceTree = "<group>"; };
 		2FA9D6299A0FF49D3BAE7BA9 /* PoseioscSenderMac.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = PoseioscSenderMac.entitlements; sourceTree = "<group>"; };
+		32858728A18EB858742EDF15 /* SpeechPanel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeechPanel.swift; sourceTree = "<group>"; };
 		3470253A507EB6108BA68854 /* MacSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MacSettingsView.swift; sourceTree = "<group>"; };
 		3502EA0A0767C242BEB50EE3 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		3873AC66AD6991EB0F5F89B5 /* VisionAngle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VisionAngle.swift; sourceTree = "<group>"; };
@@ -127,14 +170,20 @@
 		40B24378FCA4958CC6C67878 /* MacAppModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MacAppModel.swift; sourceTree = "<group>"; };
 		43282895DC1339D8266A10EA /* PlayPanel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayPanel.swift; sourceTree = "<group>"; };
 		43812415DB456C47561F7F15 /* PoseioscShared */ = {isa = PBXFileReference; lastKnownFileType = folder; name = PoseioscShared; path = PoseioscShared; sourceTree = SOURCE_ROOT; };
+		45C3F72736E2F6F48A5CDC74 /* TrackOSCSpeaker.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TrackOSCSpeaker.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		46489669183A3C4C3DCB5ACD /* TrackOSCApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackOSCApp.swift; sourceTree = "<group>"; };
+		4D08F9F13ACB14920A7CF2F9 /* SpeakerStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeakerStore.swift; sourceTree = "<group>"; };
 		51B215B8051B936FB54F092A /* BonjourAdvertiser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BonjourAdvertiser.swift; sourceTree = "<group>"; };
 		530A6F40C76AC8E1B770F370 /* OverlayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OverlayView.swift; sourceTree = "<group>"; };
+		5444409F02A098639556785F /* VoicesPanel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VoicesPanel.swift; sourceTree = "<group>"; };
 		57FB75629F78B834244A206C /* UDPDatagramServer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UDPDatagramServer.swift; sourceTree = "<group>"; };
 		5811FE8746B64C33EE554C13 /* MacCameraManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MacCameraManager.swift; sourceTree = "<group>"; };
+		5F50CE75675C4059BC693113 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		614F3F49A94F2D49C0D9EE8D /* RecordingsFolder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecordingsFolder.swift; sourceTree = "<group>"; };
+		6250C4AF817BF7046AFD497A /* SpeakerStage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeakerStage.swift; sourceTree = "<group>"; };
 		62B1966A401470721FB1A3D1 /* FrameKind.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FrameKind.swift; sourceTree = "<group>"; };
 		632C0DB0542BE2D695BC5D2E /* MacSettingsStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MacSettingsStore.swift; sourceTree = "<group>"; };
+		69C514213960AC3A423DE307 /* TrackOSCSpeakerApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackOSCSpeakerApp.swift; sourceTree = "<group>"; };
 		6A8D53A59285A22D1436833A /* CameraOrientationSetting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraOrientationSetting.swift; sourceTree = "<group>"; };
 		6B72D2F8BFF3353D566F7781 /* TransportStrip.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransportStrip.swift; sourceTree = "<group>"; };
 		6B8A575252223D6F4E4880C1 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -144,6 +193,7 @@
 		70447DEDDBD809829F414AB4 /* FrameConveyor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FrameConveyor.swift; sourceTree = "<group>"; };
 		73BF246A8EDA6004AE9CB0CA /* MacCameraPreviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MacCameraPreviewView.swift; sourceTree = "<group>"; };
 		74F48E3554BF3F95CD73A9CB /* RecorderController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecorderController.swift; sourceTree = "<group>"; };
+		795CCF0F8E07A2B649676DDC /* TrackOSCSpeaker.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = TrackOSCSpeaker.entitlements; sourceTree = "<group>"; };
 		7A7A1CCCB19259E80101446F /* Visualizer3DView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Visualizer3DView.swift; sourceTree = "<group>"; };
 		8BE01430EF3AD6073346F5DA /* ControlBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ControlBarView.swift; sourceTree = "<group>"; };
 		8F01314D4D2BB20D1A9AA995 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
@@ -155,8 +205,10 @@
 		A63A90E30A5B66DF5EBCA520 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		AAB2651F0CD22279ABBAE118 /* CameraManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraManager.swift; sourceTree = "<group>"; };
 		AB16DDD72423BB4B655CBB9F /* TrackOSCRecorderApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackOSCRecorderApp.swift; sourceTree = "<group>"; };
+		AB8C8AFBC6031D76213D73AF /* NarrationPanel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NarrationPanel.swift; sourceTree = "<group>"; };
 		AD3D69738B300368D39B7247 /* ReceiverWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReceiverWindow.swift; sourceTree = "<group>"; };
 		B703E50BF1CBFE19E73F0DA6 /* TrackOSCReceiver.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TrackOSCReceiver.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		B76186093CC3DE3EFF697723 /* TranscriptPanel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TranscriptPanel.swift; sourceTree = "<group>"; };
 		B80AF4C5BF98CDC03EE3608D /* VisualizerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VisualizerView.swift; sourceTree = "<group>"; };
 		B819CD68EA4B13B83875A8FE /* SettingsStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsStore.swift; sourceTree = "<group>"; };
 		BD1672789D4FA22707FEB23F /* ConnectionToolbar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConnectionToolbar.swift; sourceTree = "<group>"; };
@@ -167,11 +219,14 @@
 		CA84CAF9BCFB6A2ECD2C6FD4 /* Detector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Detector.swift; sourceTree = "<group>"; };
 		CAF52B1CBDA503640E633BD6 /* ReceiverSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReceiverSettings.swift; sourceTree = "<group>"; };
 		CC3412A3188D3775B908D163 /* TrackOSCRecorder.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TrackOSCRecorder.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		D173872C268611042B1A905F /* NarrationEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NarrationEngine.swift; sourceTree = "<group>"; };
 		D4BB6041EDA4F90281819196 /* AppModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppModel.swift; sourceTree = "<group>"; };
+		DB780461C44279EB6CE93D9F /* SpeechController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeechController.swift; sourceTree = "<group>"; };
 		DC3D7CD08642E802F1B7F668 /* StatusBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatusBarView.swift; sourceTree = "<group>"; };
 		DFFE2C0EA189D5506841584E /* ReceiverStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReceiverStore.swift; sourceTree = "<group>"; };
 		E3C4BC66F76FEFBB8603E7E0 /* ReceiverCommands.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReceiverCommands.swift; sourceTree = "<group>"; };
 		E62AF89FF5B3124465FB8223 /* PlayerController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerController.swift; sourceTree = "<group>"; };
+		E72EA9E4C1713C047D4A28AA /* VoiceCatalog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VoiceCatalog.swift; sourceTree = "<group>"; };
 		E771A674751535E40EA2F0A9 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		EA84C5C3CA310524FA61766A /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		EAEDF8B3FC84CE765D22B9E9 /* DatagramForwarder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DatagramForwarder.swift; sourceTree = "<group>"; };
@@ -184,6 +239,15 @@
 			files = (
 				C66E4AC917F178503C3472CA /* SwiftOSC in Frameworks */,
 				57A71BF5377190CB84C6ECE0 /* PoseioscShared in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		628C7FFE87F047CDEAF97902 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				30D4C8D93143F5A1CBA84362 /* SwiftOSC in Frameworks */,
+				0E6873D5401F9B5FB189E121 /* PoseioscShared in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -245,6 +309,45 @@
 			path = Presentation;
 			sourceTree = "<group>";
 		};
+		182344CE54C40A3AEEA945AD /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				1BD75A601554697C774DDF73 /* ContentView.swift */,
+				AB8C8AFBC6031D76213D73AF /* NarrationPanel.swift */,
+				6250C4AF817BF7046AFD497A /* SpeakerStage.swift */,
+				32858728A18EB858742EDF15 /* SpeechPanel.swift */,
+				B76186093CC3DE3EFF697723 /* TranscriptPanel.swift */,
+				5444409F02A098639556785F /* VoicesPanel.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		1838212BA08480CD1FCC5DEE /* Analysis */ = {
+			isa = PBXGroup;
+			children = (
+				12994EFE58D0AA53CDDA7858 /* FrameMetrics.swift */,
+				21B07BAA4F2A2D9245E9C48F /* PresenceTracker.swift */,
+			);
+			path = Analysis;
+			sourceTree = "<group>";
+		};
+		3C484D8BEC464D06EC05AAFB /* Speaker */ = {
+			isa = PBXGroup;
+			children = (
+				0753DB548F3DF6C5D1D1C379 /* Assets.xcassets */,
+				5F50CE75675C4059BC693113 /* Info.plist */,
+				D173872C268611042B1A905F /* NarrationEngine.swift */,
+				222BAEE6D4120E88E261CE7C /* SpeakerSettings.swift */,
+				4D08F9F13ACB14920A7CF2F9 /* SpeakerStore.swift */,
+				DB780461C44279EB6CE93D9F /* SpeechController.swift */,
+				795CCF0F8E07A2B649676DDC /* TrackOSCSpeaker.entitlements */,
+				69C514213960AC3A423DE307 /* TrackOSCSpeakerApp.swift */,
+				E72EA9E4C1713C047D4A28AA /* VoiceCatalog.swift */,
+				182344CE54C40A3AEEA945AD /* Views */,
+			);
+			path = Speaker;
+			sourceTree = "<group>";
+		};
 		5978E00BA11D99E1BF4875B7 /* Views */ = {
 			isa = PBXGroup;
 			children = (
@@ -299,6 +402,7 @@
 				B703E50BF1CBFE19E73F0DA6 /* TrackOSCReceiver.app */,
 				CC3412A3188D3775B908D163 /* TrackOSCRecorder.app */,
 				6DBA3CC5FB854CD71D3810E4 /* TrackOSCSender.app */,
+				45C3F72736E2F6F48A5CDC74 /* TrackOSCSpeaker.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -354,6 +458,7 @@
 				95326C0030E92840B79FFB79 /* ReceiverService.swift */,
 				CAF52B1CBDA503640E633BD6 /* ReceiverSettings.swift */,
 				46489669183A3C4C3DCB5ACD /* TrackOSCApp.swift */,
+				1838212BA08480CD1FCC5DEE /* Analysis */,
 				E30ED84052110F307FCDE200 /* Networking */,
 				099989B252A3FE7E4435F8B4 /* Presentation */,
 				03D74B3560604751BD5F7E33 /* Views */,
@@ -419,6 +524,7 @@
 				E8CA2342F06540D2B6E0D7C0 /* Sender */,
 				BDA3AE1F4BF34B0732B79E07 /* SenderCore */,
 				910DE9822A4E3F3A2D445867 /* SenderMac */,
+				3C484D8BEC464D06EC05AAFB /* Speaker */,
 				8B5C384F2A518B632439F32C /* Products */,
 			);
 			sourceTree = "<group>";
@@ -466,6 +572,27 @@
 			);
 			productName = PoseioscSenderMac;
 			productReference = 6DBA3CC5FB854CD71D3810E4 /* TrackOSCSender.app */;
+			productType = "com.apple.product-type.application";
+		};
+		5A70CC7FC40C78CB2D3DE155 /* TrackOSCSpeaker */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = CCCCC66E44DAE467B537360F /* Build configuration list for PBXNativeTarget "TrackOSCSpeaker" */;
+			buildPhases = (
+				16535728DB95686B539EC17A /* Sources */,
+				2C90D508871E87BF7671DBA4 /* Resources */,
+				628C7FFE87F047CDEAF97902 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = TrackOSCSpeaker;
+			packageProductDependencies = (
+				4A0457A8826DA7893B178F2D /* SwiftOSC */,
+				5C3F2A6130FD8CB81F2ECE3C /* PoseioscShared */,
+			);
+			productName = TrackOSCSpeaker;
+			productReference = 45C3F72736E2F6F48A5CDC74 /* TrackOSCSpeaker.app */;
 			productType = "com.apple.product-type.application";
 		};
 		85ACB73958B8915EC4F073B9 /* PoseioscReceiver */ = {
@@ -527,6 +654,10 @@
 						DevelopmentTeam = "";
 						ProvisioningStyle = Automatic;
 					};
+					5A70CC7FC40C78CB2D3DE155 = {
+						DevelopmentTeam = "";
+						ProvisioningStyle = Automatic;
+					};
 					85ACB73958B8915EC4F073B9 = {
 						DevelopmentTeam = "";
 						ProvisioningStyle = Automatic;
@@ -559,11 +690,20 @@
 				0A9C019024B689D94BB76BF2 /* PoseioscSenderMac */,
 				85ACB73958B8915EC4F073B9 /* PoseioscReceiver */,
 				B549319242C564FB08ABFF82 /* TrackOSCRecorder */,
+				5A70CC7FC40C78CB2D3DE155 /* TrackOSCSpeaker */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		2C90D508871E87BF7671DBA4 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				59F9224E1D9190B7FF4DAA74 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		3B707F3694EFFBF2CDC5A021 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -599,6 +739,43 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		16535728DB95686B539EC17A /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				107DE9896DFEEC728A85CE48 /* BonjourAdvertiser.swift in Sources */,
+				06103C4A68625AAC9F8EA98D /* ConnectionToolbar.swift in Sources */,
+				9C19766A94EF0EB87B204A13 /* ContentView.swift in Sources */,
+				7592AA04984B3E010A5DE121 /* DatagramForwarder.swift in Sources */,
+				7D06738F0F929A8E64E9C767 /* FrameKind.swift in Sources */,
+				990952998BB2C277274247AD /* FrameMetrics.swift in Sources */,
+				3146B0A31CC0CB11D2247BF2 /* Frames.swift in Sources */,
+				6AF30C2364F12514F735653B /* NarrationEngine.swift in Sources */,
+				F481C808947F0798A9B9C16C /* NarrationPanel.swift in Sources */,
+				E285A3116CA3232C7C4A31AF /* PresenceTracker.swift in Sources */,
+				F7DFF8363E9A00697BA05091 /* PresentationController.swift in Sources */,
+				E1208FDE00AC221CAC4441A2 /* ReceiverCommands.swift in Sources */,
+				6EE59014EDA40B2EC3A1DA64 /* ReceiverModel.swift in Sources */,
+				5DE4E9F002F31A05FBBD480A /* ReceiverService.swift in Sources */,
+				64BEC73579E1987FCCB5CBF9 /* ReceiverSettings.swift in Sources */,
+				C3FF1671F58FD2587C916EEF /* ReceiverStatusView.swift in Sources */,
+				E50F8A206C4C1FED559FE313 /* ReceiverWindow.swift in Sources */,
+				E98FF1422B444CD9563F243D /* SpeakerSettings.swift in Sources */,
+				DFC8579E7A7868E479EDC441 /* SpeakerStage.swift in Sources */,
+				5B3AF6BCD32E6D366FF324DC /* SpeakerStore.swift in Sources */,
+				FEFD22362600B41622719B2B /* SpeechController.swift in Sources */,
+				DADB1368376C6A57ECDA4812 /* SpeechPanel.swift in Sources */,
+				BFCBD5C9B9F9723BB323E54A /* TrackOSCApp.swift in Sources */,
+				66E746BAFC57F805402D8AFF /* TrackOSCSpeakerApp.swift in Sources */,
+				E87BD50FD2E878A9C8477C2D /* TranscriptPanel.swift in Sources */,
+				C78B00EC22381E93B3B4CBB9 /* UDPDatagramSender.swift in Sources */,
+				3B2CD8F6D3FEC735ACB6546A /* UDPDatagramServer.swift in Sources */,
+				BCACDEF08044A344E83EB98E /* VisualizerView.swift in Sources */,
+				F4FE70E58625878BDFAA7755 /* VoiceCatalog.swift in Sources */,
+				84DAD7D385E358A5F2C6DD9C /* VoicesPanel.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		595778D3ABBEA291BDE7CD78 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -608,9 +785,11 @@
 				F6FF5C17EE66C9679ED0C9DB /* ContentView.swift in Sources */,
 				7841C0CA538D65F7C996ECB3 /* DatagramForwarder.swift in Sources */,
 				67CC0F99B758ED66715CF35A /* FrameKind.swift in Sources */,
+				788ED95140F43824761442D8 /* FrameMetrics.swift in Sources */,
 				375D975B268E95FF3591E0FC /* Frames.swift in Sources */,
 				6032F85D894C12A60B29F472 /* PlayPanel.swift in Sources */,
 				96B29DAB8F0F88451D075A1B /* PlayerController.swift in Sources */,
+				B455BCF1E743470E3760C931 /* PresenceTracker.swift in Sources */,
 				AFF96C82C535F8F6909C3294 /* PresentationController.swift in Sources */,
 				65BAF786EFFCD8D229E6C565 /* ReceiverCommands.swift in Sources */,
 				F444235649C10EFC90AED5F0 /* ReceiverModel.swift in Sources */,
@@ -640,9 +819,11 @@
 				154BE02374030EA5028CD010 /* ContentView.swift in Sources */,
 				35991AC4FD9ACBA506145957 /* DatagramForwarder.swift in Sources */,
 				098CB90A7F581FDCF41BBD10 /* FrameKind.swift in Sources */,
+				3B31D2459F773EE7D8B203CC /* FrameMetrics.swift in Sources */,
 				EF9F38831DC420C08CEC5F3D /* Frames.swift in Sources */,
 				96AE843D0BFC95E3574A7B8D /* Pose3DScene.swift in Sources */,
 				388DDE31CDC20F2CF398E228 /* PoseioscReceiverApp.swift in Sources */,
+				0303E773711B02D6398180B7 /* PresenceTracker.swift in Sources */,
 				4712F326B630D8839CCB313C /* PresentationController.swift in Sources */,
 				67ABEAD99EC5483D6B0517C1 /* ReceiverCommands.swift in Sources */,
 				B85029810F8224D6C4B274EA /* ReceiverModel.swift in Sources */,
@@ -711,6 +892,25 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin XCBuildConfiguration section */
+		088EB96BADC1D9CDCFDD175C /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = Speaker/TrackOSCSpeaker.entitlements;
+				COMBINE_HIDPI_IMAGES = YES;
+				ENABLE_APP_SANDBOX = YES;
+				ENABLE_HARDENED_RUNTIME = YES;
+				INFOPLIST_FILE = Speaker/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.joelgethinlewis.TrackOSCSpeaker;
+				PRODUCT_NAME = TrackOSCSpeaker;
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
 		39EE523A4D0C52166CF4A76D /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -726,6 +926,25 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.joelgethinlewis.PoseioscSenderMac;
 				PRODUCT_NAME = TrackOSCSender;
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		41FE0DDDFEF52A5E30CC79FA /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = Speaker/TrackOSCSpeaker.entitlements;
+				COMBINE_HIDPI_IMAGES = YES;
+				ENABLE_APP_SANDBOX = YES;
+				ENABLE_HARDENED_RUNTIME = YES;
+				INFOPLIST_FILE = Speaker/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.joelgethinlewis.TrackOSCSpeaker;
+				PRODUCT_NAME = TrackOSCSpeaker;
 				SDKROOT = macosx;
 			};
 			name = Debug;
@@ -1035,6 +1254,15 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;
 		};
+		CCCCC66E44DAE467B537360F /* Build configuration list for PBXNativeTarget "TrackOSCSpeaker" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				41FE0DDDFEF52A5E30CC79FA /* Debug */,
+				088EB96BADC1D9CDCFDD175C /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
 		FF7F5441E743E5F14C73EA95 /* Build configuration list for PBXNativeTarget "PoseioscReceiver" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
@@ -1079,7 +1307,16 @@
 			package = BF3CEF016DCF7B415E80334E /* XCRemoteSwiftPackageReference "swift-osc" */;
 			productName = SwiftOSC;
 		};
+		4A0457A8826DA7893B178F2D /* SwiftOSC */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = BF3CEF016DCF7B415E80334E /* XCRemoteSwiftPackageReference "swift-osc" */;
+			productName = SwiftOSC;
+		};
 		5B931CA9CDAA003997500C7A /* PoseioscShared */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = PoseioscShared;
+		};
+		5C3F2A6130FD8CB81F2ECE3C /* PoseioscShared */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = PoseioscShared;
 		};

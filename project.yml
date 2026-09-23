@@ -212,6 +212,12 @@ targets:
         com.apple.security.files.bookmarks.app-scope: true
         com.apple.security.files.downloads.read-write: true
 
+  TrackOSCSpeaker:
+    templates: [TrackOSCReceiverApp]
+    templateAttributes:
+      app_dir: Speaker
+      display_name: TrackOSC Speaker
+
 schemes:
   TrackOSCSender:
     build:
@@ -235,5 +241,11 @@ schemes:
     build:
       targets:
         TrackOSCRecorder: all
+    run:
+      config: Debug
+  TrackOSCSpeaker:
+    build:
+      targets:
+        TrackOSCSpeaker: all
     run:
       config: Debug
