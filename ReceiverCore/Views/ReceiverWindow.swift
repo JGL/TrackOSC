@@ -43,12 +43,14 @@ struct ReceiverWindow<Stage: View, Controls: View, Extras: ToolbarContent>: View
         let hidden = model.presentation.isGUIHidden
         VStack(spacing: 0) {
             if !hidden, let note = model.portNote {
-                Text(note)
+                Label(note, systemImage: "exclamationmark.triangle")
                     .font(.callout)
-                    .padding(8)
-                    .frame(maxWidth: .infinity)
-                    .background(.orange.opacity(0.85))
-                    .foregroundStyle(.black)
+                    .foregroundStyle(.orange)
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 6)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .background(.orange.opacity(0.12))
+                Divider()
             }
             HSplitView {
                 stage()

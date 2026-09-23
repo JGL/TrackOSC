@@ -39,6 +39,41 @@ settings:
     MARKETING_VERSION: "1.4.0"
     CURRENT_PROJECT_VERSION: "9"
 
+targetTemplates:
+  # Every receiver-type macOS app (Recorder, Speaker, Router, …) is one of
+  # these: its own folder plus ReceiverCore, sandboxed, hardened, listening
+  # on the network. Per-app extras (file access, automation) go on the
+  # target and merge with these.
+  TrackOSCReceiverApp:
+    type: application
+    platform: macOS
+    sources: ["${app_dir}", ReceiverCore]
+    dependencies:
+      - package: swift-osc
+        product: SwiftOSC
+      - package: PoseioscShared
+        product: PoseioscShared
+    info:
+      path: "${app_dir}/Info.plist"
+      properties:
+        CFBundleDisplayName: "${display_name}"
+        CFBundleShortVersionString: $(MARKETING_VERSION)
+        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
+        LSApplicationCategoryType: public.app-category.graphics-design
+        NSLocalNetworkUsageDescription: "${display_name} listens for OSC tracking data and advertises itself on your local network via Bonjour."
+        NSBonjourServices: ["_osc._udp"]
+    settings:
+      base:
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        ENABLE_APP_SANDBOX: YES
+        ENABLE_HARDENED_RUNTIME: YES
+        PRODUCT_NAME: ${target_name}
+    entitlements:
+      path: "${app_dir}/${target_name}.entitlements"
+      properties:
+        com.apple.security.network.server: true
+        com.apple.security.network.client: true
+
 targets:
   PoseioscSender:
     type: application
@@ -151,6 +186,32 @@ targets:
         com.apple.security.network.server: true
         com.apple.security.network.client: true
 
+  TrackOSCRecorder:
+    templates: [TrackOSCReceiverApp]
+    templateAttributes:
+      app_dir: Recorder
+      display_name: TrackOSC Recorder
+    info:
+      properties:
+        CFBundleDocumentTypes:
+          - CFBundleTypeName: TrackOSC Recording
+            CFBundleTypeRole: Viewer
+            LSHandlerRank: Owner
+            LSItemContentTypes: [com.joelgethinlewis.trackosc]
+        UTExportedTypeDeclarations:
+          - UTTypeIdentifier: com.joelgethinlewis.trackosc
+            UTTypeDescription: TrackOSC Recording
+            UTTypeConformsTo: [public.data]
+            UTTypeTagSpecification:
+              public.filename-extension: [trackosc]
+    entitlements:
+      properties:
+        # Recordings go to a folder the user picks (remembered as a bookmark),
+        # or to Downloads by default.
+        com.apple.security.files.user-selected.read-write: true
+        com.apple.security.files.bookmarks.app-scope: true
+        com.apple.security.files.downloads.read-write: true
+
 schemes:
   TrackOSCSender:
     build:
@@ -168,5 +229,11 @@ schemes:
     build:
       targets:
         PoseioscReceiver: all
+    run:
+      config: Debug
+  TrackOSCRecorder:
+    build:
+      targets:
+        TrackOSCRecorder: all
     run:
       config: Debug
