@@ -16,7 +16,7 @@ import RealityKit
 import SwiftUI
 
 struct Visualizer3DView: View {
-    var model: ReceiverModel
+    var store: ReceiverStore
     @State private var scene = Pose3DScene()
     @State private var orbit = OrbitState()
     @State private var dragStart: OrbitState?
@@ -31,7 +31,7 @@ struct Visualizer3DView: View {
 
     var body: some View {
         TimelineView(.animation(minimumInterval: 1.0 / 30.0)) { timeline in
-            let poses = model.freshPoses3D(at: timeline.date)
+            let poses = store.freshPoses3D(at: timeline.date)
             ZStack {
                 RealityView { content in
                     content.add(scene.root)
@@ -64,7 +64,7 @@ struct Visualizer3DView: View {
             }
         }
         .background(.black)
-        .onChange(of: model.resetViewToken) {
+        .onChange(of: store.resetViewToken) {
             orbit = OrbitState()
         }
         .accessibilityLabel("3D pose visualiser")

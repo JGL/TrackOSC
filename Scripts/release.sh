@@ -1,7 +1,7 @@
 #!/bin/bash
 #
-# Builds, signs, notarizes, staples, and publishes BOTH macOS TrackOSC apps
-# (Receiver and Sender) as assets of a single GitHub Release.
+# Builds, signs, notarises, staples, and publishes every macOS TrackOSC app
+# as assets of a single GitHub Release.
 #
 # One-time setup (see README "Releasing the macOS apps"):
 #   1. A "Developer ID Application" certificate in your keychain
@@ -12,9 +12,15 @@
 #   3. gh CLI authenticated (gh auth login).
 #
 # Usage:
-#   POSEIOSC_TEAM_ID=YOURTEAMID Scripts/release.sh [--dry-run]
+#   POSEIOSC_TEAM_ID=YOURTEAMID Scripts/release.sh [--dry-run] [--only A,B] [--skip-notarize]
 #
-# --dry-run does everything except create the GitHub release.
+# --dry-run        everything except creating the GitHub release
+# --only A,B       only these schemes (e.g. --only TrackOSCRecorder)
+# --skip-notarize  sign and zip without notarising (local testing only)
+#
+# Every app is archived and exported first, then all of them are submitted
+# to Apple in one go and waited on together, so a release of many apps
+# takes one notarisation round-trip rather than one per app.
 
 set -euo pipefail
 
@@ -28,7 +34,17 @@ cd "$(dirname "$0")/.."
 export PATH="/usr/bin:/bin:/usr/sbin:/sbin:$PATH"
 
 DRY_RUN=0
-[[ "${1:-}" == "--dry-run" ]] && DRY_RUN=1
+SKIP_NOTARIZE=0
+ONLY=""
+while [[ $# -gt 0 ]]; do
+    case "$1" in
+        --dry-run) DRY_RUN=1 ;;
+        --skip-notarize) SKIP_NOTARIZE=1 ;;
+        --only) ONLY="$2"; shift ;;
+        *) echo "Unknown option: $1" >&2; exit 2 ;;
+    esac
+    shift
+done
 
 : "${POSEIOSC_TEAM_ID:?Set POSEIOSC_TEAM_ID to your Apple Developer team ID}"
 
@@ -47,25 +63,40 @@ VERSION=$(sed -n 's/.*MARKETING_VERSION: "\(.*\)"/\1/p' project.yml | head -1)
 BUILD_DIR="build/release"
 EXPORT_OPTIONS="$BUILD_DIR/ExportOptions.plist"
 
-# scheme:artifact-basename pairs
+# scheme:artifact-basename:release-note. Keep in the order the notes should read.
 APPS=(
-    "TrackOSCReceiver:TrackOSCReceiver"
-    "TrackOSCSenderMac:TrackOSCSender"
+    "TrackOSCReceiver:TrackOSCReceiver:listens for OSC tracking data and visualises it, in 2D and 3D."
+    "TrackOSCSenderMac:TrackOSCSender:Mac camera (built-in, external, or iPhone via Continuity Camera) → Vision tracking → OSC."
+    "TrackOSCRecorder:TrackOSCRecorder:records the tracking stream to a .trackosc file and plays recordings back to any receiver."
+    "TrackOSCSpeaker:TrackOSCSpeaker:reads the tracking stream aloud – appearances, recognised text and codes, periodic summaries – with every voice and speech option."
+    "TrackOSCRouter:TrackOSCRouter:turns tracking events and values into MIDI, Shortcuts, key presses and HTTP requests, by rules."
 )
+
+if [[ -n "$ONLY" ]]; then
+    SELECTED=()
+    for pair in "${APPS[@]}"; do
+        SCHEME="${pair%%:*}"
+        if [[ ",$ONLY," == *",$SCHEME,"* ]]; then SELECTED+=("$pair"); fi
+    done
+    [[ ${#SELECTED[@]} -gt 0 ]] || { echo "--only matched no scheme in: ${APPS[*]%%:*}" >&2; exit 2; }
+    APPS=("${SELECTED[@]}")
+fi
 
 echo "=== Releasing TrackOSC $VERSION (team $POSEIOSC_TEAM_ID) ==="
 rm -rf "$BUILD_DIR"
 mkdir -p "$BUILD_DIR"
 sed "s/TEAM_ID_PLACEHOLDER/$POSEIOSC_TEAM_ID/" Scripts/ExportOptions.plist > "$EXPORT_OPTIONS"
 
-ASSETS=()
+scheme_of() { echo "${1%%:*}"; }
+basename_of() { local rest="${1#*:}"; echo "${rest%%:*}"; }
+note_of() { echo "${1#*:*:}"; }
+
+# 1. Archive and export every app.
 for pair in "${APPS[@]}"; do
-    SCHEME="${pair%%:*}"
-    BASENAME="${pair##*:}"
+    SCHEME=$(scheme_of "$pair")
+    BASENAME=$(basename_of "$pair")
     ARCHIVE="$BUILD_DIR/$SCHEME.xcarchive"
     EXPORT_DIR="$BUILD_DIR/$SCHEME-export"
-    APP="$EXPORT_DIR/$BASENAME.app"
-    ZIP="$BUILD_DIR/$BASENAME-$VERSION-macOS.zip"
 
     echo "--- [$SCHEME] Archiving"
     xcodebuild -project TrackOSC.xcodeproj \
@@ -80,17 +111,49 @@ for pair in "${APPS[@]}"; do
         -archivePath "$ARCHIVE" \
         -exportOptionsPlist "$EXPORT_OPTIONS" \
         -exportPath "$EXPORT_DIR" | tail -1
+done
 
-    echo "--- [$SCHEME] Notarizing (waits for Apple)"
-    ditto -c -k --keepParent "$APP" "$BUILD_DIR/$SCHEME-notarize.zip"
-    xcrun notarytool submit "$BUILD_DIR/$SCHEME-notarize.zip" \
-        --keychain-profile poseiosc-notary \
-        --wait
+# 2. Submit every app to Apple, then wait for all of them.
+if [[ $SKIP_NOTARIZE -eq 0 ]]; then
+    SUBMISSIONS=()
+    for pair in "${APPS[@]}"; do
+        SCHEME=$(scheme_of "$pair")
+        APP="$BUILD_DIR/$SCHEME-export/$(basename_of "$pair").app"
+        echo "--- [$SCHEME] Submitting for notarisation"
+        ditto -c -k --keepParent "$APP" "$BUILD_DIR/$SCHEME-notarize.zip"
+        ID=$(xcrun notarytool submit "$BUILD_DIR/$SCHEME-notarize.zip" \
+            --keychain-profile poseiosc-notary --output-format json \
+            | sed -n 's/.*"id" *: *"\([^"]*\)".*/\1/p' | head -1)
+        [[ -n "$ID" ]] || { echo "No submission id for $SCHEME" >&2; exit 1; }
+        SUBMISSIONS+=("$SCHEME:$ID")
+    done
+    for entry in "${SUBMISSIONS[@]}"; do
+        SCHEME="${entry%%:*}"
+        ID="${entry##*:}"
+        echo "--- [$SCHEME] Waiting for Apple ($ID)"
+        xcrun notarytool wait "$ID" --keychain-profile poseiosc-notary
+        STATUS=$(xcrun notarytool info "$ID" --keychain-profile poseiosc-notary | sed -n 's/.*status: *//p')
+        [[ "$STATUS" == "Accepted" ]] || {
+            echo "Notarisation of $SCHEME was $STATUS; see: xcrun notarytool log $ID --keychain-profile poseiosc-notary" >&2
+            exit 1
+        }
+    done
+else
+    echo "--- Skipping notarisation (--skip-notarize)"
+fi
 
-    echo "--- [$SCHEME] Stapling and verifying"
-    xcrun stapler staple "$APP"
-    spctl -a -vv "$APP"
-
+# 3. Staple, verify and zip.
+ASSETS=()
+for pair in "${APPS[@]}"; do
+    SCHEME=$(scheme_of "$pair")
+    BASENAME=$(basename_of "$pair")
+    APP="$BUILD_DIR/$SCHEME-export/$BASENAME.app"
+    ZIP="$BUILD_DIR/$BASENAME-$VERSION-macOS.zip"
+    if [[ $SKIP_NOTARIZE -eq 0 ]]; then
+        echo "--- [$SCHEME] Stapling and verifying"
+        xcrun stapler staple "$APP"
+        spctl -a -vv "$APP"
+    fi
     ditto -c -k --keepParent "$APP" "$ZIP"
     echo "Created $ZIP"
     ASSETS+=("$ZIP")
@@ -102,14 +165,19 @@ if [[ $DRY_RUN -eq 1 ]]; then
     exit 0
 fi
 
+NOTES="macOS TrackOSC apps, $VERSION – signed and notarised; download, unzip, and open.
+"
+for pair in "${APPS[@]}"; do
+    NOTES+="
+- **$(basename_of "$pair")**: $(note_of "$pair")"
+done
+NOTES+="
+
+The iOS sender is free on the App Store: https://apps.apple.com/app/trackosc/id6795593815. To build from source, see the README."
+
 echo "--- Publishing GitHub release v$VERSION"
 gh release create "v$VERSION" "${ASSETS[@]}" \
     --title "TrackOSC $VERSION" \
-    --notes "macOS TrackOSC apps, $VERSION – signed and notarised; download, unzip, and open.
-
-- **TrackOSCReceiver**: listens for OSC tracking data and visualises it, in 2D and 3D.
-- **TrackOSCSender**: Mac camera (built-in, external, or iPhone via Continuity Camera) → Vision tracking → OSC.
-
-The iOS sender is free on the App Store: https://apps.apple.com/app/trackosc/id6795593815. To build from source, see the README."
+    --notes "$NOTES"
 
 echo "=== Done: https://github.com/JGL/TrackOSC/releases/tag/v$VERSION ==="
