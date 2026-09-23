@@ -122,7 +122,7 @@ targets:
     # Product renamed; target name (bundle ID, TCC grants) unchanged.
     # Paired with PRODUCT_NAME in settings – see the iOS sender note.
     productName: TrackOSCReceiver
-    sources: [Receiver]
+    sources: [Receiver, ReceiverCore]
     dependencies:
       - package: swift-osc
         product: SwiftOSC

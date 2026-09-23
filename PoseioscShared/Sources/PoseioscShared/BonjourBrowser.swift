@@ -1,8 +1,8 @@
 //
 //  BonjourBrowser.swift
-//  Poseiosc Sender (iOS)
+//  PoseioscShared
 //
-//  Browses for "_osc._udp" services (the Poseiosc Receiver advertises one) and
+//  Browses for "_osc._udp" services (every TrackOSC receiver-type app advertises one) and
 //  resolves a tapped service to a concrete host + port by opening a throwaway
 //  UDP connection and reading the resolved remote endpoint.
 //
@@ -12,23 +12,25 @@ import Network
 import Observation
 import os.lock
 
-struct DiscoveredReceiver: Identifiable, Equatable {
-    let name: String
-    let endpoint: NWEndpoint
+public struct DiscoveredReceiver: Identifiable, Equatable, Sendable {
+    public let name: String
+    public let endpoint: NWEndpoint
 
-    var id: String { name }
+    public var id: String { name }
 
-    static func == (lhs: Self, rhs: Self) -> Bool { lhs.name == rhs.name }
+    public static func == (lhs: Self, rhs: Self) -> Bool { lhs.name == rhs.name }
 }
 
 @Observable @MainActor
-final class BonjourBrowser {
-    private(set) var receivers: [DiscoveredReceiver] = []
-    private(set) var isBrowsing = false
+public final class BonjourBrowser {
+    public private(set) var receivers: [DiscoveredReceiver] = []
+    public private(set) var isBrowsing = false
 
     private var browser: NWBrowser?
 
-    func start() {
+    public init() {}
+
+    public func start() {
         guard browser == nil else { return }
         let browser = NWBrowser(
             for: .bonjour(type: "_osc._udp", domain: nil),
@@ -53,7 +55,7 @@ final class BonjourBrowser {
         self.browser = browser
     }
 
-    func stop() {
+    public func stop() {
         browser?.cancel()
         browser = nil
         receivers = []
@@ -64,7 +66,7 @@ final class BonjourBrowser {
     /// connection, reading the resolved remote endpoint once it's ready.
     /// IPv4 is forced because the receiver's OSC server binds IPv4-only.
     /// Returns nil on failure or after a 4-second timeout.
-    func resolve(_ receiver: DiscoveredReceiver) async -> (host: String, port: UInt16)? {
+    public func resolve(_ receiver: DiscoveredReceiver) async -> (host: String, port: UInt16)? {
         let parameters = NWParameters.udp
         if let ip = parameters.defaultProtocolStack.internetProtocol as? NWProtocolIP.Options {
             ip.version = .v4

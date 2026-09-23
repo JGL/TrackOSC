@@ -8,6 +8,7 @@
 
 import Foundation
 import Observation
+import PoseioscShared
 
 @Observable @MainActor
 final class MacAppModel {

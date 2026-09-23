@@ -1,13 +1,13 @@
 //
-//  SidebarView.swift
-//  Poseiosc Receiver (macOS)
+//  ReceiverStatusView.swift
+//  TrackOSC (ReceiverCore)
 //
 //  Per-address message rates and a scrolling (sampled) message log.
 //
 
 import SwiftUI
 
-struct SidebarView: View {
+struct ReceiverStatusView: View {
     @Bindable var model: ReceiverModel
 
     private static let timeFormat = Date.FormatStyle(date: .omitted, time: .standard)

@@ -11,18 +11,21 @@
 		0201500FD434F7A12CD0301E /* FrameConveyor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 70447DEDDBD809829F414AB4 /* FrameConveyor.swift */; };
 		06DB1B3847D50A2CE777A2D7 /* Detector.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA84CAF9BCFB6A2ECD2C6FD4 /* Detector.swift */; };
 		08E957E717DF675F8D28C75B /* MacContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BD3C524FDFE54A15AF2F4FE7 /* MacContentView.swift */; };
+		098CB90A7F581FDCF41BBD10 /* FrameKind.swift in Sources */ = {isa = PBXBuildFile; fileRef = 62B1966A401470721FB1A3D1 /* FrameKind.swift */; };
+		0C0483E3EACE1C90D5E0B365 /* VisualizerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B80AF4C5BF98CDC03EE3608D /* VisualizerView.swift */; };
 		0E369A5CB6DB7265E65DDC2C /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 044FC8024A8B6744C7E677C2 /* SettingsView.swift */; };
-		0E8A7047DE8E3A93BF9E87A9 /* SidebarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CE862C0CD72CC6015830132 /* SidebarView.swift */; };
 		1460E3D24DA7255D2B70369A /* MacAppModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 40B24378FCA4958CC6C67878 /* MacAppModel.swift */; };
 		1506EB84B34A9582A5F556F0 /* MacCameraPreviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73BF246A8EDA6004AE9CB0CA /* MacCameraPreviewView.swift */; };
 		154BE02374030EA5028CD010 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 22436542D01EAD8CED285668 /* ContentView.swift */; };
 		234ED6836F7141B00F4801A4 /* MacSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3470253A507EB6108BA68854 /* MacSettingsView.swift */; };
-		2D35826915D22DD4C9405753 /* VisualizerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A49223DA900A20D766094DB6 /* VisualizerView.swift */; };
+		25353A904B02823C05DDE577 /* ReceiverSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAF52B1CBDA503640E633BD6 /* ReceiverSettings.swift */; };
+		2CDB8BB9E645A22EA93DDA56 /* BonjourAdvertiser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51B215B8051B936FB54F092A /* BonjourAdvertiser.swift */; };
+		35991AC4FD9ACBA506145957 /* DatagramForwarder.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAEDF8B3FC84CE765D22B9E9 /* DatagramForwarder.swift */; };
 		361BABAEB93CA23E2EDF35C7 /* VisualizerMode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1C390B6BA36678B01F799334 /* VisualizerMode.swift */; };
-		3679F968B2D87D6E0B404AD3 /* BonjourAdvertiser.swift in Sources */ = {isa = PBXBuildFile; fileRef = D04CB153C381766D7D80DED7 /* BonjourAdvertiser.swift */; };
 		388DDE31CDC20F2CF398E228 /* PoseioscReceiverApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E642C8E274B338B0A9BE95F /* PoseioscReceiverApp.swift */; };
 		43B9D5C8F28A5EE3D4FB3F90 /* VisionProcessor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 25C34A45CD50185556A6E8CF /* VisionProcessor.swift */; };
 		4517204E993973CA44B019A2 /* PoseioscShared in Frameworks */ = {isa = PBXBuildFile; productRef = 3D1DFD7A45B58CCEBD9C5828 /* PoseioscShared */; };
+		4712F326B630D8839CCB313C /* PresentationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92C3225D9C6159A528F51AF9 /* PresentationController.swift */; };
 		4F7C967C1C1159A715BF86EA /* Visualizer3DView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A7A1CCCB19259E80101446F /* Visualizer3DView.swift */; };
 		516A14EDB986870936BF8F24 /* CameraOrientationSetting.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6A8D53A59285A22D1436833A /* CameraOrientationSetting.swift */; };
 		54568B16CDC6357DC59AED35 /* ControlBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BE01430EF3AD6073346F5DA /* ControlBarView.swift */; };
@@ -31,6 +34,8 @@
 		5F049B65713EDDC3E4BBBB77 /* OSCSenderService.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1E70D787D793EDCC6179AEE /* OSCSenderService.swift */; };
 		61C17E2198891967C2932D6A /* ObservationMapping.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E180D1324327865CBF54DB9 /* ObservationMapping.swift */; };
 		651E569EB4AE580C9484FBAB /* MacSettingsStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 632C0DB0542BE2D695BC5D2E /* MacSettingsStore.swift */; };
+		67ABEAD99EC5483D6B0517C1 /* ReceiverCommands.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3C4BC66F76FEFBB8603E7E0 /* ReceiverCommands.swift */; };
+		7065FC9A71EAE5575CF461C4 /* ReceiverService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95326C0030E92840B79FFB79 /* ReceiverService.swift */; };
 		70E3CAF9B00A43FB7843CAA0 /* OverlayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 530A6F40C76AC8E1B770F370 /* OverlayView.swift */; };
 		7177FAC0496F048EA8EA7926 /* MacCameraManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5811FE8746B64C33EE554C13 /* MacCameraManager.swift */; };
 		73DDCDB3284FB36FF0A1DB24 /* SwiftOSC in Frameworks */ = {isa = PBXBuildFile; productRef = E52C334B871E6E0B89351DCC /* SwiftOSC */; };
@@ -38,31 +43,35 @@
 		798691BAD52116D0B404E522 /* PoseioscSenderApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 018F41691E7A33C8E6E98248 /* PoseioscSenderApp.swift */; };
 		799FC02BE8C1C7830141A28E /* SettingsStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = B819CD68EA4B13B83875A8FE /* SettingsStore.swift */; };
 		7ABF6548D7185A6DEE614E14 /* CameraOrientationSetting.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6A8D53A59285A22D1436833A /* CameraOrientationSetting.swift */; };
-		8DCED549FBF342CAC1D3322C /* BonjourBrowser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5888FFC267ADE3BAE904B39C /* BonjourBrowser.swift */; };
+		822E91F58075F1CCB720600A /* ReceiverWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD3D69738B300368D39B7247 /* ReceiverWindow.swift */; };
 		8F48C29C69C4B202AF603167 /* PoseioscShared in Frameworks */ = {isa = PBXBuildFile; productRef = D9C35C7B8BEDADE26B92F049 /* PoseioscShared */; };
+		900E596D9B23BDBA8806BAD3 /* UDPDatagramServer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57FB75629F78B834244A206C /* UDPDatagramServer.swift */; };
 		96AE843D0BFC95E3574A7B8D /* Pose3DScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F1ED956EB76AF4D2DF40276 /* Pose3DScene.swift */; };
 		9B985C927B272B65CCD2BFBF /* AppModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4BB6041EDA4F90281819196 /* AppModel.swift */; };
-		9D9179815B38BE422FCD29D2 /* ReceiverModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36EE0DEF3AACC97EF349184D /* ReceiverModel.swift */; };
-		9DED7732D4ABB7EA2600392B /* BonjourBrowser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5888FFC267ADE3BAE904B39C /* BonjourBrowser.swift */; };
+		9FC8F5E728667D4EDB433DD6 /* ReceiverStatusView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F7488305980AB07FCBF5019 /* ReceiverStatusView.swift */; };
 		A75ADBF8805F97330A27454D /* VisionProcessor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 25C34A45CD50185556A6E8CF /* VisionProcessor.swift */; };
+		AA4182149E871179D668AF93 /* UDPDatagramSender.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F78E5BE87BEE448723FA096 /* UDPDatagramSender.swift */; };
 		ACB313DA30EF8DBEA42707FE /* PoseioscSenderMacApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16BDA48C2E84E59039EAF4B9 /* PoseioscSenderMacApp.swift */; };
 		AEABBE9BF19749DD8870268B /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 3502EA0A0767C242BEB50EE3 /* Assets.xcassets */; };
 		B62C06DF4C2018A9A252AE3F /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B8A575252223D6F4E4880C1 /* ContentView.swift */; };
+		B85029810F8224D6C4B274EA /* ReceiverModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E3432CAF33DF6D383F95379 /* ReceiverModel.swift */; };
 		B8863921CB448D84E38293CC /* FrameConveyor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 70447DEDDBD809829F414AB4 /* FrameConveyor.swift */; };
+		BB6DC60B314897D6626E8B3A /* TrackOSCApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46489669183A3C4C3DCB5ACD /* TrackOSCApp.swift */; };
 		BC08F94DD2246500B7E3FAA0 /* PoseioscShared in Frameworks */ = {isa = PBXBuildFile; productRef = DC8182587B6E0AEAD535D789 /* PoseioscShared */; };
 		BD6E86BD33A33250D7B12141 /* DetectorChip.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3FEFBCE031E1972E63A30199 /* DetectorChip.swift */; };
 		C4625786DBF05E2476775185 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 0FCA4347894328D3107380D0 /* Assets.xcassets */; };
 		C75E8DA24396C3FED330B67F /* Detector.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA84CAF9BCFB6A2ECD2C6FD4 /* Detector.swift */; };
 		C8BB858C0F5CBB946E62A8A2 /* VisionAngle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3873AC66AD6991EB0F5F89B5 /* VisionAngle.swift */; };
 		C966898D7147A40AFF57088C /* CameraManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAB2651F0CD22279ABBAE118 /* CameraManager.swift */; };
-		C96F9BBC99E5FEF6B9403CFE /* ReceiverService.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFB8A3D2E06DFAE74EFD04A8 /* ReceiverService.swift */; };
+		D7363CC71E58EC679C7AB72E /* ConnectionToolbar.swift in Sources */ = {isa = PBXBuildFile; fileRef = BD1672789D4FA22707FEB23F /* ConnectionToolbar.swift */; };
 		DBFC1FB82E0AC96F3071981A /* OverlayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 530A6F40C76AC8E1B770F370 /* OverlayView.swift */; };
-		E14710A32CB6D23676E6DFFB /* FrameKind.swift in Sources */ = {isa = PBXBuildFile; fileRef = 327A3F09FCE218827863E618 /* FrameKind.swift */; };
 		EA56466231D75F01FD30F5DB /* CameraPreviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03807F39A230F25D975DAC80 /* CameraPreviewView.swift */; };
+		EF9F38831DC420C08CEC5F3D /* Frames.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D3ADE61D12C0668D0A6E837 /* Frames.swift */; };
 		EFD4231BD477B970B00ECA08 /* StatusBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC3D7CD08642E802F1B7F668 /* StatusBarView.swift */; };
 		F1A387CAFC75B8A5A945C0B0 /* SwiftOSC in Frameworks */ = {isa = PBXBuildFile; productRef = FBC2805A38555F74868050CE /* SwiftOSC */; };
 		F1E91F3F9E8287B80709282F /* VisionAngle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3873AC66AD6991EB0F5F89B5 /* VisionAngle.swift */; };
 		F76EBB593BE1B414658CE10F /* DetectorChip.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3FEFBCE031E1972E63A30199 /* DetectorChip.swift */; };
+		FE1761B4BE215281FABCF24D /* ReceiverStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = DFFE2C0EA189D5506841584E /* ReceiverStore.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -75,46 +84,56 @@
 		16BDA48C2E84E59039EAF4B9 /* PoseioscSenderMacApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PoseioscSenderMacApp.swift; sourceTree = "<group>"; };
 		1C390B6BA36678B01F799334 /* VisualizerMode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VisualizerMode.swift; sourceTree = "<group>"; };
 		1E180D1324327865CBF54DB9 /* ObservationMapping.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ObservationMapping.swift; sourceTree = "<group>"; };
+		1F7488305980AB07FCBF5019 /* ReceiverStatusView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReceiverStatusView.swift; sourceTree = "<group>"; };
 		22436542D01EAD8CED285668 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		25C34A45CD50185556A6E8CF /* VisionProcessor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VisionProcessor.swift; sourceTree = "<group>"; };
+		2E3432CAF33DF6D383F95379 /* ReceiverModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReceiverModel.swift; sourceTree = "<group>"; };
 		2FA9D6299A0FF49D3BAE7BA9 /* PoseioscSenderMac.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = PoseioscSenderMac.entitlements; sourceTree = "<group>"; };
-		327A3F09FCE218827863E618 /* FrameKind.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FrameKind.swift; sourceTree = "<group>"; };
 		3470253A507EB6108BA68854 /* MacSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MacSettingsView.swift; sourceTree = "<group>"; };
 		3502EA0A0767C242BEB50EE3 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
-		36EE0DEF3AACC97EF349184D /* ReceiverModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReceiverModel.swift; sourceTree = "<group>"; };
 		3873AC66AD6991EB0F5F89B5 /* VisionAngle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VisionAngle.swift; sourceTree = "<group>"; };
 		3FEFBCE031E1972E63A30199 /* DetectorChip.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetectorChip.swift; sourceTree = "<group>"; };
 		40B24378FCA4958CC6C67878 /* MacAppModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MacAppModel.swift; sourceTree = "<group>"; };
 		43812415DB456C47561F7F15 /* PoseioscShared */ = {isa = PBXFileReference; lastKnownFileType = folder; name = PoseioscShared; path = PoseioscShared; sourceTree = SOURCE_ROOT; };
-		4CE862C0CD72CC6015830132 /* SidebarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SidebarView.swift; sourceTree = "<group>"; };
+		46489669183A3C4C3DCB5ACD /* TrackOSCApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackOSCApp.swift; sourceTree = "<group>"; };
+		51B215B8051B936FB54F092A /* BonjourAdvertiser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BonjourAdvertiser.swift; sourceTree = "<group>"; };
 		530A6F40C76AC8E1B770F370 /* OverlayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OverlayView.swift; sourceTree = "<group>"; };
+		57FB75629F78B834244A206C /* UDPDatagramServer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UDPDatagramServer.swift; sourceTree = "<group>"; };
 		5811FE8746B64C33EE554C13 /* MacCameraManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MacCameraManager.swift; sourceTree = "<group>"; };
-		5888FFC267ADE3BAE904B39C /* BonjourBrowser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BonjourBrowser.swift; sourceTree = "<group>"; };
+		62B1966A401470721FB1A3D1 /* FrameKind.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FrameKind.swift; sourceTree = "<group>"; };
 		632C0DB0542BE2D695BC5D2E /* MacSettingsStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MacSettingsStore.swift; sourceTree = "<group>"; };
 		6A8D53A59285A22D1436833A /* CameraOrientationSetting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraOrientationSetting.swift; sourceTree = "<group>"; };
 		6B8A575252223D6F4E4880C1 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		6DBA3CC5FB854CD71D3810E4 /* TrackOSCSender.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TrackOSCSender.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		6F1ED956EB76AF4D2DF40276 /* Pose3DScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Pose3DScene.swift; sourceTree = "<group>"; };
+		6F78E5BE87BEE448723FA096 /* UDPDatagramSender.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UDPDatagramSender.swift; sourceTree = "<group>"; };
 		70447DEDDBD809829F414AB4 /* FrameConveyor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FrameConveyor.swift; sourceTree = "<group>"; };
 		73BF246A8EDA6004AE9CB0CA /* MacCameraPreviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MacCameraPreviewView.swift; sourceTree = "<group>"; };
 		7A7A1CCCB19259E80101446F /* Visualizer3DView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Visualizer3DView.swift; sourceTree = "<group>"; };
 		8BE01430EF3AD6073346F5DA /* ControlBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ControlBarView.swift; sourceTree = "<group>"; };
 		8F01314D4D2BB20D1A9AA995 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		92C3225D9C6159A528F51AF9 /* PresentationController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PresentationController.swift; sourceTree = "<group>"; };
+		95326C0030E92840B79FFB79 /* ReceiverService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReceiverService.swift; sourceTree = "<group>"; };
+		9D3ADE61D12C0668D0A6E837 /* Frames.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Frames.swift; sourceTree = "<group>"; };
 		9E642C8E274B338B0A9BE95F /* PoseioscReceiverApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PoseioscReceiverApp.swift; sourceTree = "<group>"; };
 		A47E5298E4628C7ED98EC8ED /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
-		A49223DA900A20D766094DB6 /* VisualizerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VisualizerView.swift; sourceTree = "<group>"; };
 		AAB2651F0CD22279ABBAE118 /* CameraManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraManager.swift; sourceTree = "<group>"; };
+		AD3D69738B300368D39B7247 /* ReceiverWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReceiverWindow.swift; sourceTree = "<group>"; };
 		B703E50BF1CBFE19E73F0DA6 /* TrackOSCReceiver.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TrackOSCReceiver.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		B80AF4C5BF98CDC03EE3608D /* VisualizerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VisualizerView.swift; sourceTree = "<group>"; };
 		B819CD68EA4B13B83875A8FE /* SettingsStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsStore.swift; sourceTree = "<group>"; };
+		BD1672789D4FA22707FEB23F /* ConnectionToolbar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConnectionToolbar.swift; sourceTree = "<group>"; };
 		BD3C524FDFE54A15AF2F4FE7 /* MacContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MacContentView.swift; sourceTree = "<group>"; };
 		C1E70D787D793EDCC6179AEE /* OSCSenderService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OSCSenderService.swift; sourceTree = "<group>"; };
 		C41FCC20BC3EE6B8F0930F0E /* PoseioscReceiver.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = PoseioscReceiver.entitlements; sourceTree = "<group>"; };
 		CA84CAF9BCFB6A2ECD2C6FD4 /* Detector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Detector.swift; sourceTree = "<group>"; };
-		D04CB153C381766D7D80DED7 /* BonjourAdvertiser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BonjourAdvertiser.swift; sourceTree = "<group>"; };
+		CAF52B1CBDA503640E633BD6 /* ReceiverSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReceiverSettings.swift; sourceTree = "<group>"; };
 		D4BB6041EDA4F90281819196 /* AppModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppModel.swift; sourceTree = "<group>"; };
 		DC3D7CD08642E802F1B7F668 /* StatusBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatusBarView.swift; sourceTree = "<group>"; };
+		DFFE2C0EA189D5506841584E /* ReceiverStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReceiverStore.swift; sourceTree = "<group>"; };
+		E3C4BC66F76FEFBB8603E7E0 /* ReceiverCommands.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReceiverCommands.swift; sourceTree = "<group>"; };
 		EA84C5C3CA310524FA61766A /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
-		FFB8A3D2E06DFAE74EFD04A8 /* ReceiverService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReceiverService.swift; sourceTree = "<group>"; };
+		EAEDF8B3FC84CE765D22B9E9 /* DatagramForwarder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DatagramForwarder.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -148,12 +167,32 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		03D74B3560604751BD5F7E33 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				BD1672789D4FA22707FEB23F /* ConnectionToolbar.swift */,
+				1F7488305980AB07FCBF5019 /* ReceiverStatusView.swift */,
+				AD3D69738B300368D39B7247 /* ReceiverWindow.swift */,
+				B80AF4C5BF98CDC03EE3608D /* VisualizerView.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
 		060C33AEB02C7871EAEF3206 /* Packages */ = {
 			isa = PBXGroup;
 			children = (
 				43812415DB456C47561F7F15 /* PoseioscShared */,
 			);
 			name = Packages;
+			sourceTree = "<group>";
+		};
+		099989B252A3FE7E4435F8B4 /* Presentation */ = {
+			isa = PBXGroup;
+			children = (
+				92C3225D9C6159A528F51AF9 /* PresentationController.swift */,
+				E3C4BC66F76FEFBB8603E7E0 /* ReceiverCommands.swift */,
+			);
+			path = Presentation;
 			sourceTree = "<group>";
 		};
 		5978E00BA11D99E1BF4875B7 /* Views */ = {
@@ -215,7 +254,6 @@
 		BDA3AE1F4BF34B0732B79E07 /* SenderCore */ = {
 			isa = PBXGroup;
 			children = (
-				5888FFC267ADE3BAE904B39C /* BonjourBrowser.swift */,
 				6A8D53A59285A22D1436833A /* CameraOrientationSetting.swift */,
 				CA84CAF9BCFB6A2ECD2C6FD4 /* Detector.swift */,
 				70447DEDDBD809829F414AB4 /* FrameConveyor.swift */,
@@ -228,29 +266,51 @@
 			path = SenderCore;
 			sourceTree = "<group>";
 		};
+		C9931EFE3055F9BD4905B088 /* ReceiverCore */ = {
+			isa = PBXGroup;
+			children = (
+				51B215B8051B936FB54F092A /* BonjourAdvertiser.swift */,
+				62B1966A401470721FB1A3D1 /* FrameKind.swift */,
+				9D3ADE61D12C0668D0A6E837 /* Frames.swift */,
+				2E3432CAF33DF6D383F95379 /* ReceiverModel.swift */,
+				95326C0030E92840B79FFB79 /* ReceiverService.swift */,
+				CAF52B1CBDA503640E633BD6 /* ReceiverSettings.swift */,
+				46489669183A3C4C3DCB5ACD /* TrackOSCApp.swift */,
+				E30ED84052110F307FCDE200 /* Networking */,
+				099989B252A3FE7E4435F8B4 /* Presentation */,
+				03D74B3560604751BD5F7E33 /* Views */,
+			);
+			path = ReceiverCore;
+			sourceTree = "<group>";
+		};
 		DCD628C27D5DB0360C392C60 /* Views */ = {
 			isa = PBXGroup;
 			children = (
 				22436542D01EAD8CED285668 /* ContentView.swift */,
-				4CE862C0CD72CC6015830132 /* SidebarView.swift */,
 				7A7A1CCCB19259E80101446F /* Visualizer3DView.swift */,
-				A49223DA900A20D766094DB6 /* VisualizerView.swift */,
 			);
 			path = Views;
+			sourceTree = "<group>";
+		};
+		E30ED84052110F307FCDE200 /* Networking */ = {
+			isa = PBXGroup;
+			children = (
+				EAEDF8B3FC84CE765D22B9E9 /* DatagramForwarder.swift */,
+				6F78E5BE87BEE448723FA096 /* UDPDatagramSender.swift */,
+				57FB75629F78B834244A206C /* UDPDatagramServer.swift */,
+			);
+			path = Networking;
 			sourceTree = "<group>";
 		};
 		E7C4540CD8F0BD8EB612BF1F /* Receiver */ = {
 			isa = PBXGroup;
 			children = (
 				A47E5298E4628C7ED98EC8ED /* Assets.xcassets */,
-				D04CB153C381766D7D80DED7 /* BonjourAdvertiser.swift */,
-				327A3F09FCE218827863E618 /* FrameKind.swift */,
 				8F01314D4D2BB20D1A9AA995 /* Info.plist */,
 				6F1ED956EB76AF4D2DF40276 /* Pose3DScene.swift */,
 				C41FCC20BC3EE6B8F0930F0E /* PoseioscReceiver.entitlements */,
 				9E642C8E274B338B0A9BE95F /* PoseioscReceiverApp.swift */,
-				36EE0DEF3AACC97EF349184D /* ReceiverModel.swift */,
-				FFB8A3D2E06DFAE74EFD04A8 /* ReceiverService.swift */,
+				DFFE2C0EA189D5506841584E /* ReceiverStore.swift */,
 				1C390B6BA36678B01F799334 /* VisualizerMode.swift */,
 				DCD628C27D5DB0360C392C60 /* Views */,
 			);
@@ -276,6 +336,7 @@
 			children = (
 				060C33AEB02C7871EAEF3206 /* Packages */,
 				E7C4540CD8F0BD8EB612BF1F /* Receiver */,
+				C9931EFE3055F9BD4905B088 /* ReceiverCore */,
 				E8CA2342F06540D2B6E0D7C0 /* Sender */,
 				BDA3AE1F4BF34B0732B79E07 /* SenderCore */,
 				910DE9822A4E3F3A2D445867 /* SenderMac */,
@@ -429,17 +490,28 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				3679F968B2D87D6E0B404AD3 /* BonjourAdvertiser.swift in Sources */,
+				2CDB8BB9E645A22EA93DDA56 /* BonjourAdvertiser.swift in Sources */,
+				D7363CC71E58EC679C7AB72E /* ConnectionToolbar.swift in Sources */,
 				154BE02374030EA5028CD010 /* ContentView.swift in Sources */,
-				E14710A32CB6D23676E6DFFB /* FrameKind.swift in Sources */,
+				35991AC4FD9ACBA506145957 /* DatagramForwarder.swift in Sources */,
+				098CB90A7F581FDCF41BBD10 /* FrameKind.swift in Sources */,
+				EF9F38831DC420C08CEC5F3D /* Frames.swift in Sources */,
 				96AE843D0BFC95E3574A7B8D /* Pose3DScene.swift in Sources */,
 				388DDE31CDC20F2CF398E228 /* PoseioscReceiverApp.swift in Sources */,
-				9D9179815B38BE422FCD29D2 /* ReceiverModel.swift in Sources */,
-				C96F9BBC99E5FEF6B9403CFE /* ReceiverService.swift in Sources */,
-				0E8A7047DE8E3A93BF9E87A9 /* SidebarView.swift in Sources */,
+				4712F326B630D8839CCB313C /* PresentationController.swift in Sources */,
+				67ABEAD99EC5483D6B0517C1 /* ReceiverCommands.swift in Sources */,
+				B85029810F8224D6C4B274EA /* ReceiverModel.swift in Sources */,
+				7065FC9A71EAE5575CF461C4 /* ReceiverService.swift in Sources */,
+				25353A904B02823C05DDE577 /* ReceiverSettings.swift in Sources */,
+				9FC8F5E728667D4EDB433DD6 /* ReceiverStatusView.swift in Sources */,
+				FE1761B4BE215281FABCF24D /* ReceiverStore.swift in Sources */,
+				822E91F58075F1CCB720600A /* ReceiverWindow.swift in Sources */,
+				BB6DC60B314897D6626E8B3A /* TrackOSCApp.swift in Sources */,
+				AA4182149E871179D668AF93 /* UDPDatagramSender.swift in Sources */,
+				900E596D9B23BDBA8806BAD3 /* UDPDatagramServer.swift in Sources */,
 				4F7C967C1C1159A715BF86EA /* Visualizer3DView.swift in Sources */,
 				361BABAEB93CA23E2EDF35C7 /* VisualizerMode.swift in Sources */,
-				2D35826915D22DD4C9405753 /* VisualizerView.swift in Sources */,
+				0C0483E3EACE1C90D5E0B365 /* VisualizerView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -448,7 +520,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				9B985C927B272B65CCD2BFBF /* AppModel.swift in Sources */,
-				8DCED549FBF342CAC1D3322C /* BonjourBrowser.swift in Sources */,
 				C966898D7147A40AFF57088C /* CameraManager.swift in Sources */,
 				516A14EDB986870936BF8F24 /* CameraOrientationSetting.swift in Sources */,
 				EA56466231D75F01FD30F5DB /* CameraPreviewView.swift in Sources */,
@@ -473,7 +544,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				9DED7732D4ABB7EA2600392B /* BonjourBrowser.swift in Sources */,
 				7ABF6548D7185A6DEE614E14 /* CameraOrientationSetting.swift in Sources */,
 				C75E8DA24396C3FED330B67F /* Detector.swift in Sources */,
 				F76EBB593BE1B414658CE10F /* DetectorChip.swift in Sources */,

@@ -9,6 +9,7 @@
 import Foundation
 import AVFoundation
 import Observation
+import PoseioscShared
 import UIKit
 
 @Observable @MainActor

@@ -1,21 +1,24 @@
 //
 //  PoseioscReceiverApp.swift
-//  Poseiosc Receiver (macOS)
+//  TrackOSC Receiver (macOS)
 //
-//  Listens for Poseiosc/VisionOSC OSC messages, visualizes them, and advertises
-//  itself via Bonjour so the iOS sender can discover it.
+//  Listens for TrackOSC/VisionOSC OSC messages, visualises them, and advertises
+//  itself via Bonjour so the senders can discover it.
 //
 
 import SwiftUI
 
 @main
 struct PoseioscReceiverApp: App {
-    @State private var model = ReceiverModel()
+    @State private var store = ReceiverStore()
 
     var body: some Scene {
         WindowGroup {
-            ContentView(model: model)
+            ContentView(store: store)
                 .frame(minWidth: 900, minHeight: 560)
+        }
+        .commands {
+            ReceiverCommands(model: store.model)
         }
     }
 }
