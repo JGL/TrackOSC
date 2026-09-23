@@ -6,6 +6,12 @@
   <img src="Images/icon-mac-receiver.png" width="128" alt="TrackOSC Receiver macOS app icon">
 </p>
 <p align="center"><em>TrackOSC for iOS&ensp;·&ensp;TrackOSC Sender for macOS&ensp;·&ensp;TrackOSC Receiver for macOS</em></p>
+<p align="center">
+  <img src="Images/icon-mac-recorder.png" width="128" alt="TrackOSC Recorder macOS app icon">&nbsp;&nbsp;
+  <img src="Images/icon-mac-speaker.png" width="128" alt="TrackOSC Speaker macOS app icon">&nbsp;&nbsp;
+  <img src="Images/icon-mac-router.png" width="128" alt="TrackOSC Router macOS app icon">
+</p>
+<p align="center"><em>TrackOSC Recorder&ensp;·&ensp;TrackOSC Speaker&ensp;·&ensp;TrackOSC Router – three more macOS apps that do things with the stream</em></p>
 
 Live camera → Apple Vision tracking → OSC. TrackOSC streams (almost) all of
 [Apple's Vision framework](https://developer.apple.com/documentation/vision)
@@ -20,7 +26,7 @@ TrackOSC (formerly Poseiosc) is a native-Swift successor to
 speaks **exactly the same OSC wire format**, so existing VisionOSC/PoseOSC
 receivers (Processing, TouchDesigner, Max/MSP, openFrameworks…) work unchanged.
 
-Three apps plus open receiver examples for eight creative-coding environments:
+Six apps plus open receiver examples for eight creative-coding environments:
 
 - **TrackOSC** for iOS (iOS 18+, SwiftUI): live camera → Vision → OSC over UDP,
   with on-screen tracking overlays, per-detector toggles, front/back camera
@@ -35,6 +41,18 @@ Three apps plus open receiver examples for eight creative-coding environments:
   an orbitable 3D view for the 3D body poses, shows per-address message
   rates and a log, and advertises itself on the local network so senders
   can find it.
+- **TrackOSC Recorder** (macOS 15+): records the stream to a
+  [`.trackosc` file](Examples/RECORDING_FORMAT.md) – every datagram exactly
+  as it arrived – and plays recordings back to any receiver at any speed,
+  looping and scrubbing. Develop and demo everything else without a camera.
+- **TrackOSC Speaker** (macOS 15+): reads the stream aloud with Apple's
+  speech synthesis – "A person appeared. A hand appeared.", recognised text
+  and codes, and a periodic summary of where everyone is – with every voice
+  and every utterance option exposed.
+- **TrackOSC Router** (macOS 15+): turns tracking events and values into
+  **MIDI** notes and control changes, **Shortcuts**, **key presses** and
+  **HTTP** requests, by rules you edit in the app – so a raised hand can
+  start a song, a QR code can run an automation, and a nose can turn a knob.
 - **[Receiver examples](Examples/README.md)** for Processing, Python, p5.js,
   TouchDesigner, Max/MSP, Pure Data, openFrameworks and SuperCollider: each
   is a complete, hackable receiver of every TrackOSC message – the same
@@ -74,6 +92,21 @@ sketch just needs the free [Processing](https://processing.org) editor.
 message rates, camera info, and a live log.</em></p>
 
 <p align="center">
+  <img src="Images/screenshot-mac-speaker.png" width="90%" alt="TrackOSC Speaker on macOS: the sentence being spoken, in large type with the current words highlighted, next to a panel of narration settings – which messages to narrate, the summary interval and detail level">
+</p>
+<p align="center"><em>TrackOSC Speaker reading the stream aloud: what is being said, large enough to read across a room, with the spoken words highlighted.</em></p>
+
+<p align="center">
+  <img src="Images/screenshot-mac-router.png" width="90%" alt="TrackOSC Router on macOS: a grid of rule LEDs above an activity feed showing MIDI notes, control changes and HTTP requests firing, next to the rule list and the editor for one rule">
+</p>
+<p align="center"><em>TrackOSC Router turning appearances into MIDI notes, the nose position into a control change, recognised text into a log line and hand counts into HTTP requests.</em></p>
+
+<p align="center">
+  <img src="Images/screenshot-mac-recorder.png" width="90%" alt="TrackOSC Recorder on macOS playing a recording: a transport strip with play, stop, scrubber and time over the stage, next to the Record tab with its start button, record-on-launch option and folder choice">
+</p>
+<p align="center"><em>TrackOSC Recorder playing a .trackosc file back to the receiver on port 9527 while itself listening on 9528.</em></p>
+
+<p align="center">
   <img src="Images/screenshot-ios-sender.jpg" width="28%" alt="TrackOSC on iPhone tracking a person's face and a peace-sign hand gesture, with face box, jawline contour and landmarks in blue, hand skeleton in orange, body pose in green, and the detector chips along the bottom">
   &nbsp;&nbsp;
   <img src="Images/screenshot-processing-receiver.png" width="44%" alt="The TrackOSC Processing receiver sketch drawing the received face landmarks, jawline contour, hand skeleton, body pose, and a recognised-text box on a black canvas with coordinate guides">
@@ -96,6 +129,12 @@ All downloads are signed and notarised – no Gatekeeper hoops.
   settings – receivers on the network appear automatically. To try
   everything on one Mac, run sender and receiver together and send to
   `127.0.0.1`.
+- **Mac Recorder, Speaker and Router**: `TrackOSCRecorder-<version>-macOS.zip`,
+  `TrackOSCSpeaker-<version>-macOS.zip` and `TrackOSCRouter-<version>-macOS.zip`
+  from the same Releases page. Each listens on **9527** like the receiver, so
+  a sender that already works with the receiver works with them unchanged;
+  when 9527 is taken (say the receiver is running), the newcomer takes the
+  next free port and tells you – see [Running several apps at once](#running-several-apps-at-once).
 - **iPhone sender**: get [TrackOSC on the App Store](https://apps.apple.com/app/trackosc/id6795593815)
   (free, iOS 18+).
 - **Receiver examples**: no Apple anything required – open the
@@ -121,10 +160,12 @@ All dependencies are Swift Packages resolved automatically by Xcode
 ([swift-osc](https://swiftpackageindex.com/orchetect/swift-osc) and the local
 `PoseioscShared` package). Nothing else to install.
 
-## Building the macOS receiver
+## Building the macOS receiver (and the Recorder, Speaker and Router)
 
 1. Open `TrackOSC.xcodeproj` in Xcode.
-2. Select the **TrackOSCReceiver** scheme, destination **My Mac**.
+2. Select the **TrackOSCReceiver** scheme, destination **My Mac** (the
+   **TrackOSCRecorder**, **TrackOSCSpeaker** and **TrackOSCRouter** schemes
+   build the other three the same way).
 3. Signing: Xcode may ask you to pick a team – go to the target's
    **Signing & Capabilities** tab and select your team (personal is fine).
 4. Run (⌘R).
@@ -230,6 +271,13 @@ swift run poseiosc-testlisten 9527
 is a headless decoder that prints one line per received message (quit the
 receiver app first – only one process can bind the port).
 
+With a real scene recorded once by **TrackOSC Recorder** (or
+`Examples/Python/trackosc_record.py`), play it back to anything instead:
+
+```bash
+python3 Examples/Python/trackosc_play.py session.trackosc --loop
+```
+
 ### Receiver examples
 
 [`Examples/`](Examples/README.md) holds a complete receiver for every
@@ -259,6 +307,103 @@ the native receiver; joint orders and edge lists are shared via
 The Processing, Python and p5.js examples were run by the maintainer; the
 others were written from their platforms' documentation and are waiting for
 someone with that tool installed to confirm them – pull requests welcome.
+
+### Running several apps at once
+
+Every macOS app in this repository that receives OSC – Receiver, Recorder,
+Speaker, Router – listens on **UDP 9527** by default, the port both senders
+target, so any one of them works out of the box. Only one process can own a
+port, so when 9527 is already taken the app that launches next **falls
+forward** to 9528, 9529… and shows a banner naming the port it got (and
+advertises itself on that port, so it still appears in the senders'
+Discovered receivers list). A port you type in explicitly is never changed
+behind your back.
+
+To feed one stream to several apps on one Mac, **chain** them: in the app
+that has 9527, open the Forward popover (the ↳ toolbar button) and forward
+to `127.0.0.1:9528`; that app can forward on to 9529, and so on. Forwarding
+re-sends every datagram unchanged, so nothing is lost or re-encoded. A
+sender can equally be pointed straight at any of the ports.
+
+### Presentation mode
+
+The receiver-type apps are built to run in installations and on stage.
+**Presentation → Enter Presentation** (⌘⇧F) takes the window full screen
+with the controls, toolbar and cursor hidden, leaving only the stage –
+the visualiser, the spoken sentence, the rule LEDs. Esc brings everything
+back; ⌘⇧H hides or shows the controls without changing full screen; the
+menu also offers *Always on Top* when windowed and *Start in Presentation*
+so a Mac that boots into the app shows nothing else.
+
+### TrackOSC Recorder
+
+Records the incoming stream to a `.trackosc` file and plays one back to any
+host and port. Recording is a tap on the raw datagrams, so the file holds
+every message exactly as sent – including anything this version doesn't
+decode – and playback reproduces the stream byte for byte at 0.25× to 4×,
+looping, with a scrubber; after a seek the last `/camerainfo` is re-sent so
+the receiver knows the frame size. Files go to `~/Downloads/TrackOSC
+Recordings` or a folder you choose; **Record on launch** logs whole
+sessions; a file double-clicked in the Finder opens and plays. The same
+files are read and written by
+[`trackosc_record.py` and `trackosc_play.py`](Examples/Python/) (standard
+library only), and the format is documented in
+[`Examples/RECORDING_FORMAT.md`](Examples/RECORDING_FORMAT.md). Record a
+minute of a real scene once and every other app – and every receiver
+example – can be developed on the train.
+
+### TrackOSC Speaker
+
+Narrates the stream with `AVSpeechSynthesizer`. Events are debounced so a
+flickering detector doesn't produce a flickering commentary: a count has
+to hold for 0.4 s to be believed and 0.8 s to be dropped. What gets said:
+appearances, departures and count changes per message kind (tick the kinds
+you want; body, human and 3D body all mean "a person", so tick one),
+recognised text ("I can read: HELLO"), codes ("QR code: github.com, JGL,
+TrackOSC" – URLs are read as words, not letters), animal names, and a
+summary every *n* seconds at three levels of detail (counts; nose position
+and raised hands; face direction, mouth open, distance and height from the
+3D body). **Speech** exposes every utterance option – voice, rate within
+the API's bounds, pitch 0.5–2×, volume, pauses before and after, the
+assistive-technology preference, SSML – and how new sentences meet old
+ones (latest wins, or a capped queue; interrupt immediately or at a word
+boundary). **Voices** lists every voice installed on the Mac with
+language, quality, gender and novelty/personal filters and a preview
+button; more voices, including Enhanced and Premium ones, come from System
+Settings → Accessibility → Spoken Content. **Transcript** shows what was
+said and can append it to a text file.
+
+### TrackOSC Router
+
+Rules turn the stream into actions. A rule is a **trigger** – a message
+kind appearing, leaving or changing count; a value rising above or falling
+below a threshold (with hysteresis); a value entering or leaving a range; a
+value mapped continuously from an input range to an output range at a
+chosen rate; or text matching a pattern (equals, contains, regular
+expression, with a cooldown) – over a **source** – counts, the nose or any
+body or hand joint as a 0–1 fraction of the frame, raised hands, face
+centre, width and angles, mouth openness, distance and height from the 3D
+body, recognised text, code payloads, animal labels – and an **action**:
+
+- **MIDI** note (with velocity and length) or control change, sent from a
+  virtual MIDI source called *TrackOSC Router* that any DAW, synth or
+  lighting desk can pick as an input, and optionally to a hardware
+  destination too. A continuous rule drives the CC value or note velocity.
+- **Shortcut**: runs a Shortcut by name, with `{value}`, `{text}` or
+  `{rule}` as its input. macOS asks once for permission to control
+  Shortcuts Events; if that is refused, the `shortcuts://` URL scheme is
+  used instead.
+- **Key press**: any key with modifiers, sent to the frontmost app – for
+  presentation clickers, games, video players. Needs Accessibility access
+  (the Outputs tab requests it).
+- **HTTP** GET or POST with templated URL and body – lights, OBS,
+  Home Assistant, your own server.
+- **Log only**, for checking a trigger before wiring it up.
+
+The stage shows an LED per rule and the activity feed; **Dry run** logs
+what would happen without sending; **Sources** shows every value live;
+rules save as JSON in Application Support and can be imported, exported
+and started from ten presets.
 
 ### Hiding the video
 
@@ -305,10 +450,11 @@ question.
 
 ## Releasing the macOS apps (maintainers)
 
-`Scripts/release.sh` archives **both** macOS apps (receiver and sender),
-signs them with your Developer ID, notarises and staples them, and publishes
-the zips as one GitHub Release – so end users can download and double-click
-with no Gatekeeper friction.
+`Scripts/release.sh` archives **every** macOS app (receiver, sender,
+recorder, speaker, router), signs them with your Developer ID, submits them
+all for notarisation in one batch, staples them, and publishes the zips as
+one GitHub Release – so end users can download and double-click with no
+Gatekeeper friction.
 
 One-time setup:
 
@@ -330,7 +476,10 @@ Then, per release – bump `MARKETING_VERSION` in `project.yml`, run
 POSEIOSC_TEAM_ID=YOURTEAMID Scripts/release.sh
 ```
 
-Add `--dry-run` to build/notarise without publishing.
+Add `--dry-run` to build/notarise without publishing, `--only A,B` to
+release only some schemes, and `--skip-notarize` for a local signing test.
+App icons are rendered from `Design/render_icons.swift` by
+`Scripts/make_appiconsets.sh`.
 
 ## Coordinate system
 
@@ -505,11 +654,19 @@ SenderCore/            Platform-neutral sender pipeline shared by both
                        senders (Vision processing, OSC, Bonjour, overlay)
 Sender/                iOS sender app shell (camera, rotation, UI)
 SenderMac/             macOS sender app shell (camera picker, rig rotation)
-Receiver/              macOS receiver (OSC server, 2D + 3D visualisers, log, Bonjour)
+ReceiverCore/          Shared by every receiver-type macOS app: UDP listener,
+                       decoding, forwarding, port fall-forward, Bonjour, settings,
+                       presentation mode, window shell, presence/metrics analysis
+Receiver/              macOS receiver (2D + 3D visualisers, log)
+Recorder/              macOS recorder/player (.trackosc files)
+Speaker/               macOS speaker (narration engine, AVSpeech, voice catalogue)
+Router/                macOS router (rules, MIDI/Shortcuts/keys/HTTP actions)
 Examples/              Receiver examples: Processing, Python, p5.js, TouchDesigner,
                        Max/MSP, Pure Data, openFrameworks, SuperCollider – see
                        Examples/README.md; Examples/SKELETONS.md is the shared
-                       joint-order/edge-list reference
+                       joint-order/edge-list reference; Examples/RECORDING_FORMAT.md
+                       specifies .trackosc files
+Design/                App icon renderer
 Scripts/               Notarised-release tooling
 PROMPTS_AND_DECISIONS.md   Running record of prompts and design decisions
 ```

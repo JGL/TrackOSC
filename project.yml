@@ -36,8 +36,8 @@ settings:
     STRING_CATALOG_GENERATE_SYMBOLS: YES
     # Shared by both apps. Bump CURRENT_PROJECT_VERSION for every TestFlight
     # upload; MARKETING_VERSION is the user-facing version and release tag.
-    MARKETING_VERSION: "1.4.0"
-    CURRENT_PROJECT_VERSION: "9"
+    MARKETING_VERSION: "1.5.0"
+    CURRENT_PROJECT_VERSION: "10"
 
 targetTemplates:
   # Every receiver-type macOS app (Recorder, Speaker, Router, …) is one of
@@ -99,7 +99,7 @@ targets:
         # Standard-encryption-only exemption: skips the export compliance
         # question on every TestFlight upload.
         ITSAppUsesNonExemptEncryption: false
-        NSCameraUsageDescription: "Camera frames are analyzed on-device to detect bodies (2D and 3D), hands, faces, text, animals, and barcodes. No video leaves the phone – only OSC tracking data."
+        NSCameraUsageDescription: "Camera frames are analysed on-device to detect bodies (2D and 3D), hands, faces, text, animals, and barcodes. No video leaves the phone – only OSC tracking data."
         NSLocalNetworkUsageDescription: "TrackOSC sends OSC tracking data to receivers on your local network and browses for them via Bonjour."
         NSBonjourServices: ["_osc._udp"]
         UILaunchScreen: {}
@@ -133,7 +133,7 @@ targets:
         CFBundleDisplayName: TrackOSC Sender
         CFBundleShortVersionString: $(MARKETING_VERSION)
         CFBundleVersion: $(CURRENT_PROJECT_VERSION)
-        NSCameraUsageDescription: "Camera frames are analyzed on-device to detect bodies (2D and 3D), hands, faces, text, animals, and barcodes. No video leaves this Mac – only OSC tracking data."
+        NSCameraUsageDescription: "Camera frames are analysed on-device to detect bodies (2D and 3D), hands, faces, text, animals, and barcodes. No video leaves this Mac – only OSC tracking data."
         NSLocalNetworkUsageDescription: "TrackOSC Sender sends OSC tracking data to receivers on your local network and browses for them via Bonjour."
         NSBonjourServices: ["_osc._udp"]
     settings:

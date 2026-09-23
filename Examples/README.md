@@ -10,7 +10,7 @@ to be copied and hacked. Pick the tool you already use.
 | Platform | Folder | Demonstrates | Needs | Verified by the author |
 |---|---|---|---|---|
 | Processing | [`Processing/`](Processing/) | 2D drawing of everything with coordinate guides; a second sketch draws `/poses3d/arr` in real 3D (P3D) | Processing 4, oscP5 | **Yes** – both sketches run against the synthetic senders |
-| Python | [`Python/`](Python/) | A parser package, a pygame window (2D + top-down 3D minimap), a headless printer, and `trackosc_testsend.py` – a synthetic sender of all twelve messages | Python 3, python-osc, pygame-ce | **Yes** – unit tests, loopback, window |
+| Python | [`Python/`](Python/) | A parser package, a pygame window (2D + top-down 3D minimap), a headless printer, `trackosc_testsend.py` – a synthetic sender of all twelve messages – and `trackosc_record.py` / `trackosc_play.py` for [`.trackosc` recordings](RECORDING_FORMAT.md) | Python 3, python-osc, pygame-ce | **Yes** – unit tests, loopback, window |
 | p5.js | [`p5js/`](p5js/) | A Node **bridge** (UDP → WebSocket, browsers can't do UDP) and a p5.js sketch; `trackosc-client.js` works in any web page | Node 20+ | **Yes** – tests and browser |
 | TouchDesigner | [`TouchDesigner/`](TouchDesigner/) | OSC In DAT callbacks that fill Table DATs per message; optional Script SOP drawing skeletons; step-by-step network recipe (`.toe` is binary, so text only) | TouchDesigner 2023+ | Parser only (mock tests) – recipe not run in TD |
 | Max/MSP | [`Max/`](Max/) | A `[js]` parser emitting `[route]`-friendly streams and `[jit.lcd]` drawing; a patch that draws and sonifies | Max 8.6+ | Generated patch validated; not run in Max |
@@ -37,6 +37,7 @@ cd PoseioscShared && swift run poseiosc-testsend 127.0.0.1 9527     # needs Xcod
 
 ```bash
 python3 Examples/Python/trackosc_testsend.py 127.0.0.1 9527          # needs python-osc only
+python3 Examples/Python/trackosc_play.py session.trackosc --loop      # replay a real scene recorded by TrackOSC Recorder
 ```
 
 Add `--landscape` for 1280×720 frames. Only one program can listen on a

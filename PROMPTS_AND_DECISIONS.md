@@ -482,6 +482,112 @@ together". Planned in plan mode, then built phase by phase on
   with 3D on, settings persistence across the upgrade; then merge, notarised
   Mac release and App Store 1.4.0.
 
+## v1.5 – Recorder, Speaker, Router on a shared ReceiverCore (2026-09-23)
+
+Joel's brief: a family of new native macOS apps, free, signed and
+notarised like the existing ones, each able to go full screen with its GUI
+hidden for installations – a **Speaker** that reads incoming messages
+with AVSpeechSynthesis exposing every API option; **Colours**, **Synth**
+(vintage 303/606/808 character) and **Costumes** (SVG) to follow; plus
+extras chosen together: Recorder/Player, Particles, Router, Kinetic Text,
+and a **3D Costumes** app driving rigged USDZ on Apple's motion-capture
+skeleton. Two decisions Joel added at plan review: **every app defaults
+to port 9527** (the port the senders already target) and falls forward to
+the next free port when it is taken; and the 3D costume format should be
+Apple's documented rig. Planned in plan mode as four releases (v1.5
+foundation + Recorder + Speaker + Router; v1.6 Colours, Particles, Text;
+v1.7 Synth, Costumes; v1.8 3D Costumes). Built on `feature/v1.5`.
+
+- **ReceiverCore** is compiled into every receiver-type app (no framework
+  target: one folder in `sources`, via an XcodeGen `targetTemplates`
+  entry). The Receiver's service, model, Bonjour advertiser, frame kinds
+  and 2D visualiser moved there with `git mv`; the Receiver keeps only its
+  3D scene and the 2D/3D switch.
+- **Own UDP socket.** SwiftOSC's server never exposes raw bytes and drops
+  undecodable datagrams, but forwarding and recording need the bytes and
+  a bring-up needs the counts. `UDPDatagramServer` is a BSD socket read by
+  a DispatchSource; SwiftOSC still decodes (`OSCPacket(from:)`, bundles
+  unpacked). Deliberately no `SO_REUSEPORT`, so a second listener fails
+  and can fall forward instead of silently splitting the stream.
+- **Port fall-forward** tries 9527 then 9528…9536, shows a banner, and
+  advertises on the port it got; a user-typed port is never overridden.
+  Migration gotcha found in testing: v1.4 stored `listenPort = 9527`
+  whenever Restart was pressed, which read as an explicit choice with no
+  fall-forward – a stored value equal to the default is now treated as "no
+  custom port".
+- **Forwarding** is a datagram tap re-sending each packet unchanged, so
+  apps chain on one Mac (sender → 9527 → 9528 → …). The loop guard (own
+  port on a local address) must run *after* the port is bound; running it
+  before produced a self-amplifying loop at 500 Hz in the first test.
+- **Presentation mode** lives in one `PresentationController` (native full
+  screen + hidden controls/toolbar + cursor hidden after a delay, Esc to
+  leave, ⌘⇧F/⌘⇧H, always-on-top only when windowed, start-in-presentation)
+  and a generic `ReceiverWindow` shell (stage + hideable controls +
+  shared connection toolbar + forwarding popover).
+- **`.trackosc` format**: raw datagrams with microsecond arrival times
+  after a 32-byte header; append-only and crash-tolerant (a truncated tail
+  is ignored); byte-exact on replay so the golden compatibility holds and
+  unknown future messages survive. Specified in
+  `Examples/RECORDING_FORMAT.md`, pinned by tests in Swift and Python.
+  Playback re-sends the last `/camerainfo` after a seek.
+- **Speaker**: a pure `NarrationEngine` over a debounced
+  `PresenceTracker` (0.4 s to appear, 0.8 s to leave, quiet kinds
+  released after the stale interval); events coalesce within 250 ms;
+  text and codes are read only after their kind is confirmed present so
+  "a person appeared" comes first; the first summary comes a full
+  interval after appearance; "Nobody here" waits for the coalesced
+  "left" sentence. `SpeechController` keeps its own queue in front of
+  `AVSpeechSynthesizer` (latest-wins or capped queue; summaries never
+  interrupt events) and, after `stopSpeaking(at:)`, waits for the cancel
+  callback before speaking again. Two macOS traps found by sampling a
+  hung process: calling `AVSpeechSynthesisVoice.speechVoices()` on the
+  main thread from inside `availableVoicesDidChangeNotification`
+  deadlocks against the speech service (the voice list is now fetched off
+  the main thread), and speaking straight after a stop can stall.
+  `FaceLandmarks` (the 76-point layout, mouth openness) and
+  `FrameMetrics` (normalised joints, raised hands, face turn/tilt, 3D
+  distance) are shared with the Router.
+- **Router**: rules are Codable data (trigger × source × action), edited
+  through flat drafts so switching a trigger type keeps what was typed.
+  MIDI goes out as UMP MIDI 1.0 from a virtual source with a persisted
+  unique ID (DAWs remember it), capped at 200 messages/s; continuous rules
+  send when the mapped value changes or once a second; Shortcuts run via
+  Shortcuts Events with the URL scheme as fallback; key presses need
+  Accessibility and degrade with a prompt and a settings link; plain-http
+  local requests are allowed by an ATS exception in that app only.
+- **Release plumbing**: `release.sh` gained `--only`, `--skip-notarize`,
+  batched notarisation (submit all, then wait) and per-app release notes;
+  icons come from one `IconSpec` table with CG-drawn badges and
+  `Scripts/make_appiconsets.sh`.
+- Versions to 1.5.0 (build 10); camera purpose strings now say "analysed".
+
+### Verification record (2026-09-23)
+
+- `swift test`: 57 tests in 7 suites (recording layout, face landmarks
+  added); Python: 6 recording tests.
+- Builds: TrackOSCSender (iOS), TrackOSCSenderMac, TrackOSCReceiver,
+  TrackOSCRecorder, TrackOSCSpeaker, TrackOSCRouter.
+- Ports: three Receiver copies bound 9527, 9528, 9529; with forwarding
+  9527 → 9528 both decoded all eleven addresses at the sender's 24 Hz;
+  the self-forward loop guard reported itself.
+- Recorder: an 8 s synthetic recording (2208 datagrams) replayed into the
+  Receiver from the app and from `trackosc_play.py`; the app's playback
+  re-recorded by `trackosc_record.py` was byte-identical with ≤ 2 ms
+  timing drift.
+- Speaker (transcript file): "A person appeared. A hand appeared. A face
+  appeared. Some text appeared. I can read: HELLO. An animal appeared. A
+  cat is here. A code appeared. QR code: github.com, JGL, TrackOSC.",
+  summaries at 15 s and 30 s, the text re-read after its 30 s cooldown,
+  then "The animal left. … The text left." and "Nobody here." after the
+  sender stopped; the app quits cleanly (it hung before the voice fix).
+- Router: a scratch CoreMIDI listener on the virtual source received note
+  60 on appearance, note 48 on departure and a 10 Hz CC 1 stream from the
+  nose; HTTP GET and POST rules reached a local server; the HELLO text
+  match fired on its cooldown; dry run logged only.
+- Not exercised here (needs a person at the keyboard): presentation mode
+  (⌘⇧F, Esc), Shortcuts and key-press actions (permission prompts), the
+  Local Network prompt for the debug-signed builds.
+
 ## Verification record (2026-07-28)
 
 - `swift test` in `PoseioscShared`: 18 tests green, including round-trips for
