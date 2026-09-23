@@ -68,6 +68,8 @@ APPS=(
     "TrackOSCReceiver:TrackOSCReceiver:listens for OSC tracking data and visualises it, in 2D and 3D."
     "TrackOSCSenderMac:TrackOSCSender:Mac camera (built-in, external, or iPhone via Continuity Camera) → Vision tracking → OSC."
     "TrackOSCRecorder:TrackOSCRecorder:records the tracking stream to a .trackosc file and plays recordings back to any receiver."
+    "TrackOSCSpeaker:TrackOSCSpeaker:reads the tracking stream aloud – appearances, recognised text and codes, periodic summaries – with every voice and speech option."
+    "TrackOSCRouter:TrackOSCRouter:turns tracking events and values into MIDI, Shortcuts, key presses and HTTP requests, by rules."
 )
 
 if [[ -n "$ONLY" ]]; then
