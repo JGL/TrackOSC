@@ -218,6 +218,24 @@ targets:
       app_dir: Speaker
       display_name: TrackOSC Speaker
 
+  TrackOSCRouter:
+    templates: [TrackOSCReceiverApp]
+    templateAttributes:
+      app_dir: Router
+      display_name: TrackOSC Router
+    info:
+      properties:
+        NSAppleEventsUsageDescription: "TrackOSC Router runs Shortcuts you choose when tracking events happen."
+        NSAppTransportSecurity:
+          NSAllowsArbitraryLoads: true
+          NSAllowsLocalNetworking: true
+    entitlements:
+      properties:
+        # Running Shortcuts by name goes through Shortcuts Events.
+        com.apple.security.automation.apple-events: true
+        # Rule files can be imported from and exported to anywhere.
+        com.apple.security.files.user-selected.read-write: true
+
 schemes:
   TrackOSCSender:
     build:
@@ -247,5 +265,11 @@ schemes:
     build:
       targets:
         TrackOSCSpeaker: all
+    run:
+      config: Debug
+  TrackOSCRouter:
+    build:
+      targets:
+        TrackOSCRouter: all
     run:
       config: Debug
