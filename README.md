@@ -543,7 +543,11 @@ or the body's outline), **Word Cloud**, **Orbit** (letters circle every
 joint), **Scatter** (a resting sentence that fast movements scatter),
 **Typewriter** (recognised text typed out where it was read), **Marquee**
 (words scroll past at the height of each head), **Box Labels** (text and
-codes where they were seen) and **Letter Rain**.
+codes where they were seen) and **Letter Rain**. However many words there
+are, they repeat to fill whatever they run along; heads are the face
+landmarks when they arrive and a circle otherwise, and cats and dogs get
+words along their spines, legs, ears and tails, marquee rows and outlines
+just like people.
 
 ### Hiding the video
 

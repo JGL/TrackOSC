@@ -147,93 +147,108 @@ final class LetterSystem {
         }
     }
 
-    /// Words laid along each person's arm span and spine, letter by letter.
+    /// The sentence repeated along every path the scene offers: each
+    /// person's arm span, spine and legs and their head (face landmarks
+    /// when present, otherwise a circle), and each animal's spine, legs,
+    /// ears and tail. Letters crawl slowly along the paths.
     private func layAlongSkeleton(_ scene: TrackingScene, size: Float, aspect: Float, spacing: Float) {
         letters = []
-        guard let atlas else { return }
         let words = pool.words(at: time)
         guard !words.isEmpty else { return }
-        var wordIndex = 0
-        let ppu = pixelsPerUV
-        func lay(_ path: [SIMD2<Float>], text: String, colourT: Float) {
-            guard path.count >= 2 else { return }
-            // Arc length in pixels so letters are evenly spaced on screen.
-            func screen(_ p: SIMD2<Float>) -> SIMD2<Float> { p * ppu }
-            var lengths: [Float] = [0]
-            for i in 1..<path.count { lengths.append(lengths[i - 1] + simd_distance(screen(path[i]), screen(path[i - 1]))) }
-            let total = lengths.last!
-            let step = size * 0.7 * spacing   // letter advance in pixels
-            var s: Float = step * 0.5
-            for character in text where !character.isWhitespace {
-                guard s < total, letters.count < Self.capacity else { break }
-                var k = 1
-                while k < path.count - 1, lengths[k] < s { k += 1 }
-                let t = (s - lengths[k - 1]) / max(lengths[k] - lengths[k - 1], 1e-5)
-                let p = path[k - 1] + (path[k] - path[k - 1]) * t
-                let d = screen(path[k]) - screen(path[k - 1])
-                letters.append(Letter(character: character, word: wordIndex, position: p, rotation: atan2(d.y, d.x), size: 1, colourT: colourT))
-                s += step
+        var paths: [(points: [SIMD2<Float>], colourT: Float)] = []
+        for (pi, person) in scene.persons.enumerated() where person.confidence > 0 {
+            let base = Float(pi) * 0.3
+            func joints(_ ids: [Int]) -> [SIMD2<Float>] { ids.filter { person.visible[$0] }.map { person.joints[$0] } }
+            paths.append((joints([10, 8, 6, 5, 7, 9]), base))            // right wrist → left wrist over the shoulders
+            paths.append((joints([11, 13, 15]), base + 0.15))            // left leg
+            paths.append((joints([12, 14, 16]), base + 0.15))            // right leg
+            paths.append((joints([5, 11]), base + 0.3))                  // left side of the torso
+            paths.append((joints([6, 12]), base + 0.3))                  // right side
+            paths.append((joints([11, 12]), base + 0.3))                 // hips
+            for outline in person.headOutlines(aspect: scene.frameAspect) { paths.append((outline, base + 0.45)) }
+            for hand in person.hands {
+                for finger in [[0, 1, 2, 3, 4], [0, 5, 6, 7, 8], [0, 9, 10, 11, 12], [0, 13, 14, 15, 16], [0, 17, 18, 19, 20]] {
+                    paths.append((finger.filter { hand.visible[$0] }.map { hand.joints[$0] }, base + 0.6))
+                }
             }
         }
-        for (pi, person) in scene.persons.enumerated() where person.confidence > 0 {
-            let arm = [10, 8, 6, 5, 7, 9].filter { person.visible[$0] }.map { person.joints[$0] }   // right wrist → left wrist over the shoulders
-            let spine = [0, 11, 13, 15].filter { person.visible[$0] }.map { person.joints[$0] }
-            let leg = [12, 14, 16].filter { person.visible[$0] }.map { person.joints[$0] }
-            let word1 = words[(pi * 3) % words.count].text, word2 = words[(pi * 3 + 1) % words.count].text, word3 = words[(pi * 3 + 2) % words.count].text
-            lay(arm, text: word1, colourT: 0.1 + Float(pi) * 0.3); wordIndex += 1
-            lay(spine, text: word2, colourT: 0.4 + Float(pi) * 0.3); wordIndex += 1
-            lay(leg, text: word3, colourT: 0.7 + Float(pi) * 0.3); wordIndex += 1
-        }
         for (ai, animal) in scene.animals.enumerated() where animal.confidence > 0 {
-            let spine = [0, 9, 22, 23, 24].filter { animal.visible[$0] }.map { animal.joints[$0] }
-            lay(spine, text: words[(ai + 5) % words.count].text, colourT: 0.55); wordIndex += 1
+            let base = 0.5 + Float(ai) * 0.2
+            func joints(_ ids: [Int]) -> [SIMD2<Float>] { ids.filter { animal.visible[$0] }.map { animal.joints[$0] } }
+            paths.append((joints([0, 9, 22, 23, 24]), base))             // nose → neck → tail
+            paths.append((joints([9, 10, 11, 12]), base + 0.1))          // left front leg
+            paths.append((joints([9, 13, 14, 15]), base + 0.1))          // right front leg
+            paths.append((joints([22, 16, 17, 18]), base + 0.2))         // left back leg
+            paths.append((joints([22, 19, 20, 21]), base + 0.2))         // right back leg
+            paths.append((joints([1, 5, 4, 3]), base + 0.3))             // left ear
+            paths.append((joints([2, 8, 7, 6]), base + 0.3))             // right ear
         }
-        _ = atlas
+        layRepeating(words, along: paths, size: size, spacing: spacing)
     }
 
-    /// Words along detected outlines: /contours/arr first, then a face's jaw, then the body's outline.
+    /// Lays the words, repeated, along each path, letters crawling with time.
+    private func layRepeating(_ words: [PoolEntry], along paths: [(points: [SIMD2<Float>], colourT: Float)], size: Float, spacing: Float) {
+        let ppu = pixelsPerUV
+        let sentence = Array(words.map(\.text).joined(separator: "  ") + "  ")
+        guard !sentence.isEmpty else { return }
+        let step = size * 0.7 * spacing   // letter advance in pixels
+        func screen(_ p: SIMD2<Float>) -> SIMD2<Float> { p * ppu }
+        for (pi, path) in paths.enumerated() where path.points.count >= 2 {
+            var lengths: [Float] = [0]
+            for i in 1..<path.points.count { lengths.append(lengths[i - 1] + simd_distance(screen(path.points[i]), screen(path.points[i - 1]))) }
+            let total = lengths.last!
+            guard total > step else { continue }
+            let crawl = fmodf(time * 20 + Float(pi) * 37, step * Float(sentence.count))
+            var s: Float = -crawl
+            var ci = 0
+            while s < total, letters.count < Self.capacity {
+                let character = sentence[ci % sentence.count]
+                ci += 1
+                defer { s += step }
+                if character.isWhitespace || s < 0 { continue }
+                var k = 1
+                while k < path.points.count - 1, lengths[k] < s { k += 1 }
+                let t = (s - lengths[k - 1]) / max(lengths[k] - lengths[k - 1], 1e-5)
+                let p = path.points[k - 1] + (path.points[k] - path.points[k - 1]) * t
+                let d = screen(path.points[k]) - screen(path.points[k - 1])
+                letters.append(Letter(character: character, word: pi, position: p, rotation: atan2(d.y, d.x), size: 1,
+                                      colourT: path.colourT + s / max(total, 1) * 0.2))
+            }
+        }
+    }
+
+    /// Words along detected outlines: /contours/arr first, then faces
+    /// (landmarks or the box), then the outline of each person and animal.
     private func layAlongContour(_ scene: TrackingScene, size: Float, aspect: Float, spacing: Float) {
         letters = []
         let words = pool.words(at: time)
         guard !words.isEmpty else { return }
-        var paths: [[SIMD2<Float>]] = []
-        for contour in scene.contours.prefix(6) { paths.append(contour + [contour[0]]) }
+        var paths: [(points: [SIMD2<Float>], colourT: Float)] = []
+        for (i, contour) in scene.contours.prefix(8).enumerated() { paths.append((contour + [contour[0]], Float(i) * 0.15)) }
         if paths.isEmpty {
-            for face in scene.faces where face.landmarks.count >= 76 {
-                paths.append(Array(face.landmarks[59..<76]))
+            // No outlines from the sender: trace faces, bodies and animals instead.
+            for (i, face) in scene.faces.enumerated() {
+                if face.landmarks.count >= 76 {
+                    paths.append((Array(face.landmarks[59..<76]), Float(i) * 0.2))
+                } else {
+                    paths.append(((0...24).map { k in
+                        let angle = Float(k) / 24 * 2 * .pi
+                        return face.centre + SIMD2(cosf(angle) * face.size.x * 0.5, sinf(angle) * face.size.y * 0.5)
+                    }, Float(i) * 0.2))
+                }
+            }
+            func box(_ lo: SIMD2<Float>, _ hi: SIMD2<Float>, _ t: Float) {
+                let pad = SIMD2<Float>(0.04 / max(aspect, 0.1), 0.04)
+                paths.append(([lo - pad, SIMD2(hi.x + pad.x, lo.y - pad.y), hi + pad, SIMD2(lo.x - pad.x, hi.y + pad.y), lo - pad], t))
+            }
+            for (i, person) in scene.persons.enumerated() where person.confidence > 0 { box(person.boundingBox.min, person.boundingBox.max, 0.3 + Float(i) * 0.3) }
+            for (i, animal) in scene.animals.enumerated() where animal.confidence > 0 {
+                let visible = zip(animal.joints, animal.visible).filter { $0.1 }.map { $0.0 }
+                guard !visible.isEmpty else { continue }
+                box(visible.reduce(SIMD2(1, 1)) { simd_min($0, $1) }, visible.reduce(SIMD2(0, 0)) { simd_max($0, $1) }, 0.6 + Float(i) * 0.2)
             }
         }
-        if paths.isEmpty {
-            for person in scene.persons where person.confidence > 0 {
-                let (lo, hi) = person.boundingBox
-                let pad = SIMD2<Float>(0.04 / aspect, 0.04)
-                paths.append([lo - pad, SIMD2(hi.x + pad.x, lo.y - pad.y), hi + pad, SIMD2(lo.x - pad.x, hi.y + pad.y), lo - pad])
-            }
-        }
-        let ppu = pixelsPerUV
-        func screen(_ p: SIMD2<Float>) -> SIMD2<Float> { p * ppu }
-        let sentence = words.map(\.text).joined(separator: " ")
-        for (pi, path) in paths.enumerated() where path.count >= 2 {
-            var lengths: [Float] = [0]
-            for i in 1..<path.count { lengths.append(lengths[i - 1] + simd_distance(screen(path[i]), screen(path[i - 1]))) }
-            let total = lengths.last!
-            let step = size * 0.7 * spacing
-            var s: Float = fmodf(time * 40, step)
-            var ci = 0
-            let chars = Array(sentence)
-            while s < total, letters.count < Self.capacity, !chars.isEmpty {
-                let character = chars[ci % chars.count]
-                ci += 1
-                if character.isWhitespace { s += step; continue }
-                var k = 1
-                while k < path.count - 1, lengths[k] < s { k += 1 }
-                let t = (s - lengths[k - 1]) / max(lengths[k] - lengths[k - 1], 1e-5)
-                let p = path[k - 1] + (path[k] - path[k - 1]) * t
-                let d = screen(path[k]) - screen(path[k - 1])
-                letters.append(Letter(character: character, word: pi, position: p, rotation: atan2(d.y, d.x), size: 1, colourT: Float(pi) * 0.2 + s / max(total, 0.01) * 0.3))
-                s += step
-            }
-        }
+        layRepeating(words, along: paths, size: size, spacing: spacing)
     }
 
     private func stepWordCloud(_ scene: TrackingScene, dt: Float, speed: Float, density: Int, aspect: Float, radius: Float) {
@@ -333,7 +348,9 @@ final class LetterSystem {
         let chars = Array(sentence)
         let advance = advanceUV("M", size: size) * 0.95
         let total = advance * Float(chars.count)
-        let rows: [Float] = scene.persons.isEmpty ? [0.5] : scene.persons.filter { $0.confidence > 0 && $0.visible[0] }.map { $0.joints[0].y }
+        var rows: [Float] = scene.persons.filter { $0.confidence > 0 && $0.visible[0] }.map { $0.joints[0].y }
+        rows += scene.animals.filter { $0.confidence > 0 && $0.visible[0] }.map { $0.joints[0].y }
+        if rows.isEmpty { rows = [0.5] }
         let vp = viewport
         for (ri, row) in rows.prefix(Int(max(lines, 1))).enumerated() {
             var x = fmodf(marqueeOffset + Float(ri) * 0.37, total)
