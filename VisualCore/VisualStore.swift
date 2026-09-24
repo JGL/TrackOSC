@@ -23,14 +23,17 @@ final class VisualStore {
     let renderer: MetalRenderer?
     let modes: [VisualMode]
 
-    var modeIndex: Int {
-        didSet {
-            modeIndex = min(max(modeIndex, 0), modes.count - 1)
-            UserDefaults.standard.set(modes[modeIndex].id, forKey: "mode")
-            modeChangedAt = Date()
-        }
-    }
+    /// Always a valid index into `modes` (set through `selectMode`).
+    private(set) var modeIndex: Int
     var mode: VisualMode { modes[modeIndex] }
+
+    func selectMode(_ index: Int) {
+        let clamped = min(max(index, 0), modes.count - 1)
+        guard clamped != modeIndex else { return }
+        modeIndex = clamped
+        UserDefaults.standard.set(modes[clamped].id, forKey: "mode")
+        modeChangedAt = Date()
+    }
     /// Parameter values per mode id.
     var params: [String: ParameterValues] = [:] {
         didSet { scheduleSave() }
@@ -110,8 +113,8 @@ final class VisualStore {
 
     // MARK: - Actions
 
-    func nextMode() { modeIndex = (modeIndex + 1) % modes.count }
-    func previousMode() { modeIndex = (modeIndex - 1 + modes.count) % modes.count }
+    func nextMode() { selectMode((modeIndex + 1) % modes.count) }
+    func previousMode() { selectMode((modeIndex - 1 + modes.count) % modes.count) }
 
     func randomise() {
         params[mode.id] = mode.parameters.randomised()
@@ -124,7 +127,7 @@ final class VisualStore {
 
     func loadPreset(_ slot: Int) {
         guard let preset = presets.slots[safe: slot] ?? nil else { return }
-        if let index = modes.firstIndex(where: { $0.id == preset.mode }) { modeIndex = index }
+        if let index = modes.firstIndex(where: { $0.id == preset.mode }) { selectMode(index) }
         params[preset.mode] = preset.params
         palette = preset.palette
     }

@@ -35,6 +35,7 @@ struct VisualStage: View {
                         .allowsHitTesting(false)
                 }
             }
+            AttractBadge(store: store)
             if let error = store.rendererError {
                 Text(error)
                     .font(.callout.monospaced())
@@ -42,6 +43,34 @@ struct VisualStage: View {
                     .padding(8)
                     .background(.red.opacity(0.8))
                     .padding(16)
+            }
+        }
+    }
+}
+
+/// Says so when the synthetic figure is standing in for real tracking –
+/// only while the controls are visible, never on the wall.
+struct AttractBadge: View {
+    let store: VisualStore
+
+    var body: some View {
+        TimelineView(.periodic(from: .now, by: 0.5)) { _ in
+            if store.builder.scene.isAttract, !store.model.fullScreen.isGUIHidden {
+                VStack {
+                    Spacer()
+                    HStack {
+                        Spacer()
+                        Label("Nobody tracked – showing the demo figure (Display → Attract after)", systemImage: "figure.walk")
+                            .font(.callout)
+                            .foregroundStyle(.white)
+                            .padding(.horizontal, 12)
+                            .padding(.vertical, 6)
+                            .background(.black.opacity(0.55), in: .capsule)
+                            .padding(12)
+                        Spacer()
+                    }
+                }
+                .allowsHitTesting(false)
             }
         }
     }

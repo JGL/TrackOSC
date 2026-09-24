@@ -45,7 +45,7 @@ struct LookPanel: View {
                 Button { store.nextMode() } label: { Image(systemName: "chevron.right") }
                 Button("Randomise") { store.randomise() }
             }
-            Picker("Mode", selection: $store.modeIndex) {
+            Picker("Mode", selection: Binding(get: { store.modeIndex }, set: { store.selectMode($0) })) {
                 ForEach(Array(store.modes.enumerated()), id: \.offset) { index, mode in
                     Text(mode.name).tag(index)
                 }
