@@ -17,6 +17,8 @@
 # --dry-run        everything except creating the GitHub release
 # --only A,B       only these schemes (e.g. --only TrackOSCRecorder)
 # --skip-notarize  sign and zip without notarising (local testing only)
+# --resume         reuse the exports already in build/release (skip the
+#                  archive and export steps), e.g. after notarisation failed
 #
 # Every app is archived and exported first, then all of them are submitted
 # to Apple in one go and waited on together, so a release of many apps
@@ -35,11 +37,13 @@ export PATH="/usr/bin:/bin:/usr/sbin:/sbin:$PATH"
 
 DRY_RUN=0
 SKIP_NOTARIZE=0
+RESUME=0
 ONLY=""
 while [[ $# -gt 0 ]]; do
     case "$1" in
         --dry-run) DRY_RUN=1 ;;
         --skip-notarize) SKIP_NOTARIZE=1 ;;
+        --resume) RESUME=1 ;;
         --only) ONLY="$2"; shift ;;
         *) echo "Unknown option: $1" >&2; exit 2 ;;
     esac
@@ -86,16 +90,26 @@ if [[ -n "$ONLY" ]]; then
 fi
 
 echo "=== Releasing TrackOSC $VERSION (team $POSEIOSC_TEAM_ID) ==="
-rm -rf "$BUILD_DIR"
-mkdir -p "$BUILD_DIR"
-sed "s/TEAM_ID_PLACEHOLDER/$POSEIOSC_TEAM_ID/" Scripts/ExportOptions.plist > "$EXPORT_OPTIONS"
+if [[ $RESUME -eq 0 ]]; then
+    rm -rf "$BUILD_DIR"
+    mkdir -p "$BUILD_DIR"
+    sed "s/TEAM_ID_PLACEHOLDER/$POSEIOSC_TEAM_ID/" Scripts/ExportOptions.plist > "$EXPORT_OPTIONS"
+    # The commit the release is built from: the tag points here even if
+    # the branch moves on before a --resume publishes.
+    git rev-parse HEAD > "$BUILD_DIR/COMMIT"
+fi
+RELEASE_COMMIT=$(cat "$BUILD_DIR/COMMIT" 2>/dev/null || git rev-parse HEAD)
 
 scheme_of() { echo "${1%%:*}"; }
 basename_of() { local rest="${1#*:}"; echo "${rest%%:*}"; }
 note_of() { echo "${1#*:*:}"; }
 
-# 1. Archive and export every app.
+# 1. Archive and export every app (unless resuming with exports in place).
 for pair in "${APPS[@]}"; do
+    if [[ $RESUME -eq 1 ]]; then
+        [[ -d "$BUILD_DIR/$(scheme_of "$pair")-export/$(basename_of "$pair").app" ]] || { echo "--resume: no export for $(scheme_of "$pair")" >&2; exit 1; }
+        continue
+    fi
     SCHEME=$(scheme_of "$pair")
     BASENAME=$(basename_of "$pair")
     ARCHIVE="$BUILD_DIR/$SCHEME.xcarchive"
@@ -180,6 +194,7 @@ The iOS sender is free on the App Store: https://apps.apple.com/app/trackosc/id6
 
 echo "--- Publishing GitHub release v$VERSION"
 gh release create "v$VERSION" "${ASSETS[@]}" \
+    --target "$RELEASE_COMMIT" \
     --title "TrackOSC $VERSION" \
     --notes "$NOTES"
 
