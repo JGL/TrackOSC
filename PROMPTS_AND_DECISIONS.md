@@ -655,6 +655,67 @@ during playback; (5) Swift 6 actor errors in the Router's RuleStore.
 - Versions to 1.6.0 (build 11); the iOS sender changes, so this release
   needs an App Store upload (em-dash check first).
 
+## v1.7 – Colours, Particles and Text on a shared VisualCore (2026-09-24)
+
+Joel said "go" for the visual apps, then gave feedback on Colours as it
+went: full-screen title bar (done in v1.6), the "M" of the nose–eye–ear
+bones, recording for socials, hands and faces in body-only looks, cats and
+dogs everywhere. All three apps share `VisualCore/` and the
+`ReceiverCore/Scene/` tracking scene.
+
+- **Tracking scene**: people get stable ids by greedy nearest-centroid
+  matching with a half-second grace, one-pole smoothed joints with
+  velocities, hands attached to the nearest wrist (with an openness
+  estimate and a handedness guess), faces to the nearest nose (mouth
+  openness from the landmarks), a second tracker for cats and dogs, the
+  `/contours/arr` outlines, recognised text and codes, smoothed presence
+  and activity, a ten-second history, and an attract figure after an idle
+  delay (labelled on the stage while the controls are visible, because it
+  read as "recorded data").
+- **Colours** renders full-screen fragment modes from one uniform block
+  into a ping-pong rgba16Float pair (feedback for Memory Wash and Heat
+  Map) with a vignette/grain/gamma present pass. Fourteen modes, three
+  parameters each. Decisions: fit (letterbox) is the default because a
+  portrait phone on a landscape screen otherwise shows only the middle
+  third – the modes paint the whole screen regardless; the head is drawn
+  from face landmarks when they arrive, otherwise a circle, never the
+  skeleton's head bones; hands, faces and animals join every mode.
+- **Recording**: the post pass is drawn a second time into a Metal texture
+  backed by a CVPixelBuffer from the writer's pool, so frames never cross
+  the CPU; H.264 .mp4 at the window's size and 60 fps to Downloads. The
+  "Permission denied: CoreMedia / CM-EXPORT" console line is macOS's own
+  statistics donation being refused by the sandbox and is harmless.
+- **Sprite layer** (for Particles and Text): instanced quads – soft dots,
+  rings or glyphs from a Core Text atlas – and line strips drawn over the
+  mode background with additive or normal blending; a `vc_fade`
+  background keeps the previous frame by the Trails parameter. The atlas
+  is drawn top-down with a flipped CTM so rows, uv and texture agree (a
+  first version flipped twice and mapped every letter to the wrong cell).
+  A `SceneViewport` tells simulations where the screen's edges are in
+  scene uv, so ambient particles and falling letters cover the whole
+  screen rather than the sender's frame.
+- **Particles**: a structure-of-arrays CPU simulation (100,000 cap,
+  defaults 400–30,000) with twelve behaviours over the scene's joints,
+  bones, centroids, hands and history; dense modes are drawn dimmer so
+  additive blending does not white out.
+- **Text**: a `TextPool` (recognised text and codes with a 30 s
+  time-to-live, plus the user's words), a `LetterSystem` with ten
+  behaviours, and advances computed in pixels from the atlas so runs are
+  spaced correctly at any window size; a Words box and typeface picker
+  above the shared inspector.
+- Every shader crash-free path is checked by `--snapshot-dir`, which
+  renders every mode offscreen with a synthetic person, hand, face
+  (with landmarks), cat and two texts; the contact sheets are in the
+  README. Colours also has five unit tests (tracker, palettes,
+  parameters, catalogue). The apps are sandboxed, so `--snapshot-dir`
+  must point inside Downloads.
+- Fixed along the way: assigning to an @Observable property in its own
+  didSet recursed until the stack overflowed (mode changes crashed);
+  `HSplitView` logged "Invalid view geometry" four times per launch and
+  was replaced by a fixed-width controls column; `half` is a reserved
+  word in Metal.
+- Versions to 1.7.0 (build 12); no sender change, so no App Store upload.
+
 ## Verification record (2026-07-28)
 
 - `swift test` in `PoseioscShared`: 18 tests green, including round-trips for

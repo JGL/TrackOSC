@@ -40,6 +40,9 @@ struct ReceiverWindow<Stage: View, Controls: View, Extras: ToolbarContent>: View
         self.toolbarExtras = { EmptyToolbar() }
     }
 
+    /// The controls column is a fixed width; the stage takes the rest.
+    static var controlsWidth: CGFloat { 400 }
+
     var body: some View {
         let hidden = model.fullScreen.isGUIHidden
         VStack(spacing: 0) {
@@ -53,12 +56,16 @@ struct ReceiverWindow<Stage: View, Controls: View, Extras: ToolbarContent>: View
                     .background(.orange.opacity(0.12))
                 Divider()
             }
-            HSplitView {
+            // A plain HStack rather than HSplitView: the split view lays its
+            // children out before the window has a size and logs "Invalid
+            // view geometry: width is negative" on every launch.
+            HStack(spacing: 0) {
                 stage()
                     .frame(minWidth: 400, maxWidth: .infinity, maxHeight: .infinity)
                 if !hidden {
+                    Divider()
                     controls()
-                        .frame(minWidth: 300, idealWidth: 340, maxWidth: 460)
+                        .frame(width: Self.controlsWidth)
                 }
             }
         }

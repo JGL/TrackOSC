@@ -9,9 +9,12 @@
 <p align="center">
   <img src="Images/icon-mac-recorder.png" width="128" alt="TrackOSC Recorder macOS app icon">&nbsp;&nbsp;
   <img src="Images/icon-mac-speaker.png" width="128" alt="TrackOSC Speaker macOS app icon">&nbsp;&nbsp;
-  <img src="Images/icon-mac-router.png" width="128" alt="TrackOSC Router macOS app icon">
+  <img src="Images/icon-mac-router.png" width="128" alt="TrackOSC Router macOS app icon">&nbsp;&nbsp;
+  <img src="Images/icon-mac-colours.png" width="128" alt="TrackOSC Colours macOS app icon">&nbsp;&nbsp;
+  <img src="Images/icon-mac-particles.png" width="128" alt="TrackOSC Particles macOS app icon">&nbsp;&nbsp;
+  <img src="Images/icon-mac-text.png" width="128" alt="TrackOSC Text macOS app icon">
 </p>
-<p align="center"><em>TrackOSC Recorder&ensp;·&ensp;TrackOSC Speaker&ensp;·&ensp;TrackOSC Router – three more macOS apps that do things with the stream</em></p>
+<p align="center"><em>TrackOSC Recorder&ensp;·&ensp;TrackOSC Speaker&ensp;·&ensp;TrackOSC Router&ensp;·&ensp;TrackOSC Colours&ensp;·&ensp;TrackOSC Particles&ensp;·&ensp;TrackOSC Text – six more macOS apps that do things with the stream</em></p>
 
 Live camera → Apple Vision tracking → OSC. TrackOSC streams (almost) all of
 [Apple's Vision framework](https://developer.apple.com/documentation/vision)
@@ -26,7 +29,7 @@ TrackOSC (formerly Poseiosc) is a native-Swift successor to
 speaks **exactly the same OSC wire format**, so existing VisionOSC/PoseOSC
 receivers (Processing, TouchDesigner, Max/MSP, openFrameworks…) work unchanged.
 
-Six apps plus open receiver examples for eight creative-coding environments:
+Nine apps plus open receiver examples for eight creative-coding environments:
 
 - **TrackOSC** for iOS (iOS 18+, SwiftUI): live camera → Vision → OSC over UDP,
   with on-screen tracking overlays, per-detector toggles, front/back camera
@@ -53,6 +56,20 @@ Six apps plus open receiver examples for eight creative-coding environments:
   **MIDI** notes and control changes, **Shortcuts**, **key presses** and
   **HTTP** requests, by rules you edit in the app – so a raised hand can
   start a song, a QR code can run an automation, and a nose can turn a knob.
+- **TrackOSC Colours** (macOS 15+, Metal): gradients, colour fields and
+  patterns driven by the stream – fourteen modes from glowing skeletons and
+  Voronoi cells to heat maps and auroras, twelve palettes, nine presets,
+  keyboard control, and a full-screen stage for walls and stages.
+- **TrackOSC Particles** (macOS 15+, Metal): up to a hundred thousand
+  physics particles driven by the stream – attraction, repulsion, orbits,
+  sparks from fast joints, fire along the bones, ghosts of where people
+  were, long exposures, flow fields, constellations, rain and snow that
+  break on the body, a body made of dust, and fountains from the hands.
+- **TrackOSC Text** (macOS 15+, Metal): kinetic typography from the text
+  the sender reads, the codes it scans and your own words – letters that
+  fall and get knocked about, words along skeletons and outlines, word
+  clouds, orbits, scatter, a typewriter, a marquee, box labels and letter
+  rain – in a choice of typefaces.
 - **[Receiver examples](Examples/README.md)** for Processing, Python, p5.js,
   TouchDesigner, Max/MSP, Pure Data, openFrameworks and SuperCollider: each
   is a complete, hackable receiver of every TrackOSC message – the same
@@ -107,6 +124,26 @@ message rates, camera info, and a live log.</em></p>
 <p align="center"><em>TrackOSC Recorder playing a .trackosc file back to the receiver on port 9527 while itself listening on 9528.</em></p>
 
 <p align="center">
+  <img src="Images/screenshot-mac-colours.png" width="90%" alt="TrackOSC Colours on macOS: a glowing skeleton in the Body Hue mode fills the stage, next to the Look panel with the mode picker, three parameter sliders and a grid of twelve palettes">
+</p>
+<p align="center"><em>TrackOSC Colours in its Body Hue mode, with the mode, parameters and palette controls beside the stage.</em></p>
+
+<p align="center">
+  <img src="Images/screenshot-mac-colours-modes.png" width="90%" alt="A contact sheet of the fourteen TrackOSC Colours modes rendered from the same synthetic figure: aurora, body hue, checkers, face mood, hand glow, heat map, joint stops, kaleido, memory wash, metaballs, palette sweep, rings, stripes and voronoi">
+</p>
+<p align="center"><em>All fourteen Colours modes from one synthetic figure (the app's own build check renders this).</em></p>
+
+<p align="center">
+  <img src="Images/screenshot-mac-particles-modes.png" width="90%" alt="A contact sheet of the twelve TrackOSC Particles modes rendered from the same synthetic figure: attract, constellation, flow field, ghost parade, hand fountains, long exposure, orbit, particle body, rain and snow, repel, skeleton fire and sparks">
+</p>
+<p align="center"><em>The twelve Particles modes (Sparks is empty here because the synthetic figure never moves fast).</em></p>
+
+<p align="center">
+  <img src="Images/screenshot-mac-text-modes.png" width="90%" alt="A contact sheet of the ten TrackOSC Text modes rendered from the same synthetic figure and two synthetic texts: along contour, along skeleton, box labels, letter rain, marquee, orbit, physics letters, scatter, typewriter and word cloud">
+</p>
+<p align="center"><em>The ten Text modes.</em></p>
+
+<p align="center">
   <img src="Images/screenshot-ios-sender.jpg" width="28%" alt="TrackOSC on iPhone tracking a person's face and a peace-sign hand gesture, with face box, jawline contour and landmarks in blue, hand skeleton in orange, body pose in green, and the detector chips along the bottom">
   &nbsp;&nbsp;
   <img src="Images/screenshot-processing-receiver.png" width="44%" alt="The TrackOSC Processing receiver sketch drawing the received face landmarks, jawline contour, hand skeleton, body pose, and a recognised-text box on a black canvas with coordinate guides">
@@ -129,9 +166,8 @@ All downloads are signed and notarised – no Gatekeeper hoops.
   settings – receivers on the network appear automatically. To try
   everything on one Mac, run sender and receiver together and send to
   `127.0.0.1`.
-- **Mac Recorder, Speaker and Router**: `TrackOSCRecorder-<version>-macOS.zip`,
-  `TrackOSCSpeaker-<version>-macOS.zip` and `TrackOSCRouter-<version>-macOS.zip`
-  from the same Releases page. Each listens on **9527** like the receiver, so
+- **Mac Recorder, Speaker, Router, Colours, Particles and Text**:
+  `TrackOSC<Name>-<version>-macOS.zip` for each, from the same Releases page. Each listens on **9527** like the receiver, so
   a sender that already works with the receiver works with them unchanged;
   when 9527 is taken (say the receiver is running), the newcomer takes the
   next free port and tells you – see [Running several apps at once](#running-several-apps-at-once).
@@ -432,6 +468,87 @@ what would happen without sending; **Sources** shows every value live;
 rules save as JSON in Application Support and can be imported, exported
 and started from ten presets.
 
+### TrackOSC Colours
+
+Colour driven by people. Every frame the receiver's latest messages become
+a *tracking scene* – people with stable identities and smoothed joints in
+0–1 coordinates (mirrored, like a selfie, by default), their hands and
+faces, recognised text, and two moods, presence and activity – and a Metal
+shader paints the whole screen from it. Fourteen modes: **Body Hue**
+(glowing skeletons, a colour per person), **Hand Glow**, **Joint Stops**
+(every joint a colour stop of one smooth field), **Voronoi People**,
+**Metaballs**, **Rings**, **Stripes** (turning with the shoulders),
+**Checkers** (warped by whoever stands in it), **Memory Wash** and **Heat
+Map** (which remember where people were), **Kaleido Body**, **Aurora**,
+**Face Mood** (colour follows the gaze and the mouth) and **Palette
+Sweep**. Each has three parameters; twelve palettes are built in and any
+can be edited; nine preset slots save mode, parameters and palette
+together. When nobody has been tracked for a while a synthetic figure
+wanders through so the wall never goes dead (Display → Attract after).
+
+Every mode uses whatever is arriving: cats and dogs from **Animal Pose**
+are tracked and drawn exactly like people (their own colours); with Hand
+and Face Landmarks on, hand skeletons and a face ring join the body in
+the drawing modes, hand
+joints and face centres become extra stops, seeds, warps and heat sources
+in the field modes, and mouth openness and hand openness push the aurora,
+stripes and metaballs about. A person's head is drawn from their face
+landmarks when those arrive, otherwise as a circle.
+
+**Recording**: the Record button (or the V key) writes the rendered
+output – not a screen grab – to an H.264 `.mp4` in Downloads at the
+window's resolution and 60 fps, ready to post; a portrait window gives a
+portrait video. Keys on the stage: ←/→ mode, Space randomise, R reset,
+1–9 load a preset (⇧1–9 saves), S screenshot, V record, H hide the
+controls, F full screen. Frames are fitted (letterboxed) into the window by default; the
+modes still fill the screen, only the people's positions are mapped into
+the frame area. Adding a mode is one fragment function in
+`Colours/Shaders/ColoursModes.metal` and one catalogue entry in
+`Colours/ColoursModes.swift`; the app's `--snapshot-dir <folder>`
+argument renders every mode to a PNG without a window, which is how the
+contact sheet above was made:
+
+```bash
+open -a "TrackOSC Colours" --args --snapshot-dir ~/Downloads/colours-check
+```
+
+### TrackOSC Particles
+
+The same tracking scene, drawn as particles simulated on the CPU and
+rendered as additive sprites over a fading background (the *Trails*
+parameter is how much of the last frame survives). Twelve modes: **Attract**
+(every particle races for the nearest joint), **Repel** (a field parts
+around the body), **Orbit** (moons around each person), **Sparks** (fast
+joints throw sparks that fall), **Skeleton Fire** (bones burn), **Ghost
+Parade** (where each person was, half a second ago and before), **Long
+Exposure** (joints leave light that lingers), **Flow Field** (a current that
+moving joints stir), **Constellation** (stars, and the lines that make a
+figure of them), **Rain / Snow** (drops that break on the body), **Particle
+Body** (the body made of dust) and **Hand Fountains**. Each mode has a
+particle count (up to 100,000), size, speed, trails and one parameter of
+its own; palettes, presets, keys, recording and the `--snapshot-dir` check
+are the same as Colours. Cats, dogs, hands and faces take part everywhere.
+
+### TrackOSC Text
+
+Kinetic typography. The words come from three places: text the sender
+reads (`/texts/arr`), codes it scans (`/barcodes/arr`), both kept for half a
+minute after they were last seen, and your own words typed into the Words
+box (one or more per line). Letters are sprites from a glyph atlas built
+from the chosen typeface, so they move at the display rate and record like
+everything else. Ten modes: **Physics Letters** (fall, pile up, get knocked
+about by the body), **Along Skeleton** (words run along arms, spine and
+legs), **Along Contour** (words trace `/contours/arr` outlines, or a jaw,
+or the body's outline), **Word Cloud**, **Orbit** (letters circle every
+joint), **Scatter** (a resting sentence that fast movements scatter),
+**Typewriter** (recognised text typed out where it was read), **Marquee**
+(words scroll past at the height of each head), **Box Labels** (text and
+codes where they were seen) and **Letter Rain**. However many words there
+are, they repeat to fill whatever they run along; heads are the face
+landmarks when they arrive and a circle otherwise, and cats and dogs get
+words along their spines, legs, ears and tails, marquee rows and outlines
+just like people.
+
 ### Hiding the video
 
 Both senders have a **Hide video preview** option (the eye button on the
@@ -711,11 +828,18 @@ Sender/                iOS sender app shell (camera, rotation, UI)
 SenderMac/             macOS sender app shell (camera picker, rig rotation)
 ReceiverCore/          Shared by every receiver-type macOS app: UDP listener,
                        decoding, forwarding, port fall-forward, Bonjour, settings,
-                       full screen, window shell, presence/metrics analysis
+                       full screen, window shell, presence/metrics analysis,
+                       tracking scene (person tracker, history, attract figure)
 Receiver/              macOS receiver (2D + 3D visualisers, log)
 Recorder/              macOS recorder/player (.trackosc files)
 Speaker/               macOS speaker (narration engine, AVSpeech, voice catalogue)
 Router/                macOS router (rules, MIDI/Shortcuts/keys/HTTP actions)
+VisualCore/            Shared by the visual apps: Metal canvas and renderer (shader
+                       modes plus a sprite/line layer and glyph atlas), recorder,
+                       palettes, parameters, presets, inspector UI
+Colours/               macOS colours app (fourteen shader modes)
+Particles/             macOS particles app (CPU simulation, twelve behaviours)
+Text/                  macOS kinetic text app (word pool, letter system, ten behaviours)
 Examples/              Receiver examples: Processing, Python, p5.js, TouchDesigner,
                        Max/MSP, Pure Data, openFrameworks, SuperCollider – see
                        Examples/README.md; Examples/SKELETONS.md is the shared

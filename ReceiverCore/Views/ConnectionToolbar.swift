@@ -6,6 +6,7 @@
 //  forwarding popover – the same in every receiver-type app.
 //
 
+import AppKit
 import PoseioscShared
 import SwiftUI
 
@@ -187,6 +188,19 @@ struct SendersPopover: View {
             Text("Ignored \(model.ignoredMessages) messages from other senders")
                 .font(.footnote.monospaced())
                 .foregroundStyle(.secondary)
+
+            Divider()
+            Text("Not appearing on the phone?").font(.subheadline)
+            Text("Each app needs its own Local Network permission before senders can discover it. Check System Settings → Privacy & Security → Local Network, and that the sender targets port \(String(model.effectivePort)).")
+                .font(.footnote)
+                .foregroundStyle(.secondary)
+                .fixedSize(horizontal: false, vertical: true)
+            Button("Open Local Network settings") {
+                if let url = URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_LocalNetwork") {
+                    NSWorkspace.shared.open(url)
+                }
+            }
+            .controlSize(.small)
         }
         .padding()
         .frame(width: 360)
