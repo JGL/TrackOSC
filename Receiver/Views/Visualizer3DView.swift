@@ -19,15 +19,6 @@ struct Visualizer3DView: View {
     var store: ReceiverStore
     @State private var scene = Pose3DScene()
     @State private var orbit = OrbitState()
-    @State private var dragStart: OrbitState?
-    @State private var zoomStart: Float?
-
-    /// Spherical camera position around the scene's target.
-    struct OrbitState: Equatable {
-        var azimuth: Float = 0.70      // radians around y, from the +z side
-        var elevation: Float = 0.39    // radians above the target's horizon
-        var distance: Float = 3.7      // metres from the target
-    }
 
     var body: some View {
         TimelineView(.animation(minimumInterval: 1.0 / 30.0)) { timeline in
@@ -41,8 +32,7 @@ struct Visualizer3DView: View {
                     scene.update(poses: poses)
                     scene.placeCamera(orbit)
                 }
-                .gesture(orbitDrag)
-                .gesture(zoomPinch)
+                .modifier(OrbitGestures(orbit: $orbit))
 
                 if poses.isEmpty {
                     Text("Waiting for /poses3d/arr… (turn on 3D Body on the sender)")
@@ -68,29 +58,6 @@ struct Visualizer3DView: View {
             orbit = OrbitState()
         }
         .accessibilityLabel("3D pose visualiser")
-    }
-
-    private var orbitDrag: some Gesture {
-        DragGesture(minimumDistance: 1)
-            .onChanged { value in
-                let start = dragStart ?? orbit
-                dragStart = start
-                var next = start
-                next.azimuth = start.azimuth - Float(value.translation.width) * 0.01
-                next.elevation = min(max(start.elevation + Float(value.translation.height) * 0.01, -1.4), 1.4)
-                orbit = next
-            }
-            .onEnded { _ in dragStart = nil }
-    }
-
-    private var zoomPinch: some Gesture {
-        MagnifyGesture()
-            .onChanged { value in
-                let start = zoomStart ?? orbit.distance
-                zoomStart = start
-                orbit.distance = min(max(start / Float(value.magnification), 0.5), 12)
-            }
-            .onEnded { _ in zoomStart = nil }
     }
 
     private func caption(for poses: [Pose3DDetection]) -> String {

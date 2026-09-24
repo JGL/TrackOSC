@@ -819,6 +819,69 @@ parts, as well as 3D Costumes – I'll be back later to check." Built on
   the head; real Face Landmarks put them on the face.
 - Versions to 1.8.0 (build 13); no sender change, so no App Store upload.
 
+## v1.9 – 3D Costumes (2026-09-24)
+
+The last part of Joel's "Synth and Costumes parts, as well as 3D
+Costumes". Built on `feature/v1.8` after v1.8.0.
+
+- **Format decision (from the plan)**: a rigged USDZ on Apple's
+  motion-capture skeleton is the primary format, because it is the one
+  documented rig ("Validating a Model for Motion Capture": 91 joints,
+  T-pose, +Y up, facing +Z, left hand along +X, each joint's +X down its
+  bone, at most four influences, one bind pose) and Apple ships the Biped
+  Robot for it. Two no-rigging paths beside it: a folder of parts named
+  per bone (the SVG costumes' vocabulary) and a built-in mannequin.
+- **Costume3DCore** is pure simd, so `swift test` runs headless: the
+  91-joint table with parents (paths like `root/hips_joint/…`, which is
+  what RealityKit's `jointNames` report), validation listing missing
+  driven and optional joints, a synthetic T-pose (`RestPose.tPose()`)
+  built from world positions with +X-down-the-bone frames, `Retarget17`
+  (hips, spine and neck aim root → centre-shoulder → head with the hip
+  and shoulder lines as side vectors; limbs aim shoulder → elbow → wrist
+  and hip → knee → ankle; feet flat and forward), and the `FKSolver`
+  (parent-first: each driven joint's local rotation = parent-world⁻¹ ×
+  delta × rest-world, delta being either a full-frame change when a side
+  vector is given or the minimal rotation from the rest bone axis to the
+  live direction; slerp smoothing; hold when the body is missing; scale
+  = body height over rest height; only the hips translate). A first
+  version put the side vector on the character's left, but in Apple's
+  rest frames (+X up the spine, +Z forward) +Y is the character's right;
+  the T-pose test caught the 180° twist.
+- **Blocky.usda**: rather than download Apple's sample, the package
+  writes a rigged USD by hand (`USDAWriter`: SkelRoot, Skeleton with
+  joints, bindTransforms and restTransforms, a Mesh of boxes each
+  skinned rigidly to its joint with SkelBindingAPI). RealityKit loads
+  it, reports 91 joints, and the FK solver drives it, which is the same
+  path a real rigged model takes; it also doubles as a readable example
+  of the rig.
+- **Shared 3D stage**: the Receiver's floor grid, axis gnomon, camera
+  marker and orbit camera moved into `ReceiverCore/Scene3D/Stage3D`
+  (with `OrbitState` and an `OrbitGestures` modifier); `Pose3DScene` now
+  composes it, so the Receiver and 3D Costumes look the same.
+- **TrackOSC 3D Costumes** app: a `RealityView` stage over the shared
+  Stage3D; one costume entity per 3D pose (rigged: `Entity(contentsOf:)`,
+  the skinned `ModelEntity` found by non-empty `jointNames`, rest pose
+  read from `jointTransforms`, driven by setting each joint's rotation,
+  entity scaled and positioned so the hips land on the live root; parts:
+  a holder per file placed by `PartsMath`; primitives: cylinders or boxes
+  per edge plus a head), same/cycle assignment, opacity fades on leaving,
+  a library with a bookmarked folder (model files are rigged costumes,
+  sub-folders with model files are parts sets) and hot reload, a Rig tab
+  with validation warnings and the driven-joint list, display settings
+  (mirror by flipping the root's x scale, gnomon, background, smoothing,
+  fade), keys, and a link to Apple's rig page rather than a download
+  button (the sandbox and the licence make opening the page the honest
+  option). No recording: RealityKit output cannot be drawn into a
+  CoreGraphics context; screen recording covers it.
+- Verified: 10 package tests (rig completeness and order, validation,
+  T-pose frames, the T-pose reproducing the rest, a 90° elbow landing
+  the hand joint on the live wrist, hip yaw carrying the whole body,
+  holding and smoothing, part-name matching, parts placement, the USDA
+  skeleton and skinning); live with `poseiosc-testsend`'s walking 3D
+  figure, the mannequin, blocks and Blocky all follow it; every Mac
+  scheme builds.
+- Versions to 1.9.0 (build 14); no sender change, so no App Store upload.
+
 ## Verification record (2026-07-28)
 
 - `swift test` in `PoseioscShared`: 18 tests green, including round-trips for

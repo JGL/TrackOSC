@@ -14,9 +14,10 @@
   <img src="Images/icon-mac-particles.png" width="128" alt="TrackOSC Particles macOS app icon">&nbsp;&nbsp;
   <img src="Images/icon-mac-text.png" width="128" alt="TrackOSC Text macOS app icon">&nbsp;&nbsp;
   <img src="Images/icon-mac-synth.png" width="128" alt="TrackOSC Synth macOS app icon">&nbsp;&nbsp;
-  <img src="Images/icon-mac-costumes.png" width="128" alt="TrackOSC Costumes macOS app icon">
+  <img src="Images/icon-mac-costumes.png" width="128" alt="TrackOSC Costumes macOS app icon">&nbsp;&nbsp;
+  <img src="Images/icon-mac-costumes3d.png" width="128" alt="TrackOSC 3D Costumes macOS app icon">
 </p>
-<p align="center"><em>TrackOSC Recorder&ensp;·&ensp;TrackOSC Speaker&ensp;·&ensp;TrackOSC Router&ensp;·&ensp;TrackOSC Colours&ensp;·&ensp;TrackOSC Particles&ensp;·&ensp;TrackOSC Text&ensp;·&ensp;TrackOSC Synth&ensp;·&ensp;TrackOSC Costumes – eight more macOS apps that do things with the stream</em></p>
+<p align="center"><em>TrackOSC Recorder&ensp;·&ensp;TrackOSC Speaker&ensp;·&ensp;TrackOSC Router&ensp;·&ensp;TrackOSC Colours&ensp;·&ensp;TrackOSC Particles&ensp;·&ensp;TrackOSC Text&ensp;·&ensp;TrackOSC Synth&ensp;·&ensp;TrackOSC Costumes&ensp;·&ensp;TrackOSC 3D Costumes – nine more macOS apps that do things with the stream</em></p>
 
 Live camera → Apple Vision tracking → OSC. TrackOSC streams (almost) all of
 [Apple's Vision framework](https://developer.apple.com/documentation/vision)
@@ -83,6 +84,11 @@ Nine apps plus open receiver examples for eight creative-coding environments:
   Illustrator, Inkscape, Figma or Affinity; three bundled, a folder of your
   own that reloads as you save, several people at once, mirroring when
   someone turns their back, and recording to .mp4.
+- **TrackOSC 3D Costumes** (macOS 15+, RealityKit): dresses the 3D body
+  pose in a rigged USDZ model on Apple's motion-capture skeleton (the rig
+  ARKit drives, so the Biped Robot and anything made for it works), a
+  folder of parts named per bone, or the built-in mannequin and blocks,
+  with an orbit camera, a settling floor and several people at once.
 - **[Receiver examples](Examples/README.md)** for Processing, Python, p5.js,
   TouchDesigner, Max/MSP, Pure Data, openFrameworks and SuperCollider: each
   is a complete, hackable receiver of every TrackOSC message – the same
@@ -165,6 +171,11 @@ message rates, camera info, and a live log.</em></p>
   <img src="Images/screenshot-mac-costumes.png" width="90%" alt="Three views of the TrackOSC Costumes window with the synthetic figure wearing the bundled robot, skeleton and Template costumes, with the library, the layer inspector and the display settings beside the stage">
 </p>
 <p align="center"><em>TrackOSC Costumes: the bundled robot, skeleton and Template on the same tracked figure.</em></p>
+
+<p align="center">
+  <img src="Images/screenshot-mac-costumes3d.png" width="90%" alt="Three views of the TrackOSC 3D Costumes window with the test sender's walking 3D figure wearing the mannequin, the blocks and the rigged Blocky model on a floor grid, with the library, the display settings and the rig inspector beside the stage">
+</p>
+<p align="center"><em>TrackOSC 3D Costumes: the mannequin, the blocks and the rigged Blocky model on the same 3D pose.</em></p>
 
 <p align="center">
   <img src="Images/screenshot-ios-sender.jpg" width="28%" alt="TrackOSC on iPhone tracking a person's face and a peace-sign hand gesture, with face box, jawline contour and landmarks in blue, hand skeleton in orange, body pose in green, and the detector chips along the bottom">
@@ -639,6 +650,37 @@ skeleton, **[** and **]** change costume. The parser and rig are the
 the shapes each drawing app exports); the recipe for each app is in
 `Costumes/Resources/Costumes/README.md`.
 
+### TrackOSC 3D Costumes
+
+The 3D sibling of Costumes, for `/poses3d/arr` (turn on **3D Body** on
+the sender). Three ways to dress the pose. A **rigged model** (`.usdz`,
+`.usd`, `.usda`, `.usdc` or `.reality`) whose skeleton follows Apple's
+motion-capture rig: the 91 joints named `root`, `hips_joint`,
+`spine_1_joint` … `left_forearm_joint`, `right_upLeg_joint` and so on, in
+Apple's hierarchy, T-posed with +Y up, facing +Z, the left hand along +X
+and each joint's +X pointing down its bone. That is the rig ARKit's body
+tracking drives, so a model made for it, Apple's own Biped Robot, a
+renamed Mixamo rig or anything from Maya, Blender or Cinema 4D via
+Reality Converter works here; TrackOSC drives the hips, spine, neck,
+head, shoulders, arms, hands, legs and feet by forward kinematics (each
+bone is aimed along the live joint pair in its parent's frame, the hips
+and spine also take the hip and shoulder lines for yaw and twist, the
+model keeps its own bone lengths and is scaled to the person's height,
+and only the hips translate), and the **Rig** tab lists any joints that
+are missing. A **folder of parts** needs no rigging: one model per bone
+named `torso`, `head`, `forearm-left`, `shin-right` and so on, each laid
+along its bone by its longest axis and scaled to the bone's length. And
+the built-in **Mannequin** (capsules) and **Blocks** show something the
+moment 3D poses arrive. `Blocky.usda`, bundled, is a hand-written rigged
+model on the exact rig, readable in a text editor. The stage is the
+Receiver's 3D stage: metres, a floor that settles under the lowest
+ankle, an axis gnomon and camera marker at the origin, drag to orbit
+and pinch to zoom; several people each get a costume, the same or
+cycling through the library, fading when they leave. The rig maths is
+the `Costume3DCore` package (`cd Costume3DCore && swift test`), and
+`swift run costume3d-blocky out.usda` writes the example model. The
+models README is in `Costumes3D/Resources/README.md`.
+
 ### Hiding the video
 
 Both senders have a **Hide video preview** option (the eye button on the
@@ -919,7 +961,8 @@ SenderMac/             macOS sender app shell (camera picker, rig rotation)
 ReceiverCore/          Shared by every receiver-type macOS app: UDP listener,
                        decoding, forwarding, port fall-forward, Bonjour, settings,
                        full screen, window shell, presence/metrics analysis,
-                       tracking scene (person tracker, history, attract figure)
+                       tracking scene (person tracker, history, attract figure),
+                       the RealityKit 3D stage (floor, gnomon, orbit camera)
 Receiver/              macOS receiver (2D + 3D visualisers, log)
 Recorder/              macOS recorder/player (.trackosc files)
 Speaker/               macOS speaker (narration engine, AVSpeech, voice catalogue)
@@ -940,6 +983,10 @@ CostumeCore/           Swift package: SVG-subset parser (XMLParser, path grammar
                        mirroring, fades), CoreGraphics renderer, fixture tests
 Costumes/              macOS costumes app (library with folder bookmarks and hot reload,
                        Canvas stage, mp4 recorder, bundled costumes and recipe README)
+Costume3DCore/         Swift package: Apple's 91-joint motion-capture rig table, T-pose rest,
+                       17-joint retargeting, FK solver, parts maths, USDA writer, tests
+Costumes3D/            macOS 3D costumes app (RealityKit stage shared with the Receiver,
+                       rigged/parts/primitive costume entities, library, Blocky.usda)
 Examples/              Receiver examples: Processing, Python, p5.js, TouchDesigner,
                        Max/MSP, Pure Data, openFrameworks, SuperCollider – see
                        Examples/README.md; Examples/SKELETONS.md is the shared

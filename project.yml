@@ -22,6 +22,8 @@ packages:
     path: SynthCore
   CostumeCore:
     path: CostumeCore
+  Costume3DCore:
+    path: Costume3DCore
 
 attributes:
   LastUpgradeCheck: "2630"
@@ -40,8 +42,8 @@ settings:
     STRING_CATALOG_GENERATE_SYMBOLS: YES
     # Shared by both apps. Bump CURRENT_PROJECT_VERSION for every TestFlight
     # upload; MARKETING_VERSION is the user-facing version and release tag.
-    MARKETING_VERSION: "1.8.0"
-    CURRENT_PROJECT_VERSION: "13"
+    MARKETING_VERSION: "1.9.0"
+    CURRENT_PROJECT_VERSION: "14"
 
 targetTemplates:
   # Every receiver-type macOS app (Recorder, Speaker, Router, …) is one of
@@ -314,6 +316,20 @@ targets:
         com.apple.security.files.bookmarks.app-scope: true
         com.apple.security.files.downloads.read-write: true
 
+  TrackOSC3DCostumes:
+    templates: [TrackOSCReceiverApp]
+    templateAttributes:
+      app_dir: Costumes3D
+      display_name: TrackOSC 3D Costumes
+    dependencies:
+      - package: Costume3DCore
+        product: Costume3DCore
+    entitlements:
+      properties:
+        # A folder of the user's own models, remembered as a bookmark.
+        com.apple.security.files.user-selected.read-write: true
+        com.apple.security.files.bookmarks.app-scope: true
+
   TrackOSCColoursTests:
     type: bundle.unit-test
     platform: macOS
@@ -393,5 +409,11 @@ schemes:
     build:
       targets:
         TrackOSCCostumes: all
+    run:
+      config: Debug
+  TrackOSC3DCostumes:
+    build:
+      targets:
+        TrackOSC3DCostumes: all
     run:
       config: Debug
