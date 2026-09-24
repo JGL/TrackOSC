@@ -36,8 +36,8 @@ settings:
     STRING_CATALOG_GENERATE_SYMBOLS: YES
     # Shared by both apps. Bump CURRENT_PROJECT_VERSION for every TestFlight
     # upload; MARKETING_VERSION is the user-facing version and release tag.
-    MARKETING_VERSION: "1.6.0"
-    CURRENT_PROJECT_VERSION: "11"
+    MARKETING_VERSION: "1.7.0"
+    CURRENT_PROJECT_VERSION: "12"
 
 targetTemplates:
   # Every receiver-type macOS app (Recorder, Speaker, Router, …) is one of
@@ -251,6 +251,34 @@ targets:
         # Screenshots go to Downloads.
         com.apple.security.files.downloads.read-write: true
 
+  TrackOSCParticles:
+    templates: [TrackOSCReceiverApp]
+    templateAttributes:
+      app_dir: Particles
+      display_name: TrackOSC Particles
+    sources: [VisualCore]
+    settings:
+      base:
+        SWIFT_OBJC_BRIDGING_HEADER: VisualCore/Metal/ShaderTypes.h
+        MTL_HEADER_SEARCH_PATHS: $(SRCROOT)/VisualCore/Metal
+    entitlements:
+      properties:
+        com.apple.security.files.downloads.read-write: true
+
+  TrackOSCText:
+    templates: [TrackOSCReceiverApp]
+    templateAttributes:
+      app_dir: Text
+      display_name: TrackOSC Text
+    sources: [VisualCore]
+    settings:
+      base:
+        SWIFT_OBJC_BRIDGING_HEADER: VisualCore/Metal/ShaderTypes.h
+        MTL_HEADER_SEARCH_PATHS: $(SRCROOT)/VisualCore/Metal
+    entitlements:
+      properties:
+        com.apple.security.files.downloads.read-write: true
+
   TrackOSCColoursTests:
     type: bundle.unit-test
     platform: macOS
@@ -308,3 +336,15 @@ schemes:
       config: Debug
     test:
       targets: [TrackOSCColoursTests]
+  TrackOSCParticles:
+    build:
+      targets:
+        TrackOSCParticles: all
+    run:
+      config: Debug
+  TrackOSCText:
+    build:
+      targets:
+        TrackOSCText: all
+    run:
+      config: Debug

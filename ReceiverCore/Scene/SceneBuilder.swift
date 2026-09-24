@@ -173,6 +173,18 @@ final class SceneBuilder {
             }
         }
 
+        var contours: [[ScenePoint]] = []
+        if case .contours(let f)? = fresh(.contours) {
+            contours = f.detections.map { contour in
+                contour.points.map { p in
+                    let x = Float(p.x) / Float(max(f.width, 1))
+                    return ScenePoint(mirror ? 1 - x : x, Float(p.y) / Float(max(f.height, 1)))
+                }
+            }
+            .filter { $0.count >= 4 }
+            .sorted { $0.count > $1.count }
+        }
+
         // Moods.
         let live = !persons.isEmpty || !hands.isEmpty || !faces.isEmpty || !animals.isEmpty
         if live { lastLive = time }
@@ -184,7 +196,7 @@ final class SceneBuilder {
         activity += (activityTarget - activity) * min(1, dt / 0.5)
 
         var built = TrackingScene(time: time, deltaTime: dt, frameAspect: aspect, persons: persons, hands: hands,
-                                  faces: faces, animals: animals, texts: texts, presence: presence, activity: activity, isAttract: false)
+                                  faces: faces, animals: animals, texts: texts, contours: contours, presence: presence, activity: activity, isAttract: false)
 
         let idleFor = lastLive.map { time - $0 } ?? .infinity
         if !live, attractDelay > 0, idleFor > attractDelay {

@@ -70,6 +70,24 @@ typedef struct {
     float _pad;
 } GPUAnimal;
 
+/// One sprite: a soft dot (kind 0) or a glyph from the atlas (kind 1),
+/// drawn as a quad of `size` pixels rotated by `rotation`, in scene uv.
+typedef struct {
+    vector_float2 position;      // scene uv (0–1, y down)
+    vector_float2 size;          // pixels
+    vector_float4 color;         // premultiplied brightness; alpha = opacity
+    vector_float4 uv;            // atlas rect u0 v0 u1 v1 (glyphs)
+    float rotation;              // radians
+    float kind;                  // 0 dot, 1 glyph, 2 ring
+    float softness;              // dots: 0 hard … 1 soft
+    float _pad;
+} GPUSprite;
+
+typedef struct {
+    vector_float2 position;      // scene uv
+    vector_float4 color;
+} GPULineVertex;
+
 typedef struct {
     vector_float2 resolution;    // pixels
     vector_float2 sceneOrigin;   // uv of the scene's top-left

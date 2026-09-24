@@ -23,6 +23,17 @@ final class VisualStore {
     let renderer: MetalRenderer?
     let modes: [VisualMode]
     let recorder = StageRecorder()
+    /// The visible area in scene uv (x may run beyond 0…1 in fit mode).
+    private(set) var viewport = SceneViewport()
+    /// The render target's size in pixels (what sprite sizes are measured in).
+    private(set) var viewSize = SIMD2<Float>(1280, 720)
+
+    /// Set by sprite-based apps: builds this frame's sprites and lines from
+    /// the scene (and steps the simulation). Called once per rendered frame.
+    var overlayProvider: ((TrackingScene, VisualMode, ParameterValues, Float) -> SpriteBatch?)?
+    /// Sprite-based apps put their trail persistence here (0 = none); the
+    /// vc_fade background reads it from params[15].
+    var trailPersistence: ((VisualMode, ParameterValues) -> Float)?
 
     /// Always a valid index into `modes` (set through `selectMode`).
     private(set) var modeIndex: Int
@@ -79,16 +90,26 @@ final class VisualStore {
 
     // MARK: - Per frame
 
-    func currentInputs(for mode: VisualMode) -> RenderInputs {
-        RenderInputs(
+    func currentInputs(for mode: VisualMode, scene: TrackingScene? = nil, dt: Float = 1 / 60, size: CGSize? = nil) -> RenderInputs {
+        if let scene {
+            let s = size ?? (lastDrawableSize == .zero ? CGSize(width: 1280, height: 720) : lastDrawableSize)
+            viewport = SceneViewport(frameAspect: scene.frameAspect, viewWidth: Float(s.width), viewHeight: Float(s.height), fit: display.fitMode)
+            viewSize = SIMD2<Float>(Float(s.width), Float(s.height))
+        }
+        var packed = mode.parameters.packed(params[mode.id] ?? [:], count: Int(VC_MAX_PARAMS))
+        let values = params[mode.id] ?? mode.parameters.defaults
+        if let trailPersistence { packed[15] = trailPersistence(mode, values) }
+        let overlay = scene.flatMap { overlayProvider?($0, mode, values, dt) }
+        return RenderInputs(
             fragment: mode.fragment,
-            params: mode.parameters.packed(params[mode.id] ?? [:], count: Int(VC_MAX_PARAMS)),
+            params: packed,
             palette: palette,
             fitMode: display.fitMode,
             vignette: display.vignette,
             grain: display.grain,
             gamma: display.gamma,
-            usesFeedback: mode.usesFeedback
+            usesFeedback: mode.usesFeedback,
+            overlay: overlay
         )
     }
 
@@ -109,7 +130,7 @@ final class VisualStore {
             lastShuffle = Date()
             nextMode()
         }
-        renderer.draw(scene: scene, inputs: currentInputs(for: mode), in: view, recorder: recorder.sink)
+        renderer.draw(scene: scene, inputs: currentInputs(for: mode, scene: scene, dt: scene.deltaTime), in: view, recorder: recorder.sink)
         stats.record(cpuSeconds: CACurrentMediaTime() - started, at: CACurrentMediaTime())
         lastDrawableSize = view.drawableSize
         if let stopAt = autoStopRecordingAt, Date() >= stopAt {
@@ -174,7 +195,7 @@ final class VisualStore {
         let size = window?.contentView?.bounds.size ?? CGSize(width: 1920, height: 1080)
         let scale = window?.backingScaleFactor ?? 2
         let width = Int(size.width * scale), height = Int(size.height * scale)
-        guard width > 0, height > 0, let image = renderer.snapshot(scene: scene, inputs: currentInputs(for: mode), width: width, height: height) else { return }
+        guard width > 0, height > 0, let image = renderer.snapshot(scene: scene, inputs: currentInputs(for: mode, scene: scene), width: width, height: height) else { return }
         let downloads = FileManager.default.urls(for: .downloadsDirectory, in: .userDomainMask).first ?? FileManager.default.homeDirectoryForCurrentUser
         let formatter = DateFormatter()
         formatter.dateFormat = "yyyy-MM-dd HH-mm-ss"

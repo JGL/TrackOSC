@@ -82,14 +82,23 @@ enum SnapshotRunner {
         scene.faces = [face]
         scene.persons[0].face = face
         scene.animals = [Self.syntheticAnimal(at: SIMD2<Float>(0.68, 0.8), aspect: 9.0 / 16.0)]
+        scene.texts = [
+            SceneText(text: "HELLO", centre: SIMD2<Float>(0.3, 0.62), size: SIMD2<Float>(0.3, 0.05), isCode: false),
+            SceneText(text: "https://github.com/JGL/TrackOSC", centre: SIMD2<Float>(0.6, 0.5), size: SIMD2<Float>(0.25, 0.25), isCode: true),
+        ]
         scene.isAttract = false
         scene.presence = 1
         scene.activity = 0.4
 
         var ok = true
         for mode in store.modes {
-            let inputs = store.currentInputs(for: mode)
-            guard let image = renderer.snapshot(scene: scene, inputs: inputs, width: width, height: height, warmupFrames: mode.usesFeedback ? 30 : 0) else {
+            // Sprite apps step a simulation per call; give them time to settle.
+            let warmup = store.overlayProvider != nil ? 90 : (mode.usesFeedback ? 30 : 0)
+            for _ in 0..<warmup {
+                _ = renderer.snapshot(scene: scene, inputs: store.currentInputs(for: mode, scene: scene, dt: 1 / 60), width: width, height: height)
+            }
+            let inputs = store.currentInputs(for: mode, scene: scene, dt: 1 / 60)
+            guard let image = renderer.snapshot(scene: scene, inputs: inputs, width: width, height: height, warmupFrames: 0) else {
                 FileHandle.standardError.write(Data("Render failed: \(mode.id) \(renderer.lastError ?? "")\n".utf8))
                 ok = false
                 continue

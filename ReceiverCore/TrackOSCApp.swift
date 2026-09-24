@@ -17,6 +17,8 @@ enum TrackOSCApp: String, CaseIterable, Sendable {
     case recorder
     case router
     case colours
+    case particles
+    case text
 
     /// The port every sender targets by default (VisionOSC's).
     static let defaultPort: UInt16 = 9527
@@ -30,6 +32,8 @@ enum TrackOSCApp: String, CaseIterable, Sendable {
         case .recorder: "TrackOSC Recorder"
         case .router: "TrackOSC Router"
         case .colours: "TrackOSC Colours"
+        case .particles: "TrackOSC Particles"
+        case .text: "TrackOSC Text"
         }
     }
 
@@ -41,6 +45,8 @@ enum TrackOSCApp: String, CaseIterable, Sendable {
         case .recorder: "Records the tracking stream and plays it back."
         case .router: "Turns tracking events into MIDI, Shortcuts, key presses and HTTP."
         case .colours: "Gradients, colour fields and patterns driven by the tracking stream."
+        case .particles: "Physics particles, trails and ghosts driven by the tracking stream."
+        case .text: "Kinetic typography driven by the tracking stream."
         }
     }
 
@@ -51,6 +57,8 @@ enum TrackOSCApp: String, CaseIterable, Sendable {
         case .recorder: .red
         case .router: .teal
         case .colours: .purple
+        case .particles: .pink
+        case .text: .gray
         }
     }
 

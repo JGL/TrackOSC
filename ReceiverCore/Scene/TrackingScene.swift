@@ -98,6 +98,8 @@ struct TrackingScene: Sendable {
     var faces: [SceneFace] = []
     var animals: [SceneAnimal] = []
     var texts: [SceneText] = []
+    /// Closed edge outlines from /contours/arr, normalised, longest first.
+    var contours: [[ScenePoint]] = []
     /// 0 … 1, how much someone has been here recently (smoothed).
     var presence: Float = 0
     /// 0 … 1, how much movement there is (smoothed, saturating).

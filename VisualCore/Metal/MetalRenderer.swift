@@ -24,6 +24,8 @@ struct RenderInputs {
     var grain: Float
     var gamma: Float
     var usesFeedback: Bool
+    /// Sprites and lines drawn over the mode's background.
+    var overlay: SpriteBatch? = nil
 }
 
 @MainActor
@@ -33,6 +35,8 @@ final class MetalRenderer {
     private let library: MTLLibrary
     private var pipelines: [String: MTLRenderPipelineState] = [:]
     private var presentPipelines: [MTLPixelFormat: MTLRenderPipelineState] = [:]
+    private var spritePipelines: [Bool: MTLRenderPipelineState] = [:]   // additive?
+    private var linePipelines: [Bool: MTLRenderPipelineState] = [:]
     private var textures: [MTLTexture] = []
     private var textureIndex = 0
     private var uniformBuffers: [MTLBuffer] = []
@@ -100,6 +104,25 @@ final class MetalRenderer {
         descriptor.colorAttachments[0].pixelFormat = format
         let state = try? device.makeRenderPipelineState(descriptor: descriptor)
         presentPipelines[format] = state
+        return state
+    }
+
+    private func spritePipeline(additive: Bool, line: Bool) -> MTLRenderPipelineState? {
+        if let cached = (line ? linePipelines : spritePipelines)[additive] { return cached }
+        guard let vertex = library.makeFunction(name: line ? "vc_line_vertex" : "vc_sprite_vertex"),
+              let fragment = library.makeFunction(name: line ? "vc_line_fragment" : "vc_sprite_fragment") else { return nil }
+        let descriptor = MTLRenderPipelineDescriptor()
+        descriptor.vertexFunction = vertex
+        descriptor.fragmentFunction = fragment
+        let attachment = descriptor.colorAttachments[0]!
+        attachment.pixelFormat = Self.offscreenFormat
+        attachment.isBlendingEnabled = true
+        attachment.sourceRGBBlendFactor = .one            // colours are premultiplied
+        attachment.sourceAlphaBlendFactor = .one
+        attachment.destinationRGBBlendFactor = additive ? .one : .oneMinusSourceAlpha
+        attachment.destinationAlphaBlendFactor = additive ? .one : .oneMinusSourceAlpha
+        let state = try? device.makeRenderPipelineState(descriptor: descriptor)
+        if line { linePipelines[additive] = state } else { spritePipelines[additive] = state }
         return state
     }
 
@@ -221,6 +244,23 @@ final class MetalRenderer {
         encoder.setFragmentBuffer(animalBuffers[bufferIndex], offset: 0, index: 4)
         encoder.setFragmentTexture(previous, index: 0)
         encoder.drawPrimitives(type: .triangle, vertexStart: 0, vertexCount: 3)
+
+        if let overlay = inputs.overlay {
+            let additive = overlay.blend == .additive
+            if let lines = overlay.lines, overlay.lineVertexCount >= 2, let pipeline = spritePipeline(additive: additive, line: true) {
+                encoder.setRenderPipelineState(pipeline)
+                encoder.setVertexBuffer(lines, offset: 0, index: 0)
+                encoder.setVertexBuffer(uniformBuffers[bufferIndex], offset: 0, index: 1)
+                encoder.drawPrimitives(type: .line, vertexStart: 0, vertexCount: overlay.lineVertexCount)
+            }
+            if overlay.spriteCount > 0, let pipeline = spritePipeline(additive: additive, line: false) {
+                encoder.setRenderPipelineState(pipeline)
+                encoder.setVertexBuffer(overlay.sprites, offset: 0, index: 0)
+                encoder.setVertexBuffer(uniformBuffers[bufferIndex], offset: 0, index: 1)
+                encoder.setFragmentTexture(overlay.atlas ?? textures[textureIndex], index: 0)
+                encoder.drawPrimitives(type: .triangle, vertexStart: 0, vertexCount: 6, instanceCount: overlay.spriteCount)
+            }
+        }
         encoder.endEncoding()
         feedbackValid = true
     }
