@@ -465,9 +465,18 @@ can be edited; nine preset slots save mode, parameters and palette
 together. When nobody has been tracked for a while a synthetic figure
 wanders through so the wall never goes dead (Display → Attract after).
 
-Keys on the stage: ←/→ mode, Space randomise, R reset, 1–9 load a preset
-(⇧1–9 saves), S screenshot to Downloads, H hide the controls, F full
-screen. Frames are fitted (letterboxed) into the window by default; the
+Every mode uses whatever is arriving: with Hand and Face Landmarks on,
+hand skeletons and a face ring join the body in the drawing modes, hand
+joints and face centres become extra stops, seeds, warps and heat sources
+in the field modes, and mouth openness and hand openness push the aurora,
+stripes and metaballs about.
+
+**Recording**: the Record button (or the V key) writes the rendered
+output – not a screen grab – to an H.264 `.mp4` in Downloads at the
+window's resolution and 60 fps, ready to post; a portrait window gives a
+portrait video. Keys on the stage: ←/→ mode, Space randomise, R reset,
+1–9 load a preset (⇧1–9 saves), S screenshot, V record, H hide the
+controls, F full screen. Frames are fitted (letterboxed) into the window by default; the
 modes still fill the screen, only the people's positions are mapped into
 the frame area. Adding a mode is one fragment function in
 `Colours/Shaders/ColoursModes.metal` and one catalogue entry in

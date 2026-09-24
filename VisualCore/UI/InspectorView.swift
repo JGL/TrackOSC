@@ -6,6 +6,7 @@
 //  palette), Display, Presets and Status.
 //
 
+import AppKit
 import SwiftUI
 
 struct InspectorView: View {
@@ -232,6 +233,8 @@ struct PresetsPanel: View {
             }
             Text("Screenshots go to Downloads at the window's resolution.")
                 .font(.footnote).foregroundStyle(.secondary)
+            Divider()
+            RecordingRow(store: store)
         }
     }
 }
@@ -250,6 +253,36 @@ struct FrameStatsRow: View {
             .font(.system(.callout, design: .monospaced))
             .foregroundStyle(.secondary)
             .padding(10)
+        }
+    }
+}
+
+struct RecordingRow: View {
+    let store: VisualStore
+
+    var body: some View {
+        TimelineView(.periodic(from: .now, by: 0.5)) { _ in
+            VStack(alignment: .leading, spacing: 6) {
+                HStack {
+                    Button(store.recorder.isRecording ? "Stop Recording" : "Record Video") { store.toggleRecording() }
+                    if store.recorder.isRecording {
+                        Circle().fill(.red).frame(width: 9, height: 9)
+                        Text(String(format: "%.0f s · %d frames", store.recorder.duration, store.recorder.frameCount))
+                            .font(.system(.callout, design: .monospaced))
+                    }
+                }
+                if let url = store.recorder.lastRecording, !store.recorder.isRecording {
+                    HStack {
+                        Text(url.lastPathComponent).font(.footnote).foregroundStyle(.secondary).lineLimit(1).truncationMode(.middle)
+                        Button("Reveal") { NSWorkspace.shared.activateFileViewerSelecting([url]) }.controlSize(.small)
+                    }
+                }
+                if let error = store.recorder.lastError {
+                    Text(error).font(.footnote).foregroundStyle(.red)
+                }
+                Text("H.264 .mp4 at the window's resolution, 60 fps, to Downloads – ready to post. Key: V.")
+                    .font(.footnote).foregroundStyle(.secondary).fixedSize(horizontal: false, vertical: true)
+            }
         }
     }
 }

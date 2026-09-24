@@ -37,6 +37,8 @@ struct TrackOSCColoursApp: App {
                 Button("Reset Parameters") { store.resetParameters() }
                 Divider()
                 Button("Screenshot") { store.screenshot() }.keyboardShortcut("s", modifiers: [.command, .shift])
+                Button(store.recorder.isRecording ? "Stop Recording" : "Record Video") { store.toggleRecording() }
+                    .keyboardShortcut("v", modifiers: [.command, .option])
             }
         }
     }

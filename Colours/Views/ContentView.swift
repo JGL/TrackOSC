@@ -24,6 +24,13 @@ struct ContentView: View {
                     .help("Random parameters and palette (Space)")
                 Button { store.screenshot() } label: { Label("Screenshot", systemImage: "camera") }
                     .help("Save a PNG to Downloads (S)")
+                Button {
+                    store.toggleRecording()
+                } label: {
+                    Label(store.recorder.isRecording ? "Stop" : "Record", systemImage: store.recorder.isRecording ? "stop.circle.fill" : "record.circle")
+                        .foregroundStyle(store.recorder.isRecording ? Color.red : Color.primary)
+                }
+                .help(store.recorder.isRecording ? "Stop recording (V)" : "Record the output to an .mp4 in Downloads (V)")
             }
         }
     }

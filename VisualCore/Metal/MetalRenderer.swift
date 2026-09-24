@@ -32,7 +32,7 @@ final class MetalRenderer {
     private let queue: MTLCommandQueue
     private let library: MTLLibrary
     private var pipelines: [String: MTLRenderPipelineState] = [:]
-    private var presentPipeline: MTLRenderPipelineState?
+    private var presentPipelines: [MTLPixelFormat: MTLRenderPipelineState] = [:]
     private var textures: [MTLTexture] = []
     private var textureIndex = 0
     private var uniformBuffers: [MTLBuffer] = []
@@ -89,16 +89,16 @@ final class MetalRenderer {
     }
 
     private func present(for format: MTLPixelFormat) -> MTLRenderPipelineState? {
-        if let presentPipeline, presentPipeline.label == "present-\(format.rawValue)" { return presentPipeline }
+        if let cached = presentPipelines[format] { return cached }
         guard let vertex = library.makeFunction(name: "vc_fullscreen_vertex"),
               let function = library.makeFunction(name: "vc_present") else { return nil }
         let descriptor = MTLRenderPipelineDescriptor()
-        descriptor.label = "present-\(format.rawValue)"
         descriptor.vertexFunction = vertex
         descriptor.fragmentFunction = function
         descriptor.colorAttachments[0].pixelFormat = format
-        presentPipeline = try? device.makeRenderPipelineState(descriptor: descriptor)
-        return presentPipeline
+        let state = try? device.makeRenderPipelineState(descriptor: descriptor)
+        presentPipelines[format] = state
+        return state
     }
 
     private func ensureTextures(width: Int, height: Int) {
@@ -112,8 +112,9 @@ final class MetalRenderer {
 
     // MARK: - Drawing
 
-    /// Draw one frame into the view's drawable.
-    func draw(scene: TrackingScene, inputs: RenderInputs, in view: MTKView) {
+    /// Draw one frame into the view's drawable, and into the recorder's
+    /// frame when one is recording.
+    func draw(scene: TrackingScene, inputs: RenderInputs, in view: MTKView, recorder: RecorderSink? = nil) {
         guard let drawable = view.currentDrawable, let passDescriptor = view.currentRenderPassDescriptor,
               let commandBuffer = queue.makeCommandBuffer() else { return }
         let width = Int(view.drawableSize.width), height = Int(view.drawableSize.height)
@@ -128,6 +129,21 @@ final class MetalRenderer {
             encoder.setFragmentTexture(textures[textureIndex], index: 0)
             encoder.drawPrimitives(type: .triangle, vertexStart: 0, vertexCount: 3)
             encoder.endEncoding()
+        }
+        if let recorder, let frame = recorder.dequeueFrame(), let presentPipeline = present(for: .bgra8Unorm) {
+            let pass = MTLRenderPassDescriptor()
+            pass.colorAttachments[0].texture = frame.texture
+            pass.colorAttachments[0].loadAction = .clear
+            pass.colorAttachments[0].storeAction = .store
+            if let encoder = commandBuffer.makeRenderCommandEncoder(descriptor: pass) {
+                encoder.setRenderPipelineState(presentPipeline)
+                encoder.setFragmentBuffer(uniformBuffers[bufferIndex], offset: 0, index: 0)
+                encoder.setFragmentTexture(textures[textureIndex], index: 0)
+                encoder.drawPrimitives(type: .triangle, vertexStart: 0, vertexCount: 3)
+                encoder.endEncoding()
+            }
+            let pixelBuffer = frame.pixelBuffer, time = frame.time
+            commandBuffer.addCompletedHandler { _ in recorder.append(pixelBuffer, at: time) }
         }
         commandBuffer.present(drawable)
         commandBuffer.commit()

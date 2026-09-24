@@ -96,6 +96,44 @@ inline float vc_skeletonDistance(float2 p, constant GPUPerson& person, constant 
     return d;
 }
 
+// ---- Hand edges (JointOrder.hand21): wrist to each finger base, then along each finger.
+constant int2 vc_handEdges[20] = {
+    int2(0, 1), int2(1, 2), int2(2, 3), int2(3, 4),
+    int2(0, 5), int2(5, 6), int2(6, 7), int2(7, 8),
+    int2(0, 9), int2(9, 10), int2(10, 11), int2(11, 12),
+    int2(0, 13), int2(13, 14), int2(14, 15), int2(15, 16),
+    int2(0, 17), int2(17, 18), int2(18, 19), int2(19, 20)
+};
+constant int vc_handEdgeCount = 20;
+
+/// Distance from view point `p` to the nearest visible bone of a hand.
+inline float vc_handSkeletonDistance(float2 p, constant GPUHand& hand, constant SceneUniforms& u) {
+    float d = 1e9;
+    for (int e = 0; e < vc_handEdgeCount; e++) {
+        int a = vc_handEdges[e].x, b = vc_handEdges[e].y;
+        if (hand.visible[a] < 0.5 || hand.visible[b] < 0.5) continue;
+        d = min(d, vc_sdSegment(p, vc_sceneToView(hand.joints[a], u), vc_sceneToView(hand.joints[b], u)));
+    }
+    return d;
+}
+
+/// Signed-ish distance to a face's outline (an ellipse on its box).
+inline float vc_faceRingDistance(float2 p, constant GPUFace& face, constant SceneUniforms& u) {
+    float2 c = vc_sceneToView(face.centre, u);
+    float2 halfSize = max(float2(face.size.x * u.sceneSize.x * u.aspect, face.size.y * u.sceneSize.y) * 0.5, 1e-3);
+    float2 q = (p - c) / halfSize;
+    return (length(q) - 1.0) * min(halfSize.x, halfSize.y);
+}
+
+/// Distance to the nearest hand bone or face ring of everyone – the
+/// "extras" a body-only look can add for free.
+inline float vc_extrasDistance(float2 p, constant SceneUniforms& u, constant GPUHand* hands, constant GPUFace* faces) {
+    float d = 1e9;
+    for (int i = 0; i < u.handCount; i++) d = min(d, vc_handSkeletonDistance(p, hands[i], u));
+    for (int i = 0; i < u.faceCount; i++) d = min(d, abs(vc_faceRingDistance(p, faces[i], u)));
+    return d;
+}
+
 /// Distance to the nearest visible joint of a person.
 inline float vc_jointDistance(float2 p, constant GPUPerson& person, constant SceneUniforms& u) {
     float d = 1e9;

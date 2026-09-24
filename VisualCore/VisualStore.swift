@@ -22,6 +22,7 @@ final class VisualStore {
     let presets: PresetStore
     let renderer: MetalRenderer?
     let modes: [VisualMode]
+    let recorder = StageRecorder()
 
     /// Always a valid index into `modes` (set through `selectMode`).
     private(set) var modeIndex: Int
@@ -73,6 +74,7 @@ final class VisualStore {
         builder.smoothing = display.smoothing
         builder.attractDelay = display.attractDelay
         installKeyMonitor()
+        startAutomaticRecordingIfRequested()
     }
 
     // MARK: - Per frame
@@ -107,8 +109,36 @@ final class VisualStore {
             lastShuffle = Date()
             nextMode()
         }
-        renderer.draw(scene: scene, inputs: currentInputs(for: mode), in: view)
+        renderer.draw(scene: scene, inputs: currentInputs(for: mode), in: view, recorder: recorder.sink)
         stats.record(cpuSeconds: CACurrentMediaTime() - started, at: CACurrentMediaTime())
+        lastDrawableSize = view.drawableSize
+        if let stopAt = autoStopRecordingAt, Date() >= stopAt {
+            autoStopRecordingAt = nil
+            recorder.stop()
+        }
+    }
+
+    private(set) var lastDrawableSize = CGSize.zero
+    private var autoStopRecordingAt: Date?
+
+    /// Start or stop recording the rendered output to an .mp4 in Downloads.
+    func toggleRecording() {
+        guard let renderer else { return }
+        let width = Int(lastDrawableSize.width), height = Int(lastDrawableSize.height)
+        guard width > 16, height > 16 else { return }
+        recorder.toggle(appName: app.displayName, width: width, height: height, device: renderer.device)
+    }
+
+    /// `--record <seconds>`: record from launch for that long (a check).
+    func startAutomaticRecordingIfRequested() {
+        guard let index = CommandLine.arguments.firstIndex(of: "--record"), CommandLine.arguments.count > index + 1,
+              let seconds = Double(CommandLine.arguments[index + 1]) else { return }
+        Task { [weak self] in
+            try? await Task.sleep(for: .seconds(1))
+            guard let self, !recorder.isRecording else { return }
+            toggleRecording()
+            autoStopRecordingAt = Date().addingTimeInterval(seconds)
+        }
     }
 
     // MARK: - Actions
@@ -171,6 +201,7 @@ final class VisualStore {
             case 124: nextMode()                       // →
             case 15: resetParameters()                 // R
             case 1: screenshot()                       // S
+            case 9: toggleRecording()                  // V
             case 4, 48: model.fullScreen.toggleGUI()   // H, Tab
             case 3: model.fullScreen.toggleFullScreen()// F
             case 18...25, 29:                          // 1–9 (key codes for 1…9 are 18,19,20,21,23,22,26,28,25)

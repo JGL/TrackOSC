@@ -88,6 +88,7 @@
 		516A14EDB986870936BF8F24 /* CameraOrientationSetting.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6A8D53A59285A22D1436833A /* CameraOrientationSetting.swift */; };
 		54568B16CDC6357DC59AED35 /* ControlBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BE01430EF3AD6073346F5DA /* ControlBarView.swift */; };
 		54F6A43050021C4C1FF23CDE /* OSCSenderService.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1E70D787D793EDCC6179AEE /* OSCSenderService.swift */; };
+		554AEE10D6AB9F059E0E538F /* StageRecorder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F7D78721B99EBFEAB7CC291 /* StageRecorder.swift */; };
 		571E727A08E5F1AF40F3007D /* ActionRunner.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4C05C13DA1854939FE29FCF /* ActionRunner.swift */; };
 		57A71BF5377190CB84C6ECE0 /* PoseioscShared in Frameworks */ = {isa = PBXBuildFile; productRef = 5B931CA9CDAA003997500C7A /* PoseioscShared */; };
 		59B19B5A9689D82AFDEFB381 /* ReceiverCommands.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F1C2FBDE6981083FE6EC127 /* ReceiverCommands.swift */; };
@@ -312,6 +313,7 @@
 		4D08F9F13ACB14920A7CF2F9 /* SpeakerStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeakerStore.swift; sourceTree = "<group>"; };
 		4DA850B6DD906D9F231BFD43 /* FrameStats.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FrameStats.swift; sourceTree = "<group>"; };
 		4F527062F9BC4BD5F69EF426 /* OutputsPanel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OutputsPanel.swift; sourceTree = "<group>"; };
+		4F7D78721B99EBFEAB7CC291 /* StageRecorder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StageRecorder.swift; sourceTree = "<group>"; };
 		51B215B8051B936FB54F092A /* BonjourAdvertiser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BonjourAdvertiser.swift; sourceTree = "<group>"; };
 		530A6F40C76AC8E1B770F370 /* OverlayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OverlayView.swift; sourceTree = "<group>"; };
 		5444409F02A098639556785F /* VoicesPanel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VoicesPanel.swift; sourceTree = "<group>"; };
@@ -634,6 +636,7 @@
 				1275348FE5611D5268DC69A2 /* Parameters.swift */,
 				F7EBFFCC95E7276ED2CADD3D /* Preset.swift */,
 				93B1911D83FFA0F419FECF67 /* SnapshotRunner.swift */,
+				4F7D78721B99EBFEAB7CC291 /* StageRecorder.swift */,
 				58749156D5994628DE88ABE7 /* VisualMode.swift */,
 				35870DA6E42CADE4DD5BEDD0 /* VisualStore.swift */,
 				7A0C4D57ABE43E47CB555032 /* Metal */,
@@ -1284,6 +1287,7 @@
 				90646762EEDA195D7E5D77DB /* SceneHistory.swift in Sources */,
 				CA5119D3BC444FD7DBB554EE /* SnapshotRunner.swift in Sources */,
 				EF32D31E43D68774B044990E /* SourcePolicy.swift in Sources */,
+				554AEE10D6AB9F059E0E538F /* StageRecorder.swift in Sources */,
 				D351A92AECBA3D18F9CF8CEB /* TrackOSCApp.swift in Sources */,
 				33F59520C0A5D4C82A802F00 /* TrackOSCColoursApp.swift in Sources */,
 				289429CE56500C41B1A2D063 /* TrackingScene.swift in Sources */,
