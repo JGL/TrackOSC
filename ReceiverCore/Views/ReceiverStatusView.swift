@@ -54,6 +54,26 @@ struct ReceiverStatusView: View {
             .foregroundStyle(model.unknownMessages > 0 ? .orange : .secondary)
             .help("Messages whose address or layout the receiver doesn't understand; the log shows one line per address every few seconds.")
 
+            if model.ignoredMessages > 0 || model.settings.sourcePolicy != .all {
+                HStack {
+                    Text("Ignored (other senders)")
+                    Spacer()
+                    Text("\(model.ignoredMessages)")
+                        .font(.system(.body, design: .monospaced))
+                }
+                .foregroundStyle(.secondary)
+                .help("Messages dropped by the Senders policy in the toolbar")
+            }
+            if let host = model.activeHost {
+                HStack {
+                    Text("Sender")
+                    Spacer()
+                    Text(host)
+                        .font(.system(.body, design: .monospaced))
+                }
+                .foregroundStyle(.secondary)
+            }
+
             HStack {
                 Text("Camera")
                 Spacer()

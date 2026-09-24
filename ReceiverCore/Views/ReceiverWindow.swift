@@ -4,9 +4,10 @@
 //
 //  The window shell every receiver-type app uses: a stage (what an audience
 //  sees) beside hideable controls, the shared connection toolbar, a port
-//  banner when the default port was taken, and the presentation overlay.
+//  banner when the default port was taken, and the full-screen hint.
 //
 
+import AppKit
 import SwiftUI
 
 struct ReceiverWindow<Stage: View, Controls: View, Extras: ToolbarContent>: View {
@@ -40,7 +41,7 @@ struct ReceiverWindow<Stage: View, Controls: View, Extras: ToolbarContent>: View
     }
 
     var body: some View {
-        let hidden = model.presentation.isGUIHidden
+        let hidden = model.fullScreen.isGUIHidden
         VStack(spacing: 0) {
             if !hidden, let note = model.portNote {
                 Label(note, systemImage: "exclamationmark.triangle")
@@ -61,14 +62,15 @@ struct ReceiverWindow<Stage: View, Controls: View, Extras: ToolbarContent>: View
                 }
             }
         }
+        .background(model.settings.stageBackground)
         .toolbar(hidden ? .hidden : .visible, for: .windowToolbar)
         .toolbar {
             toolbarExtras()
             ConnectionToolbar(model: model)
         }
         .overlay(alignment: .bottomTrailing) {
-            if hidden, model.presentation.isHintVisible {
-                PresentationHint()
+            if hidden, model.fullScreen.isHintVisible {
+                FullScreenHint()
             }
         }
         .safeAreaInset(edge: .bottom) {
@@ -81,12 +83,18 @@ struct ReceiverWindow<Stage: View, Controls: View, Extras: ToolbarContent>: View
                     .background(.red.opacity(0.8))
             }
         }
-        .background(WindowAccessor { window in model.presentation.attach(window: window) })
+        .background(WindowAccessor { window in
+            model.fullScreen.attach(window: window)
+            model.fullScreen.setBackground(NSColor(model.settings.stageBackground))
+        })
+        .onChange(of: model.settings.stageBackground) { _, color in
+            model.fullScreen.setBackground(NSColor(color))
+        }
         .onAppear {
-            if model.settings.startInPresentation {
+            if model.settings.startInFullScreen {
                 Task {
                     try? await Task.sleep(for: .milliseconds(400))
-                    model.presentation.enterPresentation()
+                    model.fullScreen.enterFullScreen()
                 }
             }
         }
@@ -101,7 +109,7 @@ struct EmptyToolbar: ToolbarContent {
 }
 
 /// The fading corner hint shown while the controls are hidden.
-struct PresentationHint: View {
+struct FullScreenHint: View {
     var body: some View {
         Text("Esc shows the controls")
             .font(.caption.monospaced())

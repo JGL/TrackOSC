@@ -50,6 +50,9 @@ extension DecodedFrame {
         case .animalPoses(let f): f.detections.count
         case .humans(let f): f.detections.count
         case .barcodes(let f): f.detections.count
+        case .contours(let f): f.detections.count
+        case .horizon(let f): f.detections.count
+        case .rectangles(let f): f.detections.count
         case .cameraInfo: 0
         }
     }
@@ -68,6 +71,9 @@ extension DecodedFrame {
         case .animalPoses(let f): (f.width, f.height)
         case .humans(let f): (f.width, f.height)
         case .barcodes(let f): (f.width, f.height)
+        case .contours(let f): (f.width, f.height)
+        case .horizon(let f): (f.width, f.height)
+        case .rectangles(let f): (f.width, f.height)
         case .cameraInfo(let info): (info.width, info.height)
         }
     }

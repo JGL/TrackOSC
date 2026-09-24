@@ -196,23 +196,22 @@ enum ObservationMapping {
         let frameSize = CGSize(width: CGFloat(width), height: CGFloat(height))
 
         let landmarkDetections = capped.compactMap { observation -> FaceDetection? in
-            guard let allPoints = observation.landmarks?.allPoints else { return nil }
-
-            // Don't assume anything about the landmarks' normalization basis
-            // (it is NOT documented in the public interface): let Vision
-            // itself convert to image pixels, requesting the wire format's
-            // upper-left origin directly.
-            let imagePoints = allPoints.pointsInImageCoordinates(frameSize, origin: .upperLeft)
-            guard imagePoints.count == WireCounts.facePoints else { return nil }
-
-            let precisions = allPoints.precisionEstimatesPerPoint
-            let points = imagePoints.enumerated().map { index, point in
-                WirePoint(
-                    x: Float(point.x),
-                    y: Float(point.y),
-                    confidence: precisions.flatMap { index < $0.count ? Float($0[index]) : nil } ?? observation.confidence
-                )
+            guard let landmarks = observation.landmarks else { return nil }
+            // Assemble the wire's 76 points from the named regions in the
+            // documented order (FaceLandmarks.swift), converting each with
+            // Vision's own image-coordinate mapping. This no longer depends
+            // on allPoints' order or count, and a region that comes back with
+            // a different number of points is resampled to the expected one.
+            var points: [WirePoint] = []
+            points.reserveCapacity(WireCounts.facePoints)
+            for (region, expected) in FaceLandmarks.assemblyOrder(landmarks) {
+                let imagePoints = region?.pointsInImageCoordinates(frameSize, origin: .upperLeft) ?? []
+                let resampled = resample(imagePoints, to: expected)
+                // Every point carries the face's confidence: a detected face
+                // has all 76 landmarks, so none is "missing".
+                points += resampled.map { WirePoint(x: Float($0.x), y: Float($0.y), confidence: observation.confidence) }
             }
+            guard points.count == WireCounts.facePoints else { return nil }
             return FaceDetection(confidence: observation.confidence, points: points)
         }
 
@@ -334,6 +333,109 @@ enum ObservationMapping {
                 corners: corners,
                 symbology: symbologyName(observation.symbology),
                 payload: observation.payloadString ?? ""
+            )
+        }
+        return DetectionFrame(width: width, height: height, detections: Array(detections))
+    }
+
+    /// Linear resampling of a polyline to a fixed point count; an empty
+    /// region becomes that many points at the origin with the face's
+    /// confidence (a receiver can still draw the rest of the face).
+    private static func resample(_ points: [CGPoint], to count: Int) -> [CGPoint] {
+        guard count > 0 else { return [] }
+        guard !points.isEmpty else { return Array(repeating: .zero, count: count) }
+        guard points.count != count else { return points }
+        guard points.count > 1 else { return Array(repeating: points[0], count: count) }
+        return (0..<count).map { i in
+            let t = Double(i) / Double(count - 1) * Double(points.count - 1)
+            let a = Int(t.rounded(.down)), b = min(a + 1, points.count - 1)
+            let f = t - Double(a)
+            return CGPoint(x: points[a].x + (points[b].x - points[a].x) * f,
+                           y: points[a].y + (points[b].y - points[a].y) * f)
+        }
+    }
+
+    // MARK: - Contours, horizon, rectangles (v1.6)
+
+    /// Every contour Vision found, walked depth-first from the top-level
+    /// ones (so an outline precedes the holes inside it), simplified and
+    /// capped so one message fits a datagram.
+    static func mapContours(
+        _ observation: ContoursObservation,
+        width: Int32,
+        height: Int32
+    ) -> DetectionFrame<ContourDetection> {
+        let w = Float(width), h = Float(height)
+        var detections: [ContourDetection] = []
+        var pointBudget = WireCounts.maxContourPoints
+        var stack = Array(observation.topLevelContours.reversed())
+        while let contour = stack.popLast() {
+            guard detections.count < WireCounts.maxContours, pointBudget > 0 else { break }
+            stack.append(contentsOf: contour.childContours.reversed())
+            // Simplify: a small epsilon keeps the shape but drops most of
+            // the pixel-level vertices.
+            let simplified = (try? contour.polygonApproximation(epsilon: 0.004)) ?? contour
+            var points = simplified.normalizedPoints
+            guard points.count >= 3 else { continue }
+            if points.count > 256 {
+                let stride = Float(points.count) / 256
+                points = (0..<256).map { points[Int(Float($0) * stride)] }
+            }
+            if points.count > pointBudget { continue }
+            pointBudget -= points.count
+            detections.append(ContourDetection(
+                confidence: observation.confidence,
+                points: points.map { CoordinateMapper.xy(normalizedX: CGFloat($0.x), normalizedY: CGFloat($0.y), frameWidth: w, frameHeight: h) }
+            ))
+        }
+        return DetectionFrame(width: width, height: height, detections: detections)
+    }
+
+    /// The horizon as an angle plus the line through the frame's centre at
+    /// that angle. Vision's angle is counter-clockwise positive in its own
+    /// (y-up) space; on the wire's y-down frame the right-hand end of a
+    /// positive angle is therefore higher. One constant to flip if a device
+    /// reports it the other way.
+    static let horizonPositiveRaisesRight = true
+
+    static func mapHorizon(
+        _ observation: HorizonObservation?,
+        width: Int32,
+        height: Int32
+    ) -> DetectionFrame<HorizonDetection> {
+        guard let observation else {
+            return DetectionFrame(width: width, height: height, detections: [])
+        }
+        let w = Float(width), h = Float(height)
+        let degrees = Float(observation.angle.converted(to: .degrees).value)
+        let radians = degrees * .pi / 180
+        let dy = tanf(radians) * (w / 2) * (horizonPositiveRaisesRight ? -1 : 1)
+        let detection = HorizonDetection(
+            confidence: observation.confidence,
+            angleDegrees: degrees,
+            start: WireXY(x: 0, y: h / 2 - dy),
+            end: WireXY(x: w, y: h / 2 + dy)
+        )
+        return DetectionFrame(width: width, height: height, detections: [detection])
+    }
+
+    static func mapRectangles(
+        _ observations: [RectangleObservation],
+        width: Int32,
+        height: Int32
+    ) -> DetectionFrame<RectangleDetection> {
+        let w = Float(width), h = Float(height)
+        let detections = observations.prefix(WireCounts.maxDetections).map { observation in
+            let corners = [observation.topLeft, observation.topRight, observation.bottomRight, observation.bottomLeft]
+                .map { CoordinateMapper.xy(normalizedX: $0.x, normalizedY: $0.y, frameWidth: w, frameHeight: h) }
+            return RectangleDetection(
+                confidence: observation.confidence,
+                box: CoordinateMapper.rect(
+                    normalized: observation.boundingBox.cgRect,
+                    frameWidth: w,
+                    frameHeight: h
+                ),
+                corners: corners
             )
         }
         return DetectionFrame(width: width, height: height, detections: Array(detections))

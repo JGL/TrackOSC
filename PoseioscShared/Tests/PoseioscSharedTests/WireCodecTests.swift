@@ -264,6 +264,39 @@ struct RoundTripTests {
         #expect(out == frame)
     }
 
+    @Test func contoursHorizonRectangles() throws {
+        let contours = DetectionFrame(width: 720, height: 1280, detections: [
+            ContourDetection(confidence: 1, points: [WireXY(x: 1, y: 2), WireXY(x: 3, y: 4), WireXY(x: 5, y: 6)]),
+            ContourDetection(confidence: 0.5, points: [])
+        ])
+        guard case .contours(let c) = try WireCodec.decode(WireCodec.encodeContours(contours)) else { Issue.record("wrong kind"); return }
+        #expect(c == contours)
+
+        let horizon = DetectionFrame(width: 720, height: 1280, detections: [
+            HorizonDetection(confidence: 0.9, angleDegrees: -3.5, start: WireXY(x: 0, y: 660), end: WireXY(x: 720, y: 616))
+        ])
+        guard case .horizon(let h) = try WireCodec.decode(WireCodec.encodeHorizon(horizon)) else { Issue.record("wrong kind"); return }
+        #expect(h == horizon)
+        let noHorizon = DetectionFrame<HorizonDetection>(width: 720, height: 1280, detections: [])
+        #expect(WireCodec.encodeHorizon(noHorizon).values.count == 3)
+
+        let rectangles = DetectionFrame(width: 720, height: 1280, detections: [
+            RectangleDetection(confidence: 0.8, box: WireRect(left: 10, top: 20, width: 100, height: 50),
+                               corners: [WireXY(x: 10, y: 20), WireXY(x: 110, y: 22), WireXY(x: 108, y: 70), WireXY(x: 12, y: 68)])
+        ])
+        guard case .rectangles(let r) = try WireCodec.decode(WireCodec.encodeRectangles(rectangles)) else { Issue.record("wrong kind"); return }
+        #expect(r == rectangles)
+    }
+
+    @Test func contoursAreCapped() throws {
+        let many = (0..<(WireCounts.maxContours + 10)).map { i in
+            ContourDetection(confidence: 1, points: [WireXY(x: Float(i), y: 0)])
+        }
+        let message = WireCodec.encodeContours(DetectionFrame(width: 10, height: 10, detections: many))
+        guard case .contours(let out) = try WireCodec.decode(message) else { Issue.record("wrong kind"); return }
+        #expect(out.detections.count == WireCounts.maxContours)
+    }
+
     @Test func humans() throws {
         let frame = DetectionFrame(width: 720, height: 1280, detections: [makeHuman(seed: 1), makeHuman(seed: 2)])
         let decoded = try WireCodec.decode(WireCodec.encodeHumans(frame))
@@ -564,6 +597,32 @@ struct GoldenBytesTests {
         #expect(tags == expectedTags)
     }
 
+    /// Pins the v1.6 messages' type tags and layout: contours carry an int32
+    /// point count per contour; horizon and rectangles are all floats.
+    @Test func v16MessageTypeTags() throws {
+        func tags(_ data: Data, addressPadded: Int, count: Int) -> String? {
+            String(data: data[addressPadded..<(addressPadded + count)], encoding: .ascii)
+        }
+        let contours = DetectionFrame(width: 10, height: 20, detections: [
+            ContourDetection(confidence: 1, points: [WireXY(x: 1, y: 2), WireXY(x: 3, y: 4)])
+        ])
+        // "/contours/arr" is 13 chars + NUL, padded to 16.
+        #expect(tags(try WireCodec.encodeContours(contours).rawData(), addressPadded: 16, count: 10) == ",iiififfff")
+
+        let horizon = DetectionFrame(width: 10, height: 20, detections: [
+            HorizonDetection(confidence: 1, angleDegrees: 2, start: WireXY(x: 0, y: 10), end: WireXY(x: 10, y: 10))
+        ])
+        // "/horizon" is 8 chars + NUL, padded to 12.
+        #expect(tags(try WireCodec.encodeHorizon(horizon).rawData(), addressPadded: 12, count: 10) == ",iiiffffff")
+
+        let rectangles = DetectionFrame(width: 10, height: 20, detections: [
+            RectangleDetection(confidence: 1, box: WireRect(left: 1, top: 2, width: 3, height: 4),
+                               corners: [WireXY(x: 1, y: 2), WireXY(x: 4, y: 2), WireXY(x: 4, y: 6), WireXY(x: 1, y: 6)])
+        ])
+        // "/rectangles/arr" is 15 chars + NUL, padded to 16.
+        #expect(tags(try WireCodec.encodeRectangles(rectangles).rawData(), addressPadded: 16, count: 17) == ",iii" + String(repeating: "f", count: 13))
+    }
+
     /// Pins the /humans/arr encoding (TrackOSC additive, v1.4): header ints,
     /// then 5 big-endian float32s per human (conf, box).
     @Test func humansMessageBytes() throws {
@@ -781,7 +840,7 @@ struct SkeletonTests {
         #expect(JointOrder.hand21.count == WireCounts.handJoints)
         #expect(JointOrder.body3D17.count == WireCounts.body3DJoints)
         #expect(JointOrder.animal25.count == WireCounts.animalJoints)
-        #expect(OSCAddress.all.count == 12)
+        #expect(OSCAddress.all.count == 15)
     }
 }
 

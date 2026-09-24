@@ -80,3 +80,17 @@ test("edge lists index their joint lists", () => {
     for (const [a, b] of edges) assert.ok(a >= 0 && a < count && b >= 0 && b < count && a !== b);
   }
 });
+
+test("v1.6: contours, horizon, rectangles", () => {
+  const contours = parseMessage("/contours/arr", [720, 1280, 2, 1, 3, 1, 2, 3, 4, 5, 6, 0.5, 0]);
+  assert.equal(contours.detections.length, 2);
+  assert.deepEqual(contours.detections[0].points, [{ x: 1, y: 2 }, { x: 3, y: 4 }, { x: 5, y: 6 }]);
+  assert.deepEqual(contours.detections[1].points, []);
+  const horizon = parseMessage("/horizon", [720, 1280, 1, 0.9, -3.5, 0, 660, 720, 616]).detections[0];
+  assert.equal(horizon.angle, -3.5);
+  assert.deepEqual(horizon.end, { x: 720, y: 616 });
+  assert.equal(parseMessage("/horizon", [720, 1280, 0]).detections.length, 0);
+  const rect = parseMessage("/rectangles/arr", [720, 1280, 1, 0.8, 10, 20, 100, 50, 10, 20, 110, 22, 108, 70, 12, 68]).detections[0];
+  assert.deepEqual(rect.box, { left: 10, top: 20, width: 100, height: 50 });
+  assert.equal(rect.corners.length, 4);
+});

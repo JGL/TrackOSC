@@ -72,13 +72,6 @@ class FaceBox:
 
 
 @dataclass
-class Contour:
-    """/faces/contour: an OPEN jawline polyline (ear → chin → ear); may be empty."""
-    confidence: float
-    points: list[tuple[float, float]]
-
-
-@dataclass
 class Pose3D:
     """/poses3d/arr: 17 joints in metres + pixel projections; all present."""
     confidence: float
@@ -94,6 +87,31 @@ class Barcode:
     corners: list[tuple[float, float]]
     symbology: str
     payload: str
+
+
+@dataclass
+class Contour:
+    """/faces/contour: an OPEN jawline polyline (ear → chin → ear); may be empty.
+    Also /contours/arr (v1.6): a CLOSED edge outline."""
+    confidence: float
+    points: list[tuple[float, float]]
+
+
+@dataclass
+class Horizon:
+    """/horizon (v1.6): angle in degrees and the line through the frame centre, in pixels."""
+    confidence: float
+    angle: float
+    start: tuple[float, float]
+    end: tuple[float, float]
+
+
+@dataclass
+class Rectangle:
+    """/rectangles/arr (v1.6): box plus four corners (TL, TR, BR, BL) in the rectangle's own orientation."""
+    confidence: float
+    box: Rect
+    corners: list[tuple[float, float]]
 
 
 @dataclass
@@ -131,6 +149,7 @@ ALL_ADDRESSES = [
     "/camerainfo", "/poses/arr", "/hands/arr", "/faces/arr", "/faces/box",
     "/faces/contour", "/texts/arr", "/animals/arr", "/poses3d/arr",
     "/barcodes/arr", "/animalposes/arr", "/humans/arr",
+    "/contours/arr", "/horizon", "/rectangles/arr",
 ]
 
 
@@ -206,7 +225,7 @@ def parse_message(address: str, args: Sequence[Any]) -> Frame | CameraInfo | Non
             frame.detections.append(FaceBox(cur.f(), cur.rect(), cur.f(), cur.f(), cur.f()))
         return frame
 
-    if address == "/faces/contour":
+    if address in ("/faces/contour", "/contours/arr"):
         frame = _header(cur, address)
         for _ in range(frame_count(frame, cur)):
             conf = cur.f()
@@ -230,6 +249,20 @@ def parse_message(address: str, args: Sequence[Any]) -> Frame | CameraInfo | Non
             box = cur.rect()
             corners = [(cur.f(), cur.f()) for _ in range(4)]
             frame.detections.append(Barcode(conf, box, corners, cur.s(), cur.s()))
+        return frame
+
+    if address == "/horizon":
+        frame = _header(cur, address)
+        for _ in range(frame_count(frame, cur)):  # 0 or 1
+            frame.detections.append(Horizon(cur.f(), cur.f(), (cur.f(), cur.f()), (cur.f(), cur.f())))
+        return frame
+
+    if address == "/rectangles/arr":
+        frame = _header(cur, address)
+        for _ in range(frame_count(frame, cur)):
+            conf = cur.f()
+            box = cur.rect()
+            frame.detections.append(Rectangle(conf, box, [(cur.f(), cur.f()) for _ in range(4)]))
         return frame
 
     return None

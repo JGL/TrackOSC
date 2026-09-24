@@ -49,6 +49,11 @@
  *                  4 × (float x, y) corners TL, TR, BR, BL, string symbology, string payload
  *   /animalposes/arr per animal: float conf, then 25 × (x, y, conf)
  *   /humans/arr   per human: float conf, left, top, width, height
+ *   TrackOSC v1.6 additions (same header):
+ *   /contours/arr per contour: float conf, int32 m, then m × (float x, y) – a CLOSED outline
+ *   /horizon      n is 0 or 1: float conf, angleDegrees, x1, y1, x2, y2 (line through the centre)
+ *   /rectangles/arr per rectangle: float conf, left, top, width, height,
+ *                  4 × (float x, y) corners TL, TR, BR, BL
  *
  * TRACKOSC SKELETON REFERENCE v1.4 – source: PoseioscShared/Sources/PoseioscShared/Skeleton.swift
  * (full table in Examples/SKELETONS.md)
@@ -113,7 +118,8 @@ final int[][] ANIMAL_EDGES = {
 
 // Colors approximating the native receiver's system colors.
 color POSE_COLOR, POSE3D_COLOR, HAND_COLOR, FACE_COLOR, TEXT_COLOR, ANIMAL_COLOR,
-      ANIMALPOSE_COLOR, HUMAN_COLOR, BARCODE_COLOR, GUIDE_COLOR;
+      ANIMALPOSE_COLOR, HUMAN_COLOR, BARCODE_COLOR, CONTOUR_COLOR, HORIZON_COLOR,
+      RECTANGLE_COLOR, GUIDE_COLOR;
 
 // ---- Latest data per message kind ----
 // oscEvent runs on oscP5's network thread; each kind is parsed into a fresh
@@ -125,6 +131,9 @@ FaceBoxFrame faceBoxes;
 ContourFrame faceContours;
 Pose3DFrame poses3D;
 BarcodeFrame barcodes;
+ContourFrame contours;      // /contours/arr reuses the face-contour layout (closed outlines)
+HorizonFrame horizon;
+BarcodeFrame rectangles;    // /rectangles/arr is a barcode without the strings
 CameraInfo camInfo;
 
 OscP5 osc;
@@ -141,6 +150,9 @@ void setup() {
   ANIMALPOSE_COLOR = color(172, 142, 104);
   HUMAN_COLOR = color(94, 92, 230);
   BARCODE_COLOR = color(191, 90, 242);
+  CONTOUR_COLOR = color(230);
+  HORIZON_COLOR = color(255, 69, 58);
+  RECTANGLE_COLOR = color(64, 200, 224);
   GUIDE_COLOR = color(128);
   textFont(createFont("Monospaced", 12));
   osc = new OscP5(this, PORT);
@@ -236,6 +248,12 @@ void oscEvent(OscMessage msg) {
       animalPoses = parseKeypoints(msg, 25);
     } else if (msg.checkAddrPattern("/humans/arr")) {
       humans = parseHumans(msg);
+    } else if (msg.checkAddrPattern("/contours/arr")) {
+      contours = parseFaceContours(msg);
+    } else if (msg.checkAddrPattern("/horizon")) {
+      horizon = parseHorizon(msg);
+    } else if (msg.checkAddrPattern("/rectangles/arr")) {
+      rectangles = parseRectangles(msg);
     } else if (msg.checkAddrPattern("/camerainfo")) {
       CameraInfo info = new CameraInfo();
       info.w = msg.get(0).intValue();
@@ -387,6 +405,55 @@ BarcodeFrame parseBarcodes(OscMessage msg) {
   return f;
 }
 
+class HorizonFrame {
+  int frameW, frameH;
+  float[] conf, angle, x1, y1, x2, y2;
+  long at;
+}
+
+HorizonFrame parseHorizon(OscMessage msg) {
+  HorizonFrame f = new HorizonFrame();
+  f.frameW = msg.get(0).intValue();
+  f.frameH = msg.get(1).intValue();
+  int n = msg.get(2).intValue();  // 0 or 1
+  f.conf = new float[n]; f.angle = new float[n];
+  f.x1 = new float[n]; f.y1 = new float[n]; f.x2 = new float[n]; f.y2 = new float[n];
+  int arg = 3;
+  for (int i = 0; i < n; i++) {
+    f.conf[i] = msg.get(arg++).floatValue();
+    f.angle[i] = msg.get(arg++).floatValue();
+    f.x1[i] = msg.get(arg++).floatValue();
+    f.y1[i] = msg.get(arg++).floatValue();
+    f.x2[i] = msg.get(arg++).floatValue();
+    f.y2[i] = msg.get(arg++).floatValue();
+  }
+  f.at = millis();
+  return f;
+}
+
+/// /rectangles/arr: like a barcode (conf, box, four corners) with no strings.
+BarcodeFrame parseRectangles(OscMessage msg) {
+  BarcodeFrame f = new BarcodeFrame();
+  f.frameW = msg.get(0).intValue();
+  f.frameH = msg.get(1).intValue();
+  int n = msg.get(2).intValue();
+  f.conf = new float[n];
+  f.box = new float[n][4];
+  f.corners = new float[n][8];
+  f.symbology = new String[n];
+  f.payload = new String[n];
+  int arg = 3;
+  for (int i = 0; i < n; i++) {
+    f.conf[i] = msg.get(arg++).floatValue();
+    for (int j = 0; j < 4; j++) f.box[i][j] = msg.get(arg++).floatValue();
+    for (int j = 0; j < 8; j++) f.corners[i][j] = msg.get(arg++).floatValue();
+    f.symbology[i] = "rect";
+    f.payload[i] = nf(f.conf[i], 0, 2);
+  }
+  f.at = millis();
+  return f;
+}
+
 /// /humans/arr has no label; reuse BoxFrame with a fixed one so it draws
 /// like the other boxes.
 BoxFrame parseHumans(OscMessage msg) {
@@ -423,6 +490,9 @@ void draw() {
   ContourFrame fc = faceContours;
   Pose3DFrame p3 = poses3D;
   BarcodeFrame bc = barcodes;
+  ContourFrame co = contours;
+  HorizonFrame ho = horizon;
+  BarcodeFrame re = rectangles;
   CameraInfo ci = camInfo;
 
   // Any fresh frame supplies the sent-frame dimensions.
@@ -438,6 +508,9 @@ void draw() {
   else if (bc != null && fresh(bc.at)) { frameW = bc.frameW; frameH = bc.frameH; }
   else if (ap != null && fresh(ap.at)) { frameW = ap.frameW; frameH = ap.frameH; }
   else if (hu != null && fresh(hu.at)) { frameW = hu.frameW; frameH = hu.frameH; }
+  else if (co != null && fresh(co.at)) { frameW = co.frameW; frameH = co.frameH; }
+  else if (ho != null && fresh(ho.at)) { frameW = ho.frameW; frameH = ho.frameH; }
+  else if (re != null && fresh(re.at)) { frameW = re.frameW; frameH = re.frameH; }
 
   if (frameW <= 0 || frameH <= 0) {
     fill(128);
@@ -453,6 +526,31 @@ void draw() {
 
   boolean cameraInfoFresh = ci != null && millis() - ci.at < CAMERA_INFO_STALE_MS;
   drawCoordinateGuides(frameW, frameH, sc, ox, oy, cameraInfoFresh ? ci : null);
+
+  // v1.6: outlines and the horizon underneath everything else.
+  if (co != null && fresh(co.at)) {
+    noFill();
+    stroke(CONTOUR_COLOR, 200);
+    strokeWeight(1);
+    for (int i = 0; i < co.conf.length; i++) {
+      if (co.x[i].length < 2) continue;
+      beginShape();
+      for (int j = 0; j < co.x[i].length; j++) vertex(ox + co.x[i][j] * sc, oy + co.y[i][j] * sc);
+      endShape(CLOSE);  // outlines are closed, unlike the jawline
+    }
+  }
+  if (ho != null && fresh(ho.at)) {
+    for (int i = 0; i < ho.conf.length; i++) {
+      stroke(HORIZON_COLOR);
+      strokeWeight(2);
+      line(ox + ho.x1[i] * sc, oy + ho.y1[i] * sc, ox + ho.x2[i] * sc, oy + ho.y2[i] * sc);
+      noStroke();
+      fill(HORIZON_COLOR);
+      textAlign(CENTER, BOTTOM);
+      text("horizon " + nf(ho.angle[i], 0, 1) + "°", ox + (ho.x1[i] + ho.x2[i]) / 2 * sc, oy + (ho.y1[i] + ho.y2[i]) / 2 * sc - 6);
+    }
+  }
+  if (re != null && fresh(re.at)) drawQuads(re, RECTANGLE_COLOR, sc, ox, oy);
 
   if (hu != null && fresh(hu.at)) drawLabeledBoxes(hu, HUMAN_COLOR, sc, ox, oy);
   if (po != null && fresh(po.at)) drawSkeletons(po, BODY_EDGES, POSE_COLOR, sc, ox, oy);
@@ -524,16 +622,21 @@ void drawPoses3D(Pose3DFrame f, float sc, float ox, float oy) {
 /// Each barcode as a closed quad in the code's own orientation, a dot on its
 /// top-left corner, and the symbology + payload above it.
 void drawBarcodes(BarcodeFrame f, float sc, float ox, float oy) {
+  drawQuads(f, BARCODE_COLOR, sc, ox, oy);
+}
+
+/// Closed quadrilaterals (barcodes, rectangles) with a dot on the first corner.
+void drawQuads(BarcodeFrame f, color col, float sc, float ox, float oy) {
   for (int i = 0; i < f.conf.length; i++) {
     float[] c = f.corners[i];
     noFill();
-    stroke(BARCODE_COLOR);
+    stroke(col);
     strokeWeight(2);
     beginShape();
     for (int j = 0; j < 4; j++) vertex(ox + c[j * 2] * sc, oy + c[j * 2 + 1] * sc);
     endShape(CLOSE);
     noStroke();
-    fill(BARCODE_COLOR);
+    fill(col);
     circle(ox + c[0] * sc, oy + c[1] * sc, 8);
     float top = min(min(c[1], c[3]), min(c[5], c[7]));
     textAlign(LEFT, BOTTOM);

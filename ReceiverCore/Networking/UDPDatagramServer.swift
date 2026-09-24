@@ -124,7 +124,8 @@ final class UDPDatagramServer: @unchecked Sendable {
             var addressText = [CChar](repeating: 0, count: Int(INET_ADDRSTRLEN))
             var addressCopy = sender.sin_addr
             inet_ntop(AF_INET, &addressCopy, &addressText, socklen_t(INET_ADDRSTRLEN))
-            let host = String(cString: addressText)
+            let hostBytes = addressText.prefix { $0 != 0 }.map { UInt8(bitPattern: $0) }
+            let host = String(decoding: hostBytes, as: UTF8.self)
             handler(Data(buffer[0..<count]), host, instant)
         }
     }

@@ -182,6 +182,12 @@ struct NarrationEngine: Sendable {
             Noun(a: "An animal", the: "The animal", singular: "animal", plural: "animals", thePlural: "The animals")
         case .barcodes:
             Noun(a: "A code", the: "The code", singular: "code", plural: "codes", thePlural: "The codes")
+        case .contours:
+            Noun(a: "An outline", the: "The outline", singular: "outline", plural: "outlines", thePlural: "The outlines")
+        case .horizon:
+            Noun(a: "The horizon", the: "The horizon", singular: "horizon", plural: "horizons", thePlural: "The horizon")
+        case .rectangles:
+            Noun(a: "A rectangle", the: "The rectangle", singular: "rectangle", plural: "rectangles", thePlural: "The rectangles")
         }
     }
 

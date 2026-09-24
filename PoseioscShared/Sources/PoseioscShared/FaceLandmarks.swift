@@ -9,6 +9,9 @@
 //
 
 import Foundation
+#if canImport(Vision)
+import Vision
+#endif
 
 public enum FaceLandmarks {
     public static let leftEye = 0..<6
@@ -23,6 +26,48 @@ public enum FaceLandmarks {
     public static let noseCrest = 54..<59
     public static let medianLine = 59..<59   // not present in the 76-point set
     public static let faceContour = 59..<76
+
+    /// A drawable feature: consecutive points, closed (eyes, lips) or open
+    /// (brows, nose, jaw). Drawing these as lines shows every landmark region.
+    public struct Region: Sendable {
+        public let name: String
+        public let range: Range<Int>
+        public let isClosed: Bool
+    }
+
+    public static let regions: [Region] = [
+        Region(name: "leftEye", range: leftEye, isClosed: true),
+        Region(name: "rightEye", range: rightEye, isClosed: true),
+        Region(name: "leftEyebrow", range: leftEyebrow, isClosed: false),
+        Region(name: "rightEyebrow", range: rightEyebrow, isClosed: false),
+        Region(name: "outerLips", range: outerLips, isClosed: true),
+        Region(name: "innerLips", range: innerLips, isClosed: true),
+        Region(name: "nose", range: nose, isClosed: false),
+        Region(name: "noseCrest", range: noseCrest, isClosed: false),
+        Region(name: "faceContour", range: faceContour, isClosed: false),
+    ]
+
+#if canImport(Vision)
+    /// The wire's point order as Vision regions with their expected point
+    /// counts (sums to 76): left eye, left pupil, right eye, right pupil,
+    /// left brow, right brow, outer lips, inner lips, nose, nose crest, jaw.
+    @available(macOS 15, iOS 18, *)
+    public static func assemblyOrder(_ landmarks: FaceObservation.Landmarks2D) -> [(region: FaceObservation.Landmarks2D.Region?, count: Int)] {
+        [
+            (landmarks.leftEye, leftEye.count),
+            (landmarks.leftPupil, 1),
+            (landmarks.rightEye, rightEye.count),
+            (landmarks.rightPupil, 1),
+            (landmarks.leftEyebrow, leftEyebrow.count),
+            (landmarks.rightEyebrow, rightEyebrow.count),
+            (landmarks.outerLips, outerLips.count),
+            (landmarks.innerLips, innerLips.count),
+            (landmarks.nose, nose.count),
+            (landmarks.noseCrest, noseCrest.count),
+            (landmarks.faceContour, faceContour.count),
+        ]
+    }
+#endif
 
     /// Inner-lip points used for mouth openness: top centre and bottom centre.
     public static let innerLipTop = 41

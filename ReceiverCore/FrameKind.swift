@@ -11,6 +11,7 @@ import SwiftUI
 /// the UI. `allCases` order is the sidebar's row order.
 enum FrameKind: String, CaseIterable, Identifiable, Sendable {
     case poses, poses3D, hands, faces, faceBoxes, faceContours, texts, animals, animalPoses, humans, barcodes
+    case contours, horizon, rectangles
 
     var id: String { rawValue }
 
@@ -27,6 +28,9 @@ enum FrameKind: String, CaseIterable, Identifiable, Sendable {
         case .animalPoses: OSCAddress.animalPoses
         case .humans: OSCAddress.humans
         case .barcodes: OSCAddress.barcodes
+        case .contours: OSCAddress.contours
+        case .horizon: OSCAddress.horizon
+        case .rectangles: OSCAddress.rectangles
         }
     }
 
@@ -42,6 +46,9 @@ enum FrameKind: String, CaseIterable, Identifiable, Sendable {
         case .animalPoses: .brown
         case .humans: .indigo
         case .barcodes: .purple
+        case .contours: .white
+        case .horizon: .red
+        case .rectangles: .teal
         }
     }
 
@@ -59,6 +66,9 @@ enum FrameKind: String, CaseIterable, Identifiable, Sendable {
         case .animalPoses: .animalPoses
         case .humans: .humans
         case .barcodes: .barcodes
+        case .contours: .contours
+        case .horizon: .horizon
+        case .rectangles: .rectangles
         case .cameraInfo: nil
         }
     }

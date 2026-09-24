@@ -41,6 +41,40 @@ function draw() {
 
   if (showGuides) drawGuides(ref.frameW, ref.frameH, sc, ox, oy, client.freshCamera());
 
+  // v1.6: outlines and the horizon underneath everything else.
+  const outlines = frames["/contours/arr"];
+  if (outlines) {
+    noFill(); stroke(...S.COLOURS["/contours/arr"], 200); strokeWeight(1);
+    for (const d of outlines.detections) {
+      if (d.points.length < 2) continue;
+      beginShape();
+      for (const p of d.points) vertex(X(p.x), Y(p.y));
+      endShape(CLOSE);  // outlines are closed, unlike the jawline
+    }
+  }
+  const horizon = frames["/horizon"];
+  if (horizon) {
+    const colour = S.COLOURS["/horizon"];
+    for (const h of horizon.detections) {
+      stroke(...colour); strokeWeight(2);
+      line(X(h.start.x), Y(h.start.y), X(h.end.x), Y(h.end.y));
+      noStroke(); fill(...colour); textAlign(CENTER, BOTTOM);
+      text(`horizon ${h.angle.toFixed(1)}°`, (X(h.start.x) + X(h.end.x)) / 2, (Y(h.start.y) + Y(h.end.y)) / 2 - 6);
+    }
+  }
+  const rectangles = frames["/rectangles/arr"];
+  if (rectangles) {
+    const colour = S.COLOURS["/rectangles/arr"];
+    for (const r of rectangles.detections) {
+      noFill(); stroke(...colour); strokeWeight(2);
+      beginShape();
+      for (const c of r.corners) vertex(X(c.x), Y(c.y));
+      endShape(CLOSE);
+      noStroke(); fill(...colour);
+      circle(X(r.corners[0].x), Y(r.corners[0].y), 8);
+    }
+  }
+
   // Boxes first so skeletons draw on top.
   for (const address of ["/humans/arr", "/texts/arr", "/animals/arr"]) {
     const frame = frames[address];

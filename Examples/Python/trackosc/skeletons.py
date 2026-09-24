@@ -91,4 +91,7 @@ COLOURS = {
     "/humans/arr": (94, 92, 230),
     "/barcodes/arr": (191, 90, 242),
     "guides": (128, 128, 128),
+    "/contours/arr": (230, 230, 230),
+    "/horizon": (255, 69, 58),
+    "/rectangles/arr": (64, 200, 224),
 }

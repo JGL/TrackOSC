@@ -24,10 +24,15 @@ public enum OSCAddress {
     public static let barcodes = "/barcodes/arr"
     public static let animalPoses = "/animalposes/arr"
     public static let humans = "/humans/arr"
+    // TrackOSC v1.6 additions.
+    public static let contours = "/contours/arr"
+    public static let horizon = "/horizon"
+    public static let rectangles = "/rectangles/arr"
 
     public static let all: [String] = [
         poses, hands, faces, texts, animals, cameraInfo, faceBox, faceContour,
-        poses3D, barcodes, animalPoses, humans
+        poses3D, barcodes, animalPoses, humans,
+        contours, horizon, rectangles
     ]
 }
 
@@ -45,6 +50,12 @@ public enum WireCounts {
     public static let barcodeCorners = 4
     /// VisionOSC caps detections at 32 per frame (MAX_DET).
     public static let maxDetections = 32
+    /// Rectangle quadrilateral corners: top-left, top-right, bottom-right, bottom-left.
+    public static let rectangleCorners = 4
+    /// /contours/arr caps: contours per message and points across the whole
+    /// message, so one datagram stays well under the 64 KB UDP limit.
+    public static let maxContours = 64
+    public static let maxContourPoints = 4000
 }
 
 /// Joint name orderings. The wire format carries no names – order is the contract.

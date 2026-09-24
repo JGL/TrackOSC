@@ -17,7 +17,7 @@ import PoseioscShared
 final class ReceiverModel {
     let app: TrackOSCApp
     let settings = ReceiverSettings()
-    let presentation = PresentationController()
+    let fullScreen = FullScreenController()
     let bonjour = BonjourBrowser()
     let forwarder = DatagramForwarder()
 
@@ -45,6 +45,13 @@ final class ReceiverModel {
     /// Latest /camerainfo from the sender (nil until one arrives or when stale).
     var cameraInfo: CameraInfo?
 
+    /// Messages dropped by the source policy since launch.
+    var ignoredMessages: UInt64 = 0
+    /// The host currently being heard.
+    var activeHost: String?
+    /// Hosts heard from in the last minute, most recent first.
+    var recentHosts: [String] = []
+
     let service = ReceiverService()
     private var refreshTask: Task<Void, Never>?
 
@@ -54,8 +61,9 @@ final class ReceiverModel {
 
     init(app: TrackOSCApp) {
         self.app = app
-        presentation.cursorHideDelay = settings.cursorHideDelay
-        presentation.alwaysOnTop = settings.alwaysOnTop
+        fullScreen.cursorHideDelay = settings.cursorHideDelay
+        fullScreen.alwaysOnTop = settings.alwaysOnTop
+        applySourcePolicy()
         service.addTap(forwarder)
         start()
     }
@@ -135,6 +143,10 @@ final class ReceiverModel {
         start()
     }
 
+    func applySourcePolicy() {
+        service.setSourcePolicy(settings.sourcePolicy, onlyHost: settings.sourceHost)
+    }
+
     func applyForwarding() {
         var enabled = settings.forwardEnabled
         // Loop guard: never forward to our own port on a local address.
@@ -177,6 +189,9 @@ final class ReceiverModel {
         rates = snapshot.rates
         totalMessages = snapshot.totalMessages
         unknownMessages = snapshot.unknownMessages
+        ignoredMessages = snapshot.ignoredMessages
+        activeHost = snapshot.activeHost
+        recentHosts = snapshot.recentHosts
         if let seenAt = snapshot.cameraInfoSeenAt, Date.now.timeIntervalSince(seenAt) < 2.0 {
             cameraInfo = snapshot.cameraInfo
         } else {

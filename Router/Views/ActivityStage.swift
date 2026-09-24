@@ -3,7 +3,7 @@
 //  TrackOSC Router (macOS)
 //
 //  The stage: one LED per rule, lit for a moment when it fires, over the
-//  activity feed. Readable from across a room in presentation mode.
+//  activity feed. Readable from across a room in full screen.
 //
 
 import SwiftUI
@@ -16,7 +16,7 @@ struct ActivityStage: View {
         TimelineView(.animation(minimumInterval: 1.0 / 20.0)) { timeline in
             let now = timeline.date
             ZStack {
-                Color.black
+                store.model.settings.stageBackground
                 VStack(alignment: .leading, spacing: 16) {
                     LazyVGrid(columns: [GridItem(.adaptive(minimum: 180), spacing: 12)], alignment: .leading, spacing: 12) {
                         ForEach(store.engine.rules) { rule in

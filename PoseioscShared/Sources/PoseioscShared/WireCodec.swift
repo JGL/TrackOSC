@@ -16,6 +16,10 @@
 //                       4 × (float x, float y), string symbology, string payload
 //    animalposes/arr:   float confidence + 25 × (float x, float y, float confidence)
 //    humans/arr:        float confidence, left, top, width, height
+//  TrackOSC additions (v1.6), same header:
+//    contours/arr:      float confidence, int32 m, m × (float x, float y)  – closed polylines
+//    horizon:           float confidence, angleDegrees, x1, y1, x2, y2     – n is 0 or 1
+//    rectangles/arr:    float confidence, left, top, width, height, 4 × (float x, float y)
 //
 //  All OSC types must be exactly int32 / float32 / string to match VisionOSC.
 //
@@ -117,6 +121,51 @@ public enum WireCodec {
         return OSCMessage(OSCAddress.humans, values: values)
     }
 
+    public static func encodeContours(_ frame: DetectionFrame<ContourDetection>) -> OSCMessage {
+        let capped = Array(frame.detections.prefix(WireCounts.maxContours))
+        // Not header(): that clamps to maxDetections (32); contours allow 64.
+        var values: OSCValues = [frame.width, frame.height, Int32(capped.count)]
+        for detection in capped {
+            values.append(Float32(detection.confidence))
+            values.append(Int32(detection.points.count))
+            for point in detection.points {
+                values.append(Float32(point.x))
+                values.append(Float32(point.y))
+            }
+        }
+        return OSCMessage(OSCAddress.contours, values: values)
+    }
+
+    public static func encodeHorizon(_ frame: DetectionFrame<HorizonDetection>) -> OSCMessage {
+        let capped = Array(frame.detections.prefix(1))
+        var values: OSCValues = header(frame.width, frame.height, capped.count)
+        for detection in capped {
+            values.append(Float32(detection.confidence))
+            values.append(Float32(detection.angleDegrees))
+            values.append(Float32(detection.start.x))
+            values.append(Float32(detection.start.y))
+            values.append(Float32(detection.end.x))
+            values.append(Float32(detection.end.y))
+        }
+        return OSCMessage(OSCAddress.horizon, values: values)
+    }
+
+    public static func encodeRectangles(_ frame: DetectionFrame<RectangleDetection>) -> OSCMessage {
+        var values: OSCValues = header(frame.width, frame.height, frame.detections.count)
+        for detection in frame.detections.prefix(WireCounts.maxDetections) {
+            values.append(Float32(detection.confidence))
+            values.append(Float32(detection.box.left))
+            values.append(Float32(detection.box.top))
+            values.append(Float32(detection.box.width))
+            values.append(Float32(detection.box.height))
+            for corner in detection.corners {
+                values.append(Float32(corner.x))
+                values.append(Float32(corner.y))
+            }
+        }
+        return OSCMessage(OSCAddress.rectangles, values: values)
+    }
+
     public static func encodeBarcodes(_ frame: DetectionFrame<BarcodeDetection>) -> OSCMessage {
         var values: OSCValues = header(frame.width, frame.height, frame.detections.count)
         for detection in frame.detections.prefix(WireCounts.maxDetections) {
@@ -200,6 +249,12 @@ public enum WireCodec {
             return try .animalPoses(decodeKeypoints(message, pointCount: WireCounts.animalJoints, make: AnimalPoseDetection.init))
         case OSCAddress.humans:
             return try .humans(decodeHumans(message))
+        case OSCAddress.contours:
+            return try .contours(decodeContours(message))
+        case OSCAddress.horizon:
+            return try .horizon(decodeHorizon(message))
+        case OSCAddress.rectangles:
+            return try .rectangles(decodeRectangles(message))
         default:
             throw WireCodecError.unknownAddress(address)
         }
@@ -285,6 +340,84 @@ public enum WireCodec {
                 corners: corners,
                 symbology: symbology,
                 payload: payload
+            ))
+        }
+        return DetectionFrame(width: width, height: height, detections: detections)
+    }
+
+    private static func decodeContours(_ message: OSCMessage) throws -> DetectionFrame<ContourDetection> {
+        let address = message.addressPattern.stringValue
+        var reader = ValueReader(address: address, values: message.values)
+        let width = try reader.int32()
+        let height = try reader.int32()
+        let count = try reader.count()
+
+        var detections: [ContourDetection] = []
+        detections.reserveCapacity(min(Int(count), WireCounts.maxContours))
+        for _ in 0..<count {
+            let confidence = try reader.float()
+            let pointCount = try reader.count()
+            var points: [WireXY] = []
+            points.reserveCapacity(min(Int(pointCount), 512))
+            for _ in 0..<pointCount {
+                let x = try reader.float()
+                let y = try reader.float()
+                points.append(WireXY(x: x, y: y))
+            }
+            detections.append(ContourDetection(confidence: confidence, points: points))
+        }
+        return DetectionFrame(width: width, height: height, detections: detections)
+    }
+
+    private static func decodeHorizon(_ message: OSCMessage) throws -> DetectionFrame<HorizonDetection> {
+        let address = message.addressPattern.stringValue
+        var reader = ValueReader(address: address, values: message.values)
+        let width = try reader.int32()
+        let height = try reader.int32()
+        let count = try reader.count()
+
+        var detections: [HorizonDetection] = []
+        for _ in 0..<count {
+            let confidence = try reader.float()
+            let angle = try reader.float()
+            let x1 = try reader.float()
+            let y1 = try reader.float()
+            let x2 = try reader.float()
+            let y2 = try reader.float()
+            detections.append(HorizonDetection(
+                confidence: confidence, angleDegrees: angle,
+                start: WireXY(x: x1, y: y1), end: WireXY(x: x2, y: y2)
+            ))
+        }
+        return DetectionFrame(width: width, height: height, detections: detections)
+    }
+
+    private static func decodeRectangles(_ message: OSCMessage) throws -> DetectionFrame<RectangleDetection> {
+        let address = message.addressPattern.stringValue
+        var reader = ValueReader(address: address, values: message.values)
+        let width = try reader.int32()
+        let height = try reader.int32()
+        let count = try reader.count()
+
+        var detections: [RectangleDetection] = []
+        detections.reserveCapacity(min(Int(count), WireCounts.maxDetections))
+        for _ in 0..<count {
+            let confidence = try reader.float()
+            let left = try reader.float()
+            let top = try reader.float()
+            let boxWidth = try reader.float()
+            let boxHeight = try reader.float()
+            var corners: [WireXY] = []
+            corners.reserveCapacity(WireCounts.rectangleCorners)
+            for _ in 0..<WireCounts.rectangleCorners {
+                let x = try reader.float()
+                let y = try reader.float()
+                corners.append(WireXY(x: x, y: y))
+            }
+            detections.append(RectangleDetection(
+                confidence: confidence,
+                box: WireRect(left: left, top: top, width: boxWidth, height: boxHeight),
+                corners: corners
             ))
         }
         return DetectionFrame(width: width, height: height, detections: detections)

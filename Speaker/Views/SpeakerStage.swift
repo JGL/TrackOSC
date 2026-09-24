@@ -3,7 +3,7 @@
 //  TrackOSC Speaker (macOS)
 //
 //  The stage: what is being said, large, with the spoken words highlighted,
-//  over a quiet status line. In presentation this is all that shows.
+//  over a quiet status line. In full screen this is all that shows.
 //
 
 import SwiftUI
@@ -15,7 +15,7 @@ struct SpeakerStage: View {
         let speech = store.speech
         let shown = speech.current ?? store.lastUtterance
         ZStack {
-            Color.black
+            store.model.settings.stageBackground
             VStack(spacing: 24) {
                 Spacer()
                 if let shown {

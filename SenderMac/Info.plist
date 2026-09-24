@@ -25,7 +25,7 @@
 		<string>_osc._udp</string>
 	</array>
 	<key>NSCameraUsageDescription</key>
-	<string>Camera frames are analysed on-device to detect bodies (2D and 3D), hands, faces, text, animals, and barcodes. No video leaves this Mac – only OSC tracking data.</string>
+	<string>Camera frames are analysed on-device to detect bodies (2D and 3D), hands, faces, text, animals, barcodes, outlines, the horizon and rectangles. No video leaves this Mac – only OSC tracking data.</string>
 	<key>NSLocalNetworkUsageDescription</key>
 	<string>TrackOSC Sender sends OSC tracking data to receivers on your local network and browses for them via Bonjour.</string>
 </dict>

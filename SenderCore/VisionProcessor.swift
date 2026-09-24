@@ -50,6 +50,9 @@ struct OverlaySnapshot: Sendable {
     var animalPoses: [AnimalPoseDetection] = []
     var humans: [HumanDetection] = []
     var barcodes: [BarcodeDetection] = []
+    var contours: [ContourDetection] = []
+    var horizon: [HorizonDetection] = []
+    var rectangles: [RectangleDetection] = []
     var processingTime: TimeInterval = 0
 }
 
@@ -111,12 +114,15 @@ actor VisionProcessor {
         // interleave, so enabled requests execute concurrently.
         async let poses = cfg.isEnabled(.poses) ? runBody(frame) : nil
         async let hands = cfg.isEnabled(.hands) ? runHands(frame, maxHands: cfg.maxHands) : nil
-        async let faces = cfg.isEnabled(.faces) ? runFaces(frame) : nil
+        async let faces = (cfg.isEnabled(.faces) || cfg.isEnabled(.faceLandmarks)) ? runFaces(frame) : nil
         async let texts = cfg.isEnabled(.texts) ? runTexts(frame) : nil
         async let animals = cfg.isEnabled(.animals) ? runAnimals(frame) : nil
         async let animalPoses = cfg.isEnabled(.animalPoses) ? runAnimalPoses(frame) : nil
         async let humans = cfg.isEnabled(.humans) ? runHumans(frame) : nil
         async let barcodes = cfg.isEnabled(.barcodes) ? runBarcodes(frame) : nil
+        async let contours = cfg.isEnabled(.contours) ? runContours(frame) : nil
+        async let horizon = cfg.isEnabled(.horizon) ? runHorizon(frame) : nil
+        async let rectangles = cfg.isEnabled(.rectangles) ? runRectangles(frame) : nil
 
         if let result = await poses {
             snapshot.poses = result.detections
@@ -127,12 +133,18 @@ actor VisionProcessor {
             sender.send(WireCodec.encodeHands(result))
         }
         if let result = await faces {
-            snapshot.faces = result.landmarks.detections
-            snapshot.faceBoxes = result.boxes.detections
-            snapshot.faceContours = result.contours.detections
-            sender.send(WireCodec.encodeFaces(result.landmarks))
-            sender.send(WireCodec.encodeFaceBoxes(result.boxes))
-            sender.send(WireCodec.encodeFaceContours(result.contours))
+            // One Vision request serves two chips: Face = box, angles and
+            // jawline; Face Landmarks = the 76-point constellation.
+            if cfg.isEnabled(.faceLandmarks) {
+                snapshot.faces = result.landmarks.detections
+                sender.send(WireCodec.encodeFaces(result.landmarks))
+            }
+            if cfg.isEnabled(.faces) {
+                snapshot.faceBoxes = result.boxes.detections
+                snapshot.faceContours = result.contours.detections
+                sender.send(WireCodec.encodeFaceBoxes(result.boxes))
+                sender.send(WireCodec.encodeFaceContours(result.contours))
+            }
         }
         if let result = await texts {
             snapshot.texts = result.detections
@@ -153,6 +165,18 @@ actor VisionProcessor {
         if let result = await barcodes {
             snapshot.barcodes = result.detections
             sender.send(WireCodec.encodeBarcodes(result))
+        }
+        if let result = await contours {
+            snapshot.contours = result.detections
+            sender.send(WireCodec.encodeContours(result))
+        }
+        if let result = await horizon {
+            snapshot.horizon = result.detections
+            sender.send(WireCodec.encodeHorizon(result))
+        }
+        if let result = await rectangles {
+            snapshot.rectangles = result.detections
+            sender.send(WireCodec.encodeRectangles(result))
         }
 
         let elapsed = started.duration(to: .now).components
@@ -223,9 +247,9 @@ actor VisionProcessor {
     }
 
     private func runFaces(_ frame: FrameBox) async -> ObservationMapping.FaceFrames? {
-        // Revision 3 (the only revision of the modern API) produces the
-        // 76-point constellation VisionOSC expects.
-        let request = DetectFaceLandmarksRequest()
+        // Revision 3 produces the 76-point constellation VisionOSC expects;
+        // pin it so a newer default revision cannot change the wire format.
+        let request = DetectFaceLandmarksRequest(.revision3)
         guard let observations = try? await request.perform(
             on: frame.pixelBuffer, orientation: frame.orientation
         ) else { return nil }
@@ -294,6 +318,49 @@ actor VisionProcessor {
             on: frame.pixelBuffer, orientation: frame.orientation
         ) else { return nil }
         return ObservationMapping.mapBarcodes(
+            observations,
+            width: frame.orientedWidth,
+            height: frame.orientedHeight
+        )
+    }
+
+    private func runContours(_ frame: FrameBox) async -> DetectionFrame<ContourDetection>? {
+        var request = DetectContoursRequest()
+        // Contour detection is costly at full resolution; 512 px keeps the
+        // frame rate usable and the outlines are simplified anyway.
+        request.maximumImageDimension = 512
+        request.detectsDarkOnLight = true
+        guard let observation = try? await request.perform(
+            on: frame.pixelBuffer, orientation: frame.orientation
+        ) else { return nil }
+        return ObservationMapping.mapContours(
+            observation,
+            width: frame.orientedWidth,
+            height: frame.orientedHeight
+        )
+    }
+
+    private func runHorizon(_ frame: FrameBox) async -> DetectionFrame<HorizonDetection>? {
+        let request = DetectHorizonRequest()
+        guard let observation = try? await request.perform(
+            on: frame.pixelBuffer, orientation: frame.orientation
+        ) else { return nil }
+        return ObservationMapping.mapHorizon(
+            observation,
+            width: frame.orientedWidth,
+            height: frame.orientedHeight
+        )
+    }
+
+    private func runRectangles(_ frame: FrameBox) async -> DetectionFrame<RectangleDetection>? {
+        var request = DetectRectanglesRequest()
+        request.maximumObservations = 16
+        request.minimumSize = 0.1
+        request.minimumConfidence = 0.5
+        guard let observations = try? await request.perform(
+            on: frame.pixelBuffer, orientation: frame.orientation
+        ) else { return nil }
+        return ObservationMapping.mapRectangles(
             observations,
             width: frame.orientedWidth,
             height: frame.orientedHeight

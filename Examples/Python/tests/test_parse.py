@@ -9,8 +9,8 @@ from pythonosc.osc_message import OscMessage
 from pythonosc.osc_message_builder import OscMessageBuilder
 
 from trackosc import (ANIMAL_EDGES, BODY_EDGES, HAND_EDGES, POSE3D_EDGES, Barcode, Box,
-                      CameraInfo, Contour, FaceBox, Keypoints, Pose3D, TruncatedMessage,
-                      parse_message, visible)
+                      CameraInfo, Contour, FaceBox, Horizon, Keypoints, Pose3D, Rectangle,
+                      TruncatedMessage, parse_message, visible)
 
 
 def roundtrip(address, args):
@@ -120,3 +120,29 @@ class ParseTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class V16Tests(unittest.TestCase):
+    def test_contours(self):
+        frame = roundtrip("/contours/arr", [720, 1280, 2, 1.0, 3, 1, 2, 3, 4, 5, 6, 0.5, 0])
+        self.assertEqual(len(frame.detections), 2)
+        self.assertIsInstance(frame.detections[0], Contour)
+        self.assertEqual(frame.detections[0].points, [(1, 2), (3, 4), (5, 6)])
+        self.assertEqual(frame.detections[1].points, [])
+
+    def test_horizon(self):
+        frame = roundtrip("/horizon", [720, 1280, 1, 0.9, -3.5, 0, 660, 720, 616])
+        h = frame.detections[0]
+        self.assertIsInstance(h, Horizon)
+        self.assertAlmostEqual(h.angle, -3.5, places=5)
+        self.assertEqual(h.start, (0, 660))
+        self.assertEqual(h.end, (720, 616))
+        self.assertEqual(roundtrip("/horizon", [720, 1280, 0]).detections, [])
+
+    def test_rectangles(self):
+        frame = roundtrip("/rectangles/arr", [720, 1280, 1, 0.8, 10, 20, 100, 50, 10, 20, 110, 22, 108, 70, 12, 68])
+        r = frame.detections[0]
+        self.assertIsInstance(r, Rectangle)
+        self.assertEqual((r.box.left, r.box.top, r.box.width, r.box.height), (10, 20, 100, 50))
+        self.assertEqual(r.corners, [(10, 20), (110, 22), (108, 70), (12, 68)])
+

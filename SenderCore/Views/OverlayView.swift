@@ -47,6 +47,31 @@ struct OverlayView: View {
                 )
             }
 
+            for contour in snapshot.contours where contour.points.count >= 2 {
+                var path = Path()
+                path.move(to: map(contour.points[0]))
+                for point in contour.points.dropFirst() { path.addLine(to: map(point)) }
+                path.closeSubpath()
+                context.stroke(path, with: .color(Detector.contours.color.opacity(0.8)), lineWidth: 1.5)
+            }
+            for horizon in snapshot.horizon {
+                var path = Path()
+                path.move(to: map(horizon.start))
+                path.addLine(to: map(horizon.end))
+                context.stroke(path, with: .color(Detector.horizon.color), style: StrokeStyle(lineWidth: 2, dash: [10, 6]))
+                let mid = map(WireXY(x: (horizon.start.x + horizon.end.x) / 2, y: (horizon.start.y + horizon.end.y) / 2))
+                drawLabel(context: context, String(format: "horizon %.1f°", horizon.angleDegrees), at: CGPoint(x: mid.x, y: mid.y - 8), anchor: .bottom, color: Detector.horizon.color)
+            }
+            for rectangle in snapshot.rectangles {
+                let corners = rectangle.corners.map(map)
+                guard corners.count == 4 else { continue }
+                var path = Path()
+                path.move(to: corners[0])
+                for corner in corners.dropFirst() { path.addLine(to: corner) }
+                path.closeSubpath()
+                context.stroke(path, with: .color(Detector.rectangles.color), lineWidth: 2)
+                context.fill(Path(ellipseIn: CGRect(x: corners[0].x - 4, y: corners[0].y - 4, width: 8, height: 8)), with: .color(Detector.rectangles.color))
+            }
             for human in snapshot.humans {
                 drawBox(context: context, rect: map(human.box), label: nil, color: Detector.humans.color)
             }
@@ -74,13 +99,7 @@ struct OverlayView: View {
                 drawSkeleton(context: context, points: animal.joints, edges: Skeleton.animal25Edges, color: Detector.animalPoses.color, map: map)
             }
             for face in snapshot.faces {
-                for point in face.points where point.confidence > 0 {
-                    let p = map(point)
-                    context.fill(
-                        Path(ellipseIn: CGRect(x: p.x - 1.5, y: p.y - 1.5, width: 3, height: 3)),
-                        with: .color(Detector.faces.color)
-                    )
-                }
+                drawFaceLandmarks(context: context, points: face.points, color: Detector.faces.color, map: map)
             }
             for faceBox in snapshot.faceBoxes {
                 context.stroke(Path(map(faceBox.box)), with: .color(Detector.faces.color), lineWidth: 2)
@@ -152,6 +171,27 @@ struct OverlayView: View {
             context.fill(
                 Path(ellipseIn: CGRect(x: p.x - 3, y: p.y - 3, width: 6, height: 6)),
                 with: .color(color.opacity(0.9))
+            )
+        }
+    }
+
+    /// Every landmark as a dot, and each feature (eyes, brows, nose, lips,
+    /// jaw) joined into a line so the full constellation reads at a glance.
+    private func drawFaceLandmarks(context: GraphicsContext, points: [WirePoint], color: Color, map: (WirePoint) -> CGPoint) {
+        var lines = Path()
+        for region in FaceLandmarks.regions where region.range.upperBound <= points.count {
+            let visible = points[region.range].filter { $0.confidence > 0 }
+            guard visible.count >= 2 else { continue }
+            lines.move(to: map(visible[0]))
+            for point in visible.dropFirst() { lines.addLine(to: map(point)) }
+            if region.isClosed { lines.closeSubpath() }
+        }
+        context.stroke(lines, with: .color(color.opacity(0.7)), lineWidth: 1)
+        for point in points where point.confidence > 0 {
+            let p = map(point)
+            context.fill(
+                Path(ellipseIn: CGRect(x: p.x - 1.5, y: p.y - 1.5, width: 3, height: 3)),
+                with: .color(color)
             )
         }
     }

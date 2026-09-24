@@ -2,13 +2,15 @@
 //  ReceiverSettings.swift
 //  TrackOSC (ReceiverCore)
 //
-//  Connection and presentation settings shared by every receiver-type app,
+//  Connection, source and full-screen settings shared by every receiver-type app,
 //  persisted in UserDefaults (each app has its own defaults domain, so the
 //  keys need no prefix).
 //
 
+import AppKit
 import Foundation
 import Observation
+import SwiftUI
 
 @Observable @MainActor
 final class ReceiverSettings {
@@ -25,9 +27,21 @@ final class ReceiverSettings {
     var forwardHost: String { didSet { defaults.set(forwardHost, forKey: "forwardHost") } }
     var forwardPort: UInt16 { didSet { defaults.set(Int(forwardPort), forKey: "forwardPort") } }
 
-    /// Launch straight into presentation mode (full screen, controls hidden).
-    var startInPresentation: Bool { didSet { defaults.set(startInPresentation, forKey: "startInPresentation") } }
-    /// Seconds without mouse movement before the cursor and hint hide in presentation.
+    /// Which sender is heard when several send to this port.
+    var sourcePolicy: SourcePolicy { didSet { defaults.set(sourcePolicy.rawValue, forKey: "sourcePolicy") } }
+    var sourceHost: String { didSet { defaults.set(sourceHost, forKey: "sourceHost") } }
+
+    /// The stage's fill, and the window's background in full screen.
+    var stageBackground: Color {
+        didSet {
+            let rgb = NSColor(stageBackground).usingColorSpace(.sRGB) ?? .black
+            defaults.set([rgb.redComponent, rgb.greenComponent, rgb.blueComponent], forKey: "stageBackground")
+        }
+    }
+
+    /// Launch straight into full screen (controls hidden).
+    var startInFullScreen: Bool { didSet { defaults.set(startInFullScreen, forKey: "startInFullScreen") } }
+    /// Seconds without mouse movement before the cursor and hint hide in full screen.
     var cursorHideDelay: Double { didSet { defaults.set(cursorHideDelay, forKey: "cursorHideDelay") } }
     var alwaysOnTop: Bool { didSet { defaults.set(alwaysOnTop, forKey: "alwaysOnTop") } }
 
@@ -45,7 +59,17 @@ final class ReceiverSettings {
         forwardHost = defaults.string(forKey: "forwardHost") ?? "127.0.0.1"
         let storedForward = defaults.integer(forKey: "forwardPort")
         forwardPort = (1...65535).contains(storedForward) ? UInt16(storedForward) : 9528
-        startInPresentation = defaults.bool(forKey: "startInPresentation")
+        sourcePolicy = SourcePolicy(rawValue: defaults.string(forKey: "sourcePolicy") ?? "") ?? .latestWins
+        sourceHost = defaults.string(forKey: "sourceHost") ?? ""
+        if let rgb = defaults.array(forKey: "stageBackground") as? [Double], rgb.count == 3 {
+            stageBackground = Color(red: rgb[0], green: rgb[1], blue: rgb[2])
+        } else {
+            stageBackground = .black
+        }
+        // "startInPresentation" was the v1.5 name. A `--fullscreen` launch
+        // argument does the same for one launch without changing the setting.
+        startInFullScreen = defaults.bool(forKey: "startInFullScreen") || defaults.bool(forKey: "startInPresentation")
+            || CommandLine.arguments.contains("--fullscreen")
         let storedDelay = defaults.double(forKey: "cursorHideDelay")
         cursorHideDelay = storedDelay > 0 ? storedDelay : 2
         alwaysOnTop = defaults.bool(forKey: "alwaysOnTop")
