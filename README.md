@@ -12,9 +12,10 @@
   <img src="Images/icon-mac-router.png" width="128" alt="TrackOSC Router macOS app icon">&nbsp;&nbsp;
   <img src="Images/icon-mac-colours.png" width="128" alt="TrackOSC Colours macOS app icon">&nbsp;&nbsp;
   <img src="Images/icon-mac-particles.png" width="128" alt="TrackOSC Particles macOS app icon">&nbsp;&nbsp;
-  <img src="Images/icon-mac-text.png" width="128" alt="TrackOSC Text macOS app icon">
+  <img src="Images/icon-mac-text.png" width="128" alt="TrackOSC Text macOS app icon">&nbsp;&nbsp;
+  <img src="Images/icon-mac-synth.png" width="128" alt="TrackOSC Synth macOS app icon">
 </p>
-<p align="center"><em>TrackOSC Recorder&ensp;·&ensp;TrackOSC Speaker&ensp;·&ensp;TrackOSC Router&ensp;·&ensp;TrackOSC Colours&ensp;·&ensp;TrackOSC Particles&ensp;·&ensp;TrackOSC Text – six more macOS apps that do things with the stream</em></p>
+<p align="center"><em>TrackOSC Recorder&ensp;·&ensp;TrackOSC Speaker&ensp;·&ensp;TrackOSC Router&ensp;·&ensp;TrackOSC Colours&ensp;·&ensp;TrackOSC Particles&ensp;·&ensp;TrackOSC Text&ensp;·&ensp;TrackOSC Synth – seven more macOS apps that do things with the stream</em></p>
 
 Live camera → Apple Vision tracking → OSC. TrackOSC streams (almost) all of
 [Apple's Vision framework](https://developer.apple.com/documentation/vision)
@@ -70,6 +71,11 @@ Nine apps plus open receiver examples for eight creative-coding environments:
   fall and get knocked about, words along skeletons and outlines, word
   clouds, orbits, scatter, a typewriter, a marquee, box labels and letter
   rain – in a choice of typefaces.
+- **TrackOSC Synth** (macOS 15+, AVAudioEngine): a 303-and-808-flavoured
+  synth and drum machine played by the stream – an acid bass with a ladder
+  filter, eight analogue-model drums, a sixteen-step sequencer with eight
+  patterns, swing and a conductor mode, and mappings from noses, wrists,
+  hands, faces and presence to every knob and trigger, with MIDI out.
 - **[Receiver examples](Examples/README.md)** for Processing, Python, p5.js,
   TouchDesigner, Max/MSP, Pure Data, openFrameworks and SuperCollider: each
   is a complete, hackable receiver of every TrackOSC message – the same
@@ -142,6 +148,11 @@ message rates, camera info, and a live log.</em></p>
   <img src="Images/screenshot-mac-text-modes.png" width="90%" alt="A contact sheet of the ten TrackOSC Text modes rendered from the same synthetic figure and two synthetic texts: along contour, along skeleton, box labels, letter rain, marquee, orbit, physics letters, scatter, typewriter and word cloud">
 </p>
 <p align="center"><em>The ten Text modes.</em></p>
+
+<p align="center">
+  <img src="Images/screenshot-mac-synth.png" width="90%" alt="Four views of the TrackOSC Synth window with the synthetic figure on its black stage: the bass and mix knobs, the drum knobs, the sixteen-step sequencer grid, and the mapping table with live source readouts">
+</p>
+<p align="center"><em>TrackOSC Synth: bass and mix, drums, steps and mappings, with the step ring, level glow and drum flashes on the stage.</em></p>
 
 <p align="center">
   <img src="Images/screenshot-ios-sender.jpg" width="28%" alt="TrackOSC on iPhone tracking a person's face and a peace-sign hand gesture, with face box, jawline contour and landmarks in blue, hand skeleton in orange, body pose in green, and the detector chips along the bottom">
@@ -549,6 +560,42 @@ landmarks when they arrive and a circle otherwise, and cats and dogs get
 words along their spines, legs, ears and tails, marquee rows and outlines
 just like people.
 
+### TrackOSC Synth
+
+A synth and drum machine in the spirit of the Roland 303, 606 and 808,
+played by whoever the sender is tracking. The **bass** is a saw or pulse
+through a four-pole ladder filter with envelope modulation, accent, slide
+and overdrive; the **drums** are analogue models (a swept sine kick, a
+two-tone snare with filtered noise, hats from six square waves at the 808's
+ratios, two toms, a clap of noise bursts and a cowbell), each with tune,
+decay, tone and level. The **Steps** tab is a sixteen-step sequencer: a bass
+row (click to gate a step, drag for the note, ⌥-click for accent, ⇧-click
+for slide) and a row per drum (click cycles off, on, accent), eight
+patterns, tempo, swing, randomise and clear. **Conductor** mode stops the
+clock and lets a gesture advance the steps instead. The **Mapping** tab
+connects tracking to the instrument: continuous sources (nose across and
+down, wrist heights, movement speed, hand openness and spread, hands apart,
+3D body height and distance, face yaw, roll and pitch, mouth openness,
+number of people, presence, activity) drive any knob, the tempo, the mix or
+a MIDI CC through an input range, an output range, a curve, smoothing and
+invert, and event sources (a hand raised, a hit, hands together, mouth
+opened, a code changing, a person entering or leaving, every beat) fire
+drums, bass notes, MIDI notes, pattern changes, step toggles, the conductor
+step or play/stop. Three presets to start from: **Acid theremin** (nose
+sweeps the filter, wrists set resonance and decay), **Drum conductor**
+(hits advance the steps, hands play clap and cowbell) and **Two-hand
+filter** (hands apart opens the filter, hand openness sets resonance).
+Presets hold the whole instrument, patterns and mappings, and can be
+saved, imported and exported as JSON. Everything the synth plays also goes
+out of a virtual MIDI source called "TrackOSC Synth" (bass on channel 1,
+drums on channel 10 as General MIDI notes, optional clock and start/stop)
+and, if you choose one, to a MIDI destination. The stage is black with the
+sixteen steps as a ring of lights, the level as a glow, drum hits as
+flashes and the tracked figure faintly behind; the audio keeps running with
+the controls hidden and in full screen. The DSP lives in the `SynthCore`
+package (`cd SynthCore && swift test` renders it offline: no NaNs, filter
+stability at full resonance, PolyBLEP aliasing, sequencer timing).
+
 ### Hiding the video
 
 Both senders have a **Hide video preview** option (the eye button on the
@@ -840,6 +887,11 @@ VisualCore/            Shared by the visual apps: Metal canvas and renderer (sha
 Colours/               macOS colours app (fourteen shader modes)
 Particles/             macOS particles app (CPU simulation, twelve behaviours)
 Text/                  macOS kinetic text app (word pool, letter system, ten behaviours)
+SynthCore/             Swift package: DSP (PolyBLEP oscillators, ladder and state-variable
+                       filters, envelopes), 303 bass and 808 drum voices, lock-free
+                       parameter bank and event queues, audio graph and AVAudioEngine
+                       host, step sequencer, mapping logic, MIDI words, presets, tests
+Synth/                 macOS synth app (knobs, drums, sequencer grid, mapping table, MIDI out)
 Examples/              Receiver examples: Processing, Python, p5.js, TouchDesigner,
                        Max/MSP, Pure Data, openFrameworks, SuperCollider – see
                        Examples/README.md; Examples/SKELETONS.md is the shared

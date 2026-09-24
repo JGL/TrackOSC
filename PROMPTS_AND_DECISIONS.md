@@ -716,6 +716,61 @@ dogs everywhere. All three apps share `VisualCore/` and the
   word in Metal.
 - Versions to 1.7.0 (build 12); no sender change, so no App Store upload.
 
+## v1.8 – Synth and Costumes (2026-09-24)
+
+Joel: "Once that's complete, please continue with Synth and Costumes
+parts, as well as 3D Costumes – I'll be back later to check." Built on
+`feature/v1.8` while the v1.7.0 notarisation waited for the keychain.
+
+- **SynthCore** is a local Swift package with no app dependencies, so
+  `swift test` renders the instrument offline: PolyBLEP saw and pulse, a
+  Zavalishin zero-delay ladder with soft-clipped feedback (stable at full
+  resonance across a 100 Hz–8 kHz sweep by test), a Simper state-variable
+  filter, a 303-style bass (envelope-modulated cutoff, accent, 60 ms
+  slide, overdrive) and eight 808-style drums (swept-sine kick, two-tone
+  snare with filtered noise, six-square hats at the 808 ratios, toms, a
+  clap of four noise bursts, a two-square cowbell), a delay and a small
+  Schroeder reverb. Decisions: every knob is a `Float` bit pattern in an
+  `Atomic<UInt32>` (`ParameterBank`), events cross to the audio thread
+  through a single-producer single-consumer ring (`EventQueue`) and
+  triggers come back the same way, so the render path never locks or
+  allocates; the `AVAudioSourceNode` is made in a `nonisolated static`
+  factory so its render closure is not main-actor isolated (the Swift 6
+  trap); the sequencer counts samples, with swing lengthening even
+  sixteenths and shortening odd ones, and a conductor mode where steps
+  advance only on a gesture.
+- **Mappings** are pure logic in the package (`ContinuousMapping` with
+  input range, output range, curve, invert and smoothing; `EventMapping`;
+  an `EdgeDetector` with hysteresis and a refractory period, so a wrist
+  hovering at the threshold fires once), and the app reads the sources
+  out of the tracking scene once per tick (`SynthSources`). A hand is
+  "raised" when the wrist is above its shoulder, measured in shoulder
+  widths; a "hit" is wrist speed; "hands together" is wrist distance
+  under 0.6 shoulder widths; codes, arrivals and departures are events by
+  nature and bypass the detectors.
+- **TrackOSC Synth** app: rotary knobs (drag up and down, double-click
+  to reset, accent ring when a mapping drives them), bass and mix,
+  drums with audition buttons, a 16-step grid (bass row with note drag,
+  ⌥ accent, ⇧ slide; drum rows cycling off/on/accent), eight patterns,
+  the mapping table with live bars and readouts, presets (three built
+  in, user presets in Application Support, JSON import and export; the
+  whole state is autosaved as a preset), an output-device picker that
+  rebuilds the graph, and a virtual MIDI source "TrackOSC Synth" that
+  mirrors everything played (bass ch 1, drums ch 10 on General MIDI
+  notes, optional clock). The stage is a ring of sixteen step lights
+  round a level glow with drum flashes and the figure behind. `--panel`
+  opens on a tab (for screenshots).
+- Verified: 11 package tests (offline render clean and non-silent,
+  drums decay to silence, ladder stability, PolyBLEP ≥ 20 dB below the
+  naive saw off-harmonic, sequencer sample timing and swing, conductor
+  mode, hysteresis and refractory, mapping curves, UMP words, queue
+  bounds, preset JSON round trip); live with `poseiosc-testsend`: the
+  "Acid theremin" preset starts on person entered, the mapped knobs
+  follow the figure, and a CoreMIDI listener sees bass note-ons on
+  channel 1, GM drum notes on channel 10 and all-notes-off on gate off.
+- Renamed the package's `Pattern` to `StepPattern` because the app also
+  sees SwiftUI's type of that name.
+
 ## Verification record (2026-07-28)
 
 - `swift test` in `PoseioscShared`: 18 tests green, including round-trips for

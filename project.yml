@@ -18,6 +18,8 @@ packages:
     from: 3.1.0
   PoseioscShared:
     path: PoseioscShared
+  SynthCore:
+    path: SynthCore
 
 attributes:
   LastUpgradeCheck: "2630"
@@ -279,6 +281,22 @@ targets:
       properties:
         com.apple.security.files.downloads.read-write: true
 
+  TrackOSCSynth:
+    templates: [TrackOSCReceiverApp]
+    templateAttributes:
+      app_dir: Synth
+      display_name: TrackOSC Synth
+    dependencies:
+      - package: SynthCore
+        product: SynthCore
+    info:
+      properties:
+        LSApplicationCategoryType: public.app-category.music
+    entitlements:
+      properties:
+        # Presets can be imported from and exported to anywhere.
+        com.apple.security.files.user-selected.read-write: true
+
   TrackOSCColoursTests:
     type: bundle.unit-test
     platform: macOS
@@ -346,5 +364,11 @@ schemes:
     build:
       targets:
         TrackOSCText: all
+    run:
+      config: Debug
+  TrackOSCSynth:
+    build:
+      targets:
+        TrackOSCSynth: all
     run:
       config: Debug

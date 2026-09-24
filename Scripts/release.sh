@@ -77,6 +77,7 @@ APPS=(
     "TrackOSCColours:TrackOSCColours:gradients, colour fields and patterns driven by the tracking stream – fourteen modes, palettes, presets, full screen."
     "TrackOSCParticles:TrackOSCParticles:physics particles, trails and ghosts driven by the tracking stream – twelve modes."
     "TrackOSCText:TrackOSCText:kinetic typography from recognised text, codes and your own words – ten modes."
+    "TrackOSCSynth:TrackOSCSynth:a 303-and-808-flavoured synth and drum machine played by the tracking stream – knobs, a step sequencer, mappings and MIDI out."
 )
 
 if [[ -n "$ONLY" ]]; then
