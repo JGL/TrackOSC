@@ -20,6 +20,8 @@ packages:
     path: PoseioscShared
   SynthCore:
     path: SynthCore
+  CostumeCore:
+    path: CostumeCore
 
 attributes:
   LastUpgradeCheck: "2630"
@@ -38,8 +40,8 @@ settings:
     STRING_CATALOG_GENERATE_SYMBOLS: YES
     # Shared by both apps. Bump CURRENT_PROJECT_VERSION for every TestFlight
     # upload; MARKETING_VERSION is the user-facing version and release tag.
-    MARKETING_VERSION: "1.7.0"
-    CURRENT_PROJECT_VERSION: "12"
+    MARKETING_VERSION: "1.8.0"
+    CURRENT_PROJECT_VERSION: "13"
 
 targetTemplates:
   # Every receiver-type macOS app (Recorder, Speaker, Router, …) is one of
@@ -297,6 +299,21 @@ targets:
         # Presets can be imported from and exported to anywhere.
         com.apple.security.files.user-selected.read-write: true
 
+  TrackOSCCostumes:
+    templates: [TrackOSCReceiverApp]
+    templateAttributes:
+      app_dir: Costumes
+      display_name: TrackOSC Costumes
+    dependencies:
+      - package: CostumeCore
+        product: CostumeCore
+    entitlements:
+      properties:
+        # A folder of the user's own costumes, remembered as a bookmark; recordings to Downloads.
+        com.apple.security.files.user-selected.read-write: true
+        com.apple.security.files.bookmarks.app-scope: true
+        com.apple.security.files.downloads.read-write: true
+
   TrackOSCColoursTests:
     type: bundle.unit-test
     platform: macOS
@@ -370,5 +387,11 @@ schemes:
     build:
       targets:
         TrackOSCSynth: all
+    run:
+      config: Debug
+  TrackOSCCostumes:
+    build:
+      targets:
+        TrackOSCCostumes: all
     run:
       config: Debug

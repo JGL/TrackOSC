@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- TrackOSC Costumes – Skeleton: bones in white on nothing. Layer names as in Template.svg. -->
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape" viewBox="0 0 400 800" width="400" height="800">
+  <defs><style>.bone{fill:#f5f5f0;stroke:#263238;stroke-width:3;stroke-linejoin:round}.dark{fill:#263238}</style></defs>
+  <g inkscape:label="guide:torso" data-name="guide:torso" style="display:none"><line x1="200" y1="220" x2="200" y2="430"/></g>
+  <g inkscape:label="bone:thigh:right" data-name="bone:thigh:right">
+    <path class="bone" d="M158 428 a16 16 0 0 1 32 0 v10 l-6 150 a12 12 0 0 1 -20 0 l-6 -150 z"/>
+  </g>
+  <g inkscape:label="bone:thigh:left" data-name="bone:thigh:left">
+    <path class="bone" d="M210 428 a16 16 0 0 1 32 0 v10 l-6 150 a12 12 0 0 1 -20 0 l-6 -150 z"/>
+  </g>
+  <g inkscape:label="bone:shin:right" data-name="bone:shin:right">
+    <path class="bone" d="M162 598 a14 14 0 0 1 28 0 v8 l-4 140 a10 10 0 0 1 -20 0 l-4 -140 z"/>
+    <path class="bone" d="M186 606 l-3 130 a5 5 0 0 1 -8 0 l0 -130 z"/>
+  </g>
+  <g inkscape:label="bone:shin:left" data-name="bone:shin:left">
+    <path class="bone" d="M214 598 a14 14 0 0 1 28 0 v8 l-4 140 a10 10 0 0 1 -20 0 l-4 -140 z"/>
+    <path class="bone" d="M212 606 l3 130 a5 5 0 0 1 8 0 l0 -130 z"/>
+  </g>
+  <g inkscape:label="bone:foot:right.fixed" data-name="bone:foot:right.fixed">
+    <path class="bone" d="M150 758 h14 v10 h6 v-10 h14 v10 h6 v-10 h14 v10 h6 v-10 h8 v26 h-68 z"/>
+  </g>
+  <g inkscape:label="bone:foot:left.fixed" data-name="bone:foot:left.fixed">
+    <path class="bone" d="M198 758 h14 v10 h6 v-10 h14 v10 h6 v-10 h14 v10 h6 v-10 h8 v26 h-68 z"/>
+  </g>
+  <g inkscape:label="bone:hips" data-name="bone:hips">
+    <path class="bone" d="M140 415 q60 -18 120 0 q10 22 -10 40 q-50 -14 -100 0 q-20 -18 -10 -40 z"/>
+  </g>
+  <g inkscape:label="bone:torso.stretch" data-name="bone:torso.stretch">
+    <rect class="bone" x="190" y="220" width="20" height="200" rx="8"/>
+    <path class="bone" d="M200 250 q-60 5 -70 40 q5 30 70 30 q65 0 70 -30 q-10 -35 -70 -40 z" fill-opacity="0.9"/>
+    <path class="bone" d="M200 300 q-55 5 -62 34 q5 26 62 26 q57 0 62 -26 q-7 -29 -62 -34 z"/>
+    <path class="bone" d="M200 345 q-45 4 -50 28 q5 20 50 20 q45 0 50 -20 q-5 -24 -50 -28 z"/>
+  </g>
+  <g inkscape:label="bone:shoulders" data-name="bone:shoulders">
+    <path class="bone" d="M120 216 h160 a8 8 0 0 1 0 16 h-160 a8 8 0 0 1 0 -16 z"/>
+  </g>
+  <g inkscape:label="bone:neck" data-name="bone:neck">
+    <rect class="bone" x="192" y="165" width="16" height="60" rx="6"/>
+  </g>
+  <g inkscape:label="bone:upperArm:right" data-name="bone:upperArm:right">
+    <path class="bone" d="M86 222 a14 14 0 0 1 28 0 l-4 110 a10 10 0 0 1 -20 0 z"/>
+  </g>
+  <g inkscape:label="bone:upperArm:left" data-name="bone:upperArm:left">
+    <path class="bone" d="M286 222 a14 14 0 0 1 28 0 l-4 110 a10 10 0 0 1 -20 0 z"/>
+  </g>
+  <g inkscape:label="bone:forearm:right" data-name="bone:forearm:right">
+    <path class="bone" d="M90 338 a11 11 0 0 1 22 0 l-3 115 a8 8 0 0 1 -16 0 z"/>
+    <path class="bone" d="M112 344 l-2 100 a4 4 0 0 1 -8 0 l1 -100 z"/>
+  </g>
+  <g inkscape:label="bone:forearm:left" data-name="bone:forearm:left">
+    <path class="bone" d="M290 338 a11 11 0 0 1 22 0 l-3 115 a8 8 0 0 1 -16 0 z"/>
+    <path class="bone" d="M288 344 l2 100 a4 4 0 0 1 8 0 l-1 -100 z"/>
+  </g>
+  <g inkscape:label="bone:hand:right" data-name="bone:hand:right">
+    <path class="bone" d="M84 462 h32 v18 l-4 30 h-4 l0 -26 h-4 l-2 30 h-4 l0 -30 h-4 l-2 26 h-4 z"/>
+  </g>
+  <g inkscape:label="bone:hand:left" data-name="bone:hand:left">
+    <path class="bone" d="M284 462 h32 v18 l-4 30 h-4 l0 -26 h-4 l-2 30 h-4 l0 -30 h-4 l-2 26 h-4 z"/>
+  </g>
+  <g inkscape:label="head" data-name="head">
+    <path class="bone" d="M130 110 q0 -70 70 -70 q70 0 70 70 q0 40 -30 60 v14 q-40 12 -80 0 v-14 q-30 -20 -30 -60 z"/>
+    <ellipse class="dark" cx="172" cy="112" rx="18" ry="16"/>
+    <ellipse class="dark" cx="228" cy="112" rx="18" ry="16"/>
+    <path class="dark" d="M200 128 l-8 18 h16 z"/>
+    <path class="dark" d="M168 160 h64 v6 h-64 z M176 160 v14 M188 160 v14 M200 160 v14 M212 160 v14 M224 160 v14" stroke="#263238" stroke-width="3"/>
+  </g>
+</svg>

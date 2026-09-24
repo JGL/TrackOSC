@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  TrackOSC Costumes – Template
+
+  Every layer TrackOSC Costumes understands, as flat shapes you can replace
+  with your own drawing. Keep the layer names (the app reads inkscape:label,
+  then data-name, then serif:id, then id; Illustrator's _x3A_ for ":" and
+  _x2E_ for "." are understood). Draw the figure as seen from the front:
+  the person's LEFT arm is on the picture's RIGHT. Each layer is placed on
+  its own, so where it sits in the drawing does not matter – only its shape
+  and, if you draw one, its pivot line.
+
+  bone:<part>[:left|right]  torso, shoulders, hips, neck, upperArm,
+                            forearm, hand, thigh, shin, foot
+  head                      spans the ears
+  face:<part>               leftEye, rightEye, leftBrow, rightBrow, nose,
+                            mouth, jaw, face – on Face Landmarks, else
+                            they ride on the head
+  hand:<part>[:1-3][:side]  palm, thumb, index, middle, ring, pinky – on
+                            Hands, else they sit at the body's wrist
+  guide:torso / guide:shoulders   a line the app measures, never drawn
+  pivot                     a two-point line inside a layer: its axis
+  flags: .stretch (only lengthen), .fixed (never scale with the bone),
+         .noflip (do not mirror when facing away), .front, .back
+-->
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape" viewBox="0 0 400 800" width="400" height="800">
+  <g id="guide_x3A_torso" inkscape:label="guide:torso" data-name="guide:torso" style="display:none">
+    <line x1="200" y1="220" x2="200" y2="430" stroke="#f0f"/>
+  </g>
+  <g id="bone_x3A_thigh_x3A_right" inkscape:label="bone:thigh:right" data-name="bone:thigh:right">
+    <rect x="145" y="425" width="50" height="180" rx="22" fill="#5c6bc0"/>
+  </g>
+  <g id="bone_x3A_thigh_x3A_left" inkscape:label="bone:thigh:left" data-name="bone:thigh:left">
+    <rect x="205" y="425" width="50" height="180" rx="22" fill="#5c6bc0"/>
+  </g>
+  <g id="bone_x3A_shin_x3A_right" inkscape:label="bone:shin:right" data-name="bone:shin:right">
+    <rect x="148" y="595" width="44" height="170" rx="20" fill="#3f51b5"/>
+  </g>
+  <g id="bone_x3A_shin_x3A_left" inkscape:label="bone:shin:left" data-name="bone:shin:left">
+    <rect x="208" y="595" width="44" height="170" rx="20" fill="#3f51b5"/>
+  </g>
+  <g id="bone_x3A_foot_x3A_right_x2E_fixed" inkscape:label="bone:foot:right.fixed" data-name="bone:foot:right.fixed">
+    <path d="M140 755 h60 a14 14 0 0 1 14 14 v16 h-88 v-16 a14 14 0 0 1 14 -14 z" fill="#263238"/>
+  </g>
+  <g id="bone_x3A_foot_x3A_left_x2E_fixed" inkscape:label="bone:foot:left.fixed" data-name="bone:foot:left.fixed">
+    <path d="M200 755 h60 a14 14 0 0 1 14 14 v16 h-88 v-16 a14 14 0 0 1 14 -14 z" fill="#263238"/>
+  </g>
+  <g id="bone_x3A_torso" inkscape:label="bone:torso" data-name="bone:torso">
+    <path d="M130 220 h140 v160 q0 50 -50 50 h-40 q-50 0 -50 -50 z" fill="#ef6c00"/>
+  </g>
+  <g id="bone_x3A_neck" inkscape:label="bone:neck" data-name="bone:neck">
+    <rect x="185" y="160" width="30" height="70" rx="10" fill="#ffcc80"/>
+  </g>
+  <g id="bone_x3A_upperArm_x3A_right" inkscape:label="bone:upperArm:right" data-name="bone:upperArm:right">
+    <rect x="78" y="210" width="44" height="140" rx="22" fill="#fb8c00"/>
+    <line inkscape:label="pivot" data-name="pivot" id="pivot_1_" x1="100" y1="222" x2="100" y2="340" stroke="none"/>
+  </g>
+  <g id="bone_x3A_upperArm_x3A_left" inkscape:label="bone:upperArm:left" data-name="bone:upperArm:left">
+    <rect x="278" y="210" width="44" height="140" rx="22" fill="#fb8c00"/>
+    <line inkscape:label="pivot" data-name="pivot" id="pivot_2_" x1="300" y1="222" x2="300" y2="340" stroke="none"/>
+  </g>
+  <g id="bone_x3A_forearm_x3A_right_x2E_stretch" inkscape:label="bone:forearm:right.stretch" data-name="bone:forearm:right.stretch">
+    <rect x="82" y="335" width="36" height="130" rx="18" fill="#ffcc80"/>
+  </g>
+  <g id="bone_x3A_forearm_x3A_left_x2E_stretch" inkscape:label="bone:forearm:left.stretch" data-name="bone:forearm:left.stretch">
+    <rect x="282" y="335" width="36" height="130" rx="18" fill="#ffcc80"/>
+  </g>
+  <g id="bone_x3A_hand_x3A_right" inkscape:label="bone:hand:right" data-name="bone:hand:right">
+    <ellipse cx="100" cy="485" rx="24" ry="30" fill="#ffe0b2"/>
+  </g>
+  <g id="bone_x3A_hand_x3A_left" inkscape:label="bone:hand:left" data-name="bone:hand:left">
+    <ellipse cx="300" cy="485" rx="24" ry="30" fill="#ffe0b2"/>
+  </g>
+  <g id="head" inkscape:label="head" data-name="head">
+    <circle cx="200" cy="110" r="70" fill="#ffe0b2"/>
+    <path d="M130 100 q10 -75 70 -75 q60 0 70 75 q-30 -30 -70 -30 q-40 0 -70 30 z" fill="#6d4c41"/>
+  </g>
+  <g id="face_x3A_leftBrow" inkscape:label="face:leftBrow" data-name="face:leftBrow">
+    <path d="M208 82 q17 -8 34 0" stroke="#4e342e" stroke-width="5" fill="none" stroke-linecap="round"/>
+  </g>
+  <g id="face_x3A_rightBrow" inkscape:label="face:rightBrow" data-name="face:rightBrow">
+    <path d="M158 82 q17 -8 34 0" stroke="#4e342e" stroke-width="5" fill="none" stroke-linecap="round"/>
+  </g>
+  <g id="face_x3A_leftEye" inkscape:label="face:leftEye" data-name="face:leftEye">
+    <ellipse cx="225" cy="100" rx="14" ry="9" fill="#fff" stroke="#4e342e" stroke-width="2"/>
+    <circle cx="225" cy="101" r="5" fill="#263238"/>
+  </g>
+  <g id="face_x3A_rightEye" inkscape:label="face:rightEye" data-name="face:rightEye">
+    <ellipse cx="175" cy="100" rx="14" ry="9" fill="#fff" stroke="#4e342e" stroke-width="2"/>
+    <circle cx="175" cy="101" r="5" fill="#263238"/>
+  </g>
+  <g id="face_x3A_nose" inkscape:label="face:nose" data-name="face:nose">
+    <path d="M200 105 l-8 22 h16 z" fill="#ffb74d"/>
+  </g>
+  <g id="face_x3A_mouth" inkscape:label="face:mouth" data-name="face:mouth">
+    <ellipse cx="200" cy="145" rx="20" ry="7" fill="#d84315"/>
+  </g>
+</svg>

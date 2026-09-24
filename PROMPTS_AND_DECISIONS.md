@@ -770,6 +770,54 @@ parts, as well as 3D Costumes – I'll be back later to check." Built on
   channel 1, GM drum notes on channel 10 and all-notes-off on gate off.
 - Renamed the package's `Pattern` to `StepPattern` because the app also
   sees SwiftUI's type of that name.
+- **CostumeCore** is the second local package: an `XMLParser`-based SVG
+  reader for the subset costumes need (svg, g, path with the full grammar
+  including arcs, rect, circle, ellipse, line, polyline, polygon,
+  transforms baked into document space, `<style>` class/element/id rules,
+  `style=""` and presentation attributes cascading in that order,
+  `display:none`; `use`, gradients, clip paths, masks, filters, text and
+  images skipped with a warning each), the layer-name grammar
+  `prefix:part[:side][.flag]` resolved from inkscape:label → data-name →
+  serif:id → id with Illustrator's `_x3A_`/`_x2E_` escapes and `_N_`
+  copies undone, and the rig. Decisions: the rig works in stage pixels
+  and maps an art segment onto a target segment with one formula
+  (translate, rotate the axis to +x, scale along and across, rotate to
+  the target, translate), so uniform, `.stretch` (across = the figure's
+  overall scale, live torso over art torso) and `.fixed` differ only in
+  the two scale factors and mirroring is a negative across-scale; the
+  head spans the ears (eyes or the nose otherwise); face parts map their
+  horizontal midline onto a landmark cluster's extent along the pupil
+  line and fall back to riding on the head layer's transform; hand parts
+  use the 21-joint chains and fall back to the body's wrist; facing away
+  is the shoulders crossing with hysteresis of 12 % of the torso; lost
+  parts fade over 0.3 s and hold their last transform; scenery (unnamed
+  art) is fitted to the stage once per costume however many people wear
+  it. A `<style>` inside `<defs>` was being skipped with the defs, which
+  drew the skeleton and robot black on black; defs now hide their shapes
+  but keep their styles.
+- **TrackOSC Costumes** app: a `Canvas` stage at the display rate drawing
+  a `StageFrame` the store solves at 60 Hz (so the recorder can draw the
+  same frame into a pixel buffer on its own queue, at the backing scale),
+  a library of the bundled costumes plus a user folder kept as a
+  security-scoped bookmark and watched with a `DispatchSource` for hot
+  reload, a layer inspector with live dots and the parser's warnings,
+  display settings (mirror, fit/fill, background, skeleton overlay,
+  smoothing, fade, attract delay), same/cycle assignment for several
+  people, hands-only and face-only wearers when nobody's body is
+  tracked, and `--panel`/`-costume`/`-showSkeleton` launch arguments for
+  screenshots. Bundled: an annotated `Template.svg`, `skeleton.svg` and
+  `robot.svg` (stretching limbs, a `.noflip` visor, hand parts), with a
+  README of export recipes for Illustrator, Inkscape, Figma and Affinity.
+- Verified: 15 package tests (four exporter-shaped fixtures, path
+  grammar, transforms and colours, the layer grammar, bones landing on
+  joints, stretch keeping width, mirroring with hysteresis, fades, face
+  parts on landmarks and their fallback, fingers and the wrist fallback,
+  the renderer painting); live with `poseiosc-testsend`, all three
+  bundled costumes follow the synthetic figure and the skeleton overlay
+  confirms the joints. The test sender's synthetic face is a ring of 76
+  points beside the body, so face parts land on that ring rather than
+  the head; real Face Landmarks put them on the face.
+- Versions to 1.8.0 (build 13); no sender change, so no App Store upload.
 
 ## Verification record (2026-07-28)
 

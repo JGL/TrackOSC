@@ -13,9 +13,10 @@
   <img src="Images/icon-mac-colours.png" width="128" alt="TrackOSC Colours macOS app icon">&nbsp;&nbsp;
   <img src="Images/icon-mac-particles.png" width="128" alt="TrackOSC Particles macOS app icon">&nbsp;&nbsp;
   <img src="Images/icon-mac-text.png" width="128" alt="TrackOSC Text macOS app icon">&nbsp;&nbsp;
-  <img src="Images/icon-mac-synth.png" width="128" alt="TrackOSC Synth macOS app icon">
+  <img src="Images/icon-mac-synth.png" width="128" alt="TrackOSC Synth macOS app icon">&nbsp;&nbsp;
+  <img src="Images/icon-mac-costumes.png" width="128" alt="TrackOSC Costumes macOS app icon">
 </p>
-<p align="center"><em>TrackOSC Recorder&ensp;·&ensp;TrackOSC Speaker&ensp;·&ensp;TrackOSC Router&ensp;·&ensp;TrackOSC Colours&ensp;·&ensp;TrackOSC Particles&ensp;·&ensp;TrackOSC Text&ensp;·&ensp;TrackOSC Synth – seven more macOS apps that do things with the stream</em></p>
+<p align="center"><em>TrackOSC Recorder&ensp;·&ensp;TrackOSC Speaker&ensp;·&ensp;TrackOSC Router&ensp;·&ensp;TrackOSC Colours&ensp;·&ensp;TrackOSC Particles&ensp;·&ensp;TrackOSC Text&ensp;·&ensp;TrackOSC Synth&ensp;·&ensp;TrackOSC Costumes – eight more macOS apps that do things with the stream</em></p>
 
 Live camera → Apple Vision tracking → OSC. TrackOSC streams (almost) all of
 [Apple's Vision framework](https://developer.apple.com/documentation/vision)
@@ -76,6 +77,12 @@ Nine apps plus open receiver examples for eight creative-coding environments:
   filter, eight analogue-model drums, a sixteen-step sequencer with eight
   patterns, swing and a conductor mode, and mappings from noses, wrists,
   hands, faces and presence to every knob and trigger, with MIDI out.
+- **TrackOSC Costumes** (macOS 15+): dresses tracked bodies, faces and
+  hands in SVG costumes – one file per costume with named layers
+  (`bone:upperArm:left`, `head`, `face:mouth`, `hand:index`…) drawn in
+  Illustrator, Inkscape, Figma or Affinity; three bundled, a folder of your
+  own that reloads as you save, several people at once, mirroring when
+  someone turns their back, and recording to .mp4.
 - **[Receiver examples](Examples/README.md)** for Processing, Python, p5.js,
   TouchDesigner, Max/MSP, Pure Data, openFrameworks and SuperCollider: each
   is a complete, hackable receiver of every TrackOSC message – the same
@@ -153,6 +160,11 @@ message rates, camera info, and a live log.</em></p>
   <img src="Images/screenshot-mac-synth.png" width="90%" alt="Four views of the TrackOSC Synth window with the synthetic figure on its black stage: the bass and mix knobs, the drum knobs, the sixteen-step sequencer grid, and the mapping table with live source readouts">
 </p>
 <p align="center"><em>TrackOSC Synth: bass and mix, drums, steps and mappings, with the step ring, level glow and drum flashes on the stage.</em></p>
+
+<p align="center">
+  <img src="Images/screenshot-mac-costumes.png" width="90%" alt="Three views of the TrackOSC Costumes window with the synthetic figure wearing the bundled robot, skeleton and Template costumes, with the library, the layer inspector and the display settings beside the stage">
+</p>
+<p align="center"><em>TrackOSC Costumes: the bundled robot, skeleton and Template on the same tracked figure.</em></p>
 
 <p align="center">
   <img src="Images/screenshot-ios-sender.jpg" width="28%" alt="TrackOSC on iPhone tracking a person's face and a peace-sign hand gesture, with face box, jawline contour and landmarks in blue, hand skeleton in orange, body pose in green, and the detector chips along the bottom">
@@ -596,6 +608,37 @@ the controls hidden and in full screen. The DSP lives in the `SynthCore`
 package (`cd SynthCore && swift test` renders it offline: no NaNs, filter
 stability at full resonance, PolyBLEP aliasing, sequencer timing).
 
+### TrackOSC Costumes
+
+Cut-out puppetry: a costume is one SVG file whose layers are named after
+the parts they dress, and the app places each layer on the tracked person
+at the display rate. Bones (`bone:torso`, `bone:upperArm:left`,
+`bone:shin:right`, …) map the layer's art axis (a `pivot` line you draw,
+or the shape's midline) onto the live joint pair, scaling uniformly, only
+along the bone (`.stretch`) or not at all (`.fixed`); `head` spans the
+ears; `face:` parts sit on the Face Landmarks clusters (the mouth opens
+with the lips) and ride on the head when landmarks are not arriving;
+`hand:` parts follow the Hands detector's fingers, per finger or per
+phalanx, and sit at the body's wrist without it. When someone turns their
+back the shoulders cross and every layer without `.noflip` is mirrored;
+`.front` and `.back` layers show only one way round. Parts whose joints
+vanish fade out and hold their last place. Layer names are read from
+Inkscape labels, Figma and Illustrator ids (with Illustrator's `_x3A_`
+escapes undone) and Affinity's `serif:id`; the parser handles paths with
+arcs, transforms, `<style>` classes, `style=""` and presentation
+attributes, and lists what it skipped (gradients, clones, clip paths,
+text, images) in the **Layers** tab. Three costumes are bundled
+(**robot**, **skeleton** and an annotated **Template** to copy from), and
+**Choose Folder…** points the app at a folder of your own that reloads
+whenever a file is saved, so a drawing app can stay open beside the
+stage. With several people tracked, everyone wears the same costume or
+each new arrival gets the next one in the library. **V** records the
+stage to an .mp4 in Downloads, **M** mirrors, **K** shows the tracked
+skeleton, **[** and **]** change costume. The parser and rig are the
+`CostumeCore` package (`cd CostumeCore && swift test` runs fixtures in
+the shapes each drawing app exports); the recipe for each app is in
+`Costumes/Resources/Costumes/README.md`.
+
 ### Hiding the video
 
 Both senders have a **Hide video preview** option (the eye button on the
@@ -892,6 +935,11 @@ SynthCore/             Swift package: DSP (PolyBLEP oscillators, ladder and stat
                        parameter bank and event queues, audio graph and AVAudioEngine
                        host, step sequencer, mapping logic, MIDI words, presets, tests
 Synth/                 macOS synth app (knobs, drums, sequencer grid, mapping table, MIDI out)
+CostumeCore/           Swift package: SVG-subset parser (XMLParser, path grammar, transforms,
+                       CSS classes), layer-name grammar, 2D rig (bones, head, face, hands,
+                       mirroring, fades), CoreGraphics renderer, fixture tests
+Costumes/              macOS costumes app (library with folder bookmarks and hot reload,
+                       Canvas stage, mp4 recorder, bundled costumes and recipe README)
 Examples/              Receiver examples: Processing, Python, p5.js, TouchDesigner,
                        Max/MSP, Pure Data, openFrameworks, SuperCollider – see
                        Examples/README.md; Examples/SKELETONS.md is the shared

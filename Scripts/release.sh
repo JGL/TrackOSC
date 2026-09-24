@@ -78,6 +78,7 @@ APPS=(
     "TrackOSCParticles:TrackOSCParticles:physics particles, trails and ghosts driven by the tracking stream – twelve modes."
     "TrackOSCText:TrackOSCText:kinetic typography from recognised text, codes and your own words – ten modes."
     "TrackOSCSynth:TrackOSCSynth:a 303-and-808-flavoured synth and drum machine played by the tracking stream – knobs, a step sequencer, mappings and MIDI out."
+    "TrackOSCCostumes:TrackOSCCostumes:dresses tracked bodies, faces and hands in SVG costumes with named layers – three bundled, bring your own from Illustrator, Inkscape, Figma or Affinity."
 )
 
 if [[ -n "$ONLY" ]]; then
