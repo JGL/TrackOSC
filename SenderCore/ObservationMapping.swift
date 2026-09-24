@@ -339,6 +339,92 @@ enum ObservationMapping {
         return DetectionFrame(width: width, height: height, detections: Array(detections))
     }
 
+    // MARK: - Contours, horizon, rectangles (v1.6)
+
+    /// Every contour Vision found, walked depth-first from the top-level
+    /// ones (so an outline precedes the holes inside it), simplified and
+    /// capped so one message fits a datagram.
+    static func mapContours(
+        _ observation: ContoursObservation,
+        width: Int32,
+        height: Int32
+    ) -> DetectionFrame<ContourDetection> {
+        let w = Float(width), h = Float(height)
+        var detections: [ContourDetection] = []
+        var pointBudget = WireCounts.maxContourPoints
+        var stack = Array(observation.topLevelContours.reversed())
+        while let contour = stack.popLast() {
+            guard detections.count < WireCounts.maxContours, pointBudget > 0 else { break }
+            stack.append(contentsOf: contour.childContours.reversed())
+            // Simplify: a small epsilon keeps the shape but drops most of
+            // the pixel-level vertices.
+            let simplified = (try? contour.polygonApproximation(epsilon: 0.004)) ?? contour
+            var points = simplified.normalizedPoints
+            guard points.count >= 3 else { continue }
+            if points.count > 256 {
+                let stride = Float(points.count) / 256
+                points = (0..<256).map { points[Int(Float($0) * stride)] }
+            }
+            if points.count > pointBudget { continue }
+            pointBudget -= points.count
+            detections.append(ContourDetection(
+                confidence: observation.confidence,
+                points: points.map { CoordinateMapper.xy(normalizedX: CGFloat($0.x), normalizedY: CGFloat($0.y), frameWidth: w, frameHeight: h) }
+            ))
+        }
+        return DetectionFrame(width: width, height: height, detections: detections)
+    }
+
+    /// The horizon as an angle plus the line through the frame's centre at
+    /// that angle. Vision's angle is counter-clockwise positive in its own
+    /// (y-up) space; on the wire's y-down frame the right-hand end of a
+    /// positive angle is therefore higher. One constant to flip if a device
+    /// reports it the other way.
+    static let horizonPositiveRaisesRight = true
+
+    static func mapHorizon(
+        _ observation: HorizonObservation?,
+        width: Int32,
+        height: Int32
+    ) -> DetectionFrame<HorizonDetection> {
+        guard let observation else {
+            return DetectionFrame(width: width, height: height, detections: [])
+        }
+        let w = Float(width), h = Float(height)
+        let degrees = Float(observation.angle.converted(to: .degrees).value)
+        let radians = degrees * .pi / 180
+        let dy = tanf(radians) * (w / 2) * (horizonPositiveRaisesRight ? -1 : 1)
+        let detection = HorizonDetection(
+            confidence: observation.confidence,
+            angleDegrees: degrees,
+            start: WireXY(x: 0, y: h / 2 - dy),
+            end: WireXY(x: w, y: h / 2 + dy)
+        )
+        return DetectionFrame(width: width, height: height, detections: [detection])
+    }
+
+    static func mapRectangles(
+        _ observations: [RectangleObservation],
+        width: Int32,
+        height: Int32
+    ) -> DetectionFrame<RectangleDetection> {
+        let w = Float(width), h = Float(height)
+        let detections = observations.prefix(WireCounts.maxDetections).map { observation in
+            let corners = [observation.topLeft, observation.topRight, observation.bottomRight, observation.bottomLeft]
+                .map { CoordinateMapper.xy(normalizedX: $0.x, normalizedY: $0.y, frameWidth: w, frameHeight: h) }
+            return RectangleDetection(
+                confidence: observation.confidence,
+                box: CoordinateMapper.rect(
+                    normalized: observation.boundingBox.cgRect,
+                    frameWidth: w,
+                    frameHeight: h
+                ),
+                corners: corners
+            )
+        }
+        return DetectionFrame(width: width, height: height, detections: Array(detections))
+    }
+
     /// The wire's symbology string: VNBarcodeSymbology's names without the prefix.
     static func symbologyName(_ symbology: BarcodeSymbology) -> String {
         switch symbology {

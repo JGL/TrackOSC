@@ -50,6 +50,9 @@ struct OverlaySnapshot: Sendable {
     var animalPoses: [AnimalPoseDetection] = []
     var humans: [HumanDetection] = []
     var barcodes: [BarcodeDetection] = []
+    var contours: [ContourDetection] = []
+    var horizon: [HorizonDetection] = []
+    var rectangles: [RectangleDetection] = []
     var processingTime: TimeInterval = 0
 }
 
@@ -117,6 +120,9 @@ actor VisionProcessor {
         async let animalPoses = cfg.isEnabled(.animalPoses) ? runAnimalPoses(frame) : nil
         async let humans = cfg.isEnabled(.humans) ? runHumans(frame) : nil
         async let barcodes = cfg.isEnabled(.barcodes) ? runBarcodes(frame) : nil
+        async let contours = cfg.isEnabled(.contours) ? runContours(frame) : nil
+        async let horizon = cfg.isEnabled(.horizon) ? runHorizon(frame) : nil
+        async let rectangles = cfg.isEnabled(.rectangles) ? runRectangles(frame) : nil
 
         if let result = await poses {
             snapshot.poses = result.detections
@@ -153,6 +159,18 @@ actor VisionProcessor {
         if let result = await barcodes {
             snapshot.barcodes = result.detections
             sender.send(WireCodec.encodeBarcodes(result))
+        }
+        if let result = await contours {
+            snapshot.contours = result.detections
+            sender.send(WireCodec.encodeContours(result))
+        }
+        if let result = await horizon {
+            snapshot.horizon = result.detections
+            sender.send(WireCodec.encodeHorizon(result))
+        }
+        if let result = await rectangles {
+            snapshot.rectangles = result.detections
+            sender.send(WireCodec.encodeRectangles(result))
         }
 
         let elapsed = started.duration(to: .now).components
@@ -294,6 +312,49 @@ actor VisionProcessor {
             on: frame.pixelBuffer, orientation: frame.orientation
         ) else { return nil }
         return ObservationMapping.mapBarcodes(
+            observations,
+            width: frame.orientedWidth,
+            height: frame.orientedHeight
+        )
+    }
+
+    private func runContours(_ frame: FrameBox) async -> DetectionFrame<ContourDetection>? {
+        var request = DetectContoursRequest()
+        // Contour detection is costly at full resolution; 512 px keeps the
+        // frame rate usable and the outlines are simplified anyway.
+        request.maximumImageDimension = 512
+        request.detectsDarkOnLight = true
+        guard let observation = try? await request.perform(
+            on: frame.pixelBuffer, orientation: frame.orientation
+        ) else { return nil }
+        return ObservationMapping.mapContours(
+            observation,
+            width: frame.orientedWidth,
+            height: frame.orientedHeight
+        )
+    }
+
+    private func runHorizon(_ frame: FrameBox) async -> DetectionFrame<HorizonDetection>? {
+        let request = DetectHorizonRequest()
+        guard let observation = try? await request.perform(
+            on: frame.pixelBuffer, orientation: frame.orientation
+        ) else { return nil }
+        return ObservationMapping.mapHorizon(
+            observation,
+            width: frame.orientedWidth,
+            height: frame.orientedHeight
+        )
+    }
+
+    private func runRectangles(_ frame: FrameBox) async -> DetectionFrame<RectangleDetection>? {
+        var request = DetectRectanglesRequest()
+        request.maximumObservations = 16
+        request.minimumSize = 0.1
+        request.minimumConfidence = 0.5
+        guard let observations = try? await request.perform(
+            on: frame.pixelBuffer, orientation: frame.orientation
+        ) else { return nil }
+        return ObservationMapping.mapRectangles(
             observations,
             width: frame.orientedWidth,
             height: frame.orientedHeight

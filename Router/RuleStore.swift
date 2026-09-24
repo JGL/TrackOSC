@@ -28,7 +28,7 @@ enum RuleStore {
         try? data.write(to: fileURL, options: .atomic)
     }
 
-    static func exportPanel(_ rules: [Rule]) {
+    @MainActor static func exportPanel(_ rules: [Rule]) {
         let panel = NSSavePanel()
         panel.allowedContentTypes = [.json]
         panel.nameFieldStringValue = "TrackOSC Router rules.json"
@@ -36,7 +36,7 @@ enum RuleStore {
         try? data.write(to: url, options: .atomic)
     }
 
-    static func importPanel() -> [Rule]? {
+    @MainActor static func importPanel() -> [Rule]? {
         let panel = NSOpenPanel()
         panel.allowedContentTypes = [.json]
         panel.allowsMultipleSelection = false

@@ -13,6 +13,7 @@ struct ConnectionToolbar: ToolbarContent {
     @Bindable var model: ReceiverModel
     @State private var portText = ""
     @State private var showForwarding = false
+    @State private var showSenders = false
 
     var body: some ToolbarContent {
         ToolbarItemGroup(placement: .automatic) {
@@ -40,6 +41,24 @@ struct ConnectionToolbar: ToolbarContent {
             .popover(isPresented: $showForwarding) {
                 ForwardingPopover(model: model)
             }
+
+            Button {
+                showSenders.toggle()
+            } label: {
+                Label("Senders", systemImage: "antenna.radiowaves.left.and.right")
+                    .foregroundStyle(model.settings.sourcePolicy == .all ? Color.primary : Color.accentColor)
+            }
+            .help("Which sender is heard when several send to this port")
+            .popover(isPresented: $showSenders) {
+                SendersPopover(model: model)
+            }
+
+            ColorPicker("Background", selection: Binding(
+                get: { model.settings.stageBackground },
+                set: { model.settings.stageBackground = $0 }
+            ), supportsOpacity: false)
+            .labelsHidden()
+            .help("Stage background colour (also the window's colour in full screen)")
 
             if let name = model.advertisedName {
                 Label(name, systemImage: "dot.radiowaves.left.and.right")
@@ -120,5 +139,62 @@ struct ForwardingPopover: View {
         model.settings.forwardHost = hostText.trimmingCharacters(in: .whitespaces)
         if let port = UInt16(portText), port > 0 { model.settings.forwardPort = port }
         model.applyForwarding()
+    }
+}
+
+/// Source selection: which host is heard, with the hosts seen recently.
+struct SendersPopover: View {
+    @Bindable var model: ReceiverModel
+    @State private var hostText = ""
+
+    var body: some View {
+        @Bindable var settings = model.settings
+        VStack(alignment: .leading, spacing: 10) {
+            Picker("Listen to", selection: $settings.sourcePolicy) {
+                ForEach(SourcePolicy.allCases) { Text($0.label).tag($0) }
+            }
+            .pickerStyle(.radioGroup)
+            .onChange(of: settings.sourcePolicy) { model.applySourcePolicy() }
+            Text(settings.sourcePolicy.explanation)
+                .font(.footnote)
+                .foregroundStyle(.secondary)
+                .fixedSize(horizontal: false, vertical: true)
+
+            if settings.sourcePolicy == .only {
+                HStack {
+                    TextField("Host", text: $hostText)
+                        .textFieldStyle(.roundedBorder)
+                        .onSubmit(applyHost)
+                    Button("Apply", action: applyHost)
+                }
+            }
+
+            if !model.recentHosts.isEmpty {
+                Text("Heard from in the last minute").font(.subheadline)
+                ForEach(model.recentHosts, id: \.self) { host in
+                    HStack {
+                        Circle()
+                            .fill(host == model.activeHost ? .green : .gray.opacity(0.4))
+                            .frame(width: 8, height: 8)
+                        Text(host).font(.system(.body, design: .monospaced))
+                        Spacer()
+                        if settings.sourcePolicy == .only {
+                            Button("Use") { hostText = host; applyHost() }.controlSize(.small)
+                        }
+                    }
+                }
+            }
+            Text("Ignored \(model.ignoredMessages) messages from other senders")
+                .font(.footnote.monospaced())
+                .foregroundStyle(.secondary)
+        }
+        .padding()
+        .frame(width: 360)
+        .onAppear { hostText = settings.sourceHost }
+    }
+
+    private func applyHost() {
+        model.settings.sourceHost = hostText.trimmingCharacters(in: .whitespaces)
+        model.applySourcePolicy()
     }
 }

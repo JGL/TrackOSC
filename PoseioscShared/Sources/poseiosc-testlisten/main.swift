@@ -58,6 +58,15 @@ func summarize(_ decoded: DecodedFrame) -> String {
     case .humans(let f):
         return "/humans/arr  \(f.width)x\(f.height) n=\(f.detections.count)" +
             (f.detections.first.map { d in String(format: " conf=%.2f box=(%.0f,%.0f %.0fx%.0f)", d.confidence, d.box.left, d.box.top, d.box.width, d.box.height) } ?? "")
+    case .contours(let f):
+        return "/contours/arr \(f.width)x\(f.height) n=\(f.detections.count)" +
+            " points=\(f.detections.reduce(0) { $0 + $1.points.count })"
+    case .horizon(let f):
+        return "/horizon     \(f.width)x\(f.height) n=\(f.detections.count)" +
+            (f.detections.first.map { d in String(format: " angle=%.1f° (%.0f,%.0f)→(%.0f,%.0f)", d.angleDegrees, d.start.x, d.start.y, d.end.x, d.end.y) } ?? "")
+    case .rectangles(let f):
+        return "/rectangles/arr \(f.width)x\(f.height) n=\(f.detections.count)" +
+            (f.detections.first.map { d in String(format: " conf=%.2f box=(%.0f,%.0f %.0fx%.0f)", d.confidence, d.box.left, d.box.top, d.box.width, d.box.height) } ?? "")
     }
 }
 

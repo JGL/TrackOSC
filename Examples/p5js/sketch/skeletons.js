@@ -82,6 +82,9 @@
     "/animalposes/arr": [172, 142, 104],
     "/humans/arr": [94, 92, 230],
     "/barcodes/arr": [191, 90, 242],
+    "/contours/arr": [230, 230, 230],
+    "/horizon": [255, 69, 58],
+    "/rectangles/arr": [64, 200, 224],
     guides: [128, 128, 128],
   };
 

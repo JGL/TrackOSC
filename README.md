@@ -217,8 +217,11 @@ click. Send to `127.0.0.1` to feed a receiver on the same Mac.
 3. Point the camera at a person: a skeleton appears on the sender's overlay
    and, live, on the receiver's canvas.
 4. Toggle detectors with the chips along the bottom (2D Body / 3D Body /
-   Hand / Face / Text / Animal / Animal Pose / Human / Barcode – the row
-   scrolls sideways on the iPhone). More detectors = lower frame rate;
+   Hand / Face / Text / Animal / Animal Pose / Human / Barcode / Contours /
+   Horizon / Rectangle – the row scrolls sideways on the iPhone). **Face**
+   sends the full 76-point landmark constellation (eyes, pupils, brows,
+   nose, lips, jaw) as well as the box with head angles and the jawline;
+   both overlays draw each feature as a line so you can see it all. More detectors = lower frame rate;
    2D Body + Hand + Face is the comfortable default. **3D Body** runs in its
    own lane at its own, lower rate so it never slows the other detectors;
    its rate is shown in Settings → Statistics. The status capsule shows
@@ -256,11 +259,12 @@ The shared package includes two CLI tools (run from `PoseioscShared/`):
 swift run poseiosc-testsend 127.0.0.1 9527
 ```
 
-sends synthetic animated frames of all twelve message types – point it at
+sends synthetic animated frames of all fifteen message types – point it at
 the receiver and you should see a walking stick figure, a waving hand, a
 face ring with box and jawline, a "HELLO" text box, a "Cat" box, a 3D
 figure two metres from the camera (switch the receiver to **3D**), a QR
-code, a quadruped skeleton, and a human box. Add `--landscape` to send
+code, a quadruped skeleton, a human box, two drifting outlines, a rocking
+horizon and a rectangle in perspective. Add `--landscape` to send
 landscape-oriented frames instead of portrait. Without Xcode,
 `python3 Examples/Python/trackosc_testsend.py` sends the same scene.
 
@@ -282,8 +286,9 @@ python3 Examples/Python/trackosc_play.py session.trackosc --loop
 
 [`Examples/`](Examples/README.md) holds a complete receiver for every
 TrackOSC message in eight environments – FLOSS starting points for modding
-and tinkering with no Apple toolchain required. Each parses all twelve
-messages, draws (or sonifies) them, and shows the same coordinate guides as
+and tinkering with no Apple toolchain required. Each parses the twelve
+messages up to v1.4 (the native, Processing, Python and p5.js receivers
+also draw the three v1.6 ones), draws (or sonifies) them, and shows the same coordinate guides as
 the native receiver; joint orders and edge lists are shared via
 [`Examples/SKELETONS.md`](Examples/SKELETONS.md).
 
@@ -325,15 +330,36 @@ to `127.0.0.1:9528`; that app can forward on to 9529, and so on. Forwarding
 re-sends every datagram unchanged, so nothing is lost or re-encoded. A
 sender can equally be pointed straight at any of the ports.
 
-### Presentation mode
+### Full screen
 
 The receiver-type apps are built to run in installations and on stage.
-**Presentation → Enter Presentation** (⌘⇧F) takes the window full screen
-with the controls, toolbar and cursor hidden, leaving only the stage –
-the visualiser, the spoken sentence, the rule LEDs. Esc brings everything
-back; ⌘⇧H hides or shows the controls without changing full screen; the
-menu also offers *Always on Top* when windowed and *Start in Presentation*
-so a Mac that boots into the app shows nothing else.
+**Full Screen → Enter Full Screen** (⌘⇧F) fills the screen with the stage
+alone – the visualiser, the spoken sentence, the rule LEDs – on a flat
+background with no title bar, toolbar, controls or cursor. Esc brings
+everything back; ⌘⇧H hides or shows the controls without leaving full
+screen; the menu also offers *Always on Top* when windowed and *Start in
+Full Screen* so a Mac that boots into the app shows nothing else, and a
+`--fullscreen` launch argument does the same for one launch:
+
+```bash
+open -a "TrackOSC Receiver" --args --fullscreen
+```
+
+The **background colour** is the colour well in the toolbar: black by
+default, but any colour, and it fills the whole window in full screen.
+
+### Several senders at once
+
+When more than one sender targets the same port – an iPhone and the
+Recorder playing a file back, say – the **Senders** toolbar popover decides
+who is heard. *Latest sender wins* (the default) gives the stream to
+whichever host most recently **started** sending, so pressing Play in the
+Recorder takes over from the phone, and the phone gets the stream back a
+second after playback stops. *All senders* mixes everything as it arrives
+(the pre-1.6 behaviour) and *Only one host* pins a single address; the
+popover lists the hosts heard in the last minute and the status panel
+counts what was ignored. Ignored datagrams are invisible to forwarding
+and recording too.
 
 ### TrackOSC Recorder
 
@@ -394,7 +420,7 @@ body, recognised text, code payloads, animal labels – and an **action**:
   Shortcuts Events; if that is refused, the `shortcuts://` URL scheme is
   used instead.
 - **Key press**: any key with modifiers, sent to the frontmost app – for
-  presentation clickers, games, video players. Needs Accessibility access
+  remote clickers, games, video players. Needs Accessibility access
   (the Outputs tab requests it).
 - **HTTP** GET or POST with templated URL and body – lights, OBS,
   Home Assistant, your own server.
@@ -643,6 +669,34 @@ people at distances where pose estimation gives up.
 Edge lists for drawing all four skeletons, and the colours the apps use,
 are in [`Examples/SKELETONS.md`](Examples/SKELETONS.md).
 
+### Contour, horizon and rectangle messages (TrackOSC addition, v1.6)
+
+Three more additive messages behind three chips at the end of the row,
+from Vision's `DetectContoursRequest`, `DetectHorizonRequest` and
+`DetectRectanglesRequest`. Same header, same pixel conventions.
+
+**`/contours/arr`** – per contour: `float` confidence, `int32` m, then m ×
+(`float` x, `float` y): a **closed** outline (draw it with the last point
+joined back to the first – unlike `/faces/contour`, which is open). Vision
+returns every edge it finds, nested holes included, walked outline-first;
+the sender simplifies each outline and caps a message at 64 contours and
+4,000 points so it fits one datagram. Detection runs on a 512-pixel copy of
+the frame, dark shapes on a light background.
+
+**`/horizon`** – n is 0 or 1; when 1: `float` confidence, `float` angle in
+degrees, then `float` x1, y1, x2, y2 – the horizon as a line through the
+frame's centre from the left edge to the right edge. A positive angle
+raises the right-hand end (one constant in the sender,
+`horizonPositiveRaisesRight`, should a device say otherwise). Point the
+camera at a real horizon or a tabletop edge to see it.
+
+**`/rectangles/arr`** – per rectangle: `float` confidence, `float` left,
+top, width, height, then 4 × (`float` x, `float` y) corners in the
+rectangle's own orientation (top-left, top-right, bottom-right,
+bottom-left), exactly like a barcode without the strings. Up to 16 per
+frame, at least a tenth of the frame in size, confidence 0.5 or better –
+screens, sheets of paper, picture frames, doors.
+
 ## Project layout
 
 ```
@@ -656,7 +710,7 @@ Sender/                iOS sender app shell (camera, rotation, UI)
 SenderMac/             macOS sender app shell (camera picker, rig rotation)
 ReceiverCore/          Shared by every receiver-type macOS app: UDP listener,
                        decoding, forwarding, port fall-forward, Bonjour, settings,
-                       presentation mode, window shell, presence/metrics analysis
+                       full screen, window shell, presence/metrics analysis
 Receiver/              macOS receiver (2D + 3D visualisers, log)
 Recorder/              macOS recorder/player (.trackosc files)
 Speaker/               macOS speaker (narration engine, AVSpeech, voice catalogue)

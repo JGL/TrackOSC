@@ -5,7 +5,7 @@ Browsers can't open UDP sockets, so this example has two halves:
 | Part | What it does |
 |---|---|
 | [`bridge/`](bridge/) | **trackosc-bridge**, a ~100-line Node program: listens for OSC on UDP 9527 and relays every message to browsers as JSON over WebSocket (`ws://localhost:8765`). It also serves the sketch on `http://localhost:8080`. |
-| [`sketch/`](sketch/) | A p5.js sketch drawing all twelve TrackOSC messages – mirroring the Processing reference sketch – plus [`trackosc-client.js`](sketch/trackosc-client.js), a dependency-free parser/client you can drop into any web page (p5 or not). |
+| [`sketch/`](sketch/) | A p5.js sketch drawing all fifteen TrackOSC messages – mirroring the Processing reference sketch – plus [`trackosc-client.js`](sketch/trackosc-client.js), a dependency-free parser/client you can drop into any web page (p5 or not). |
 
 ## Run
 

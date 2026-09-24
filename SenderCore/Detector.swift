@@ -20,6 +20,9 @@ enum Detector: String, CaseIterable, Identifiable, Sendable {
     case animalPoses
     case humans
     case barcodes
+    case contours
+    case horizon
+    case rectangles
 
     var id: String { rawValue }
 
@@ -35,6 +38,9 @@ enum Detector: String, CaseIterable, Identifiable, Sendable {
         case .animalPoses: "Animal Pose"
         case .humans: "Human"
         case .barcodes: "Barcode"
+        case .contours: "Contours"
+        case .horizon: "Horizon"
+        case .rectangles: "Rectangle"
         }
     }
 
@@ -50,6 +56,9 @@ enum Detector: String, CaseIterable, Identifiable, Sendable {
         case .animalPoses: .brown
         case .humans: .indigo
         case .barcodes: .purple
+        case .contours: .white
+        case .horizon: .red
+        case .rectangles: .teal
         }
     }
 
@@ -57,7 +66,7 @@ enum Detector: String, CaseIterable, Identifiable, Sendable {
     /// colours, white on the darker new ones.
     var chipTextColor: Color {
         switch self {
-        case .animalPoses, .humans, .barcodes: .white
+        case .animalPoses, .humans, .barcodes, .horizon: .white
         default: .black
         }
     }
@@ -83,6 +92,9 @@ enum Detector: String, CaseIterable, Identifiable, Sendable {
         case .animalPoses: "detectAnimalPoses"
         case .humans: "detectHumans"
         case .barcodes: "detectBarcodes"
+        case .contours: "detectContours"
+        case .horizon: "detectHorizon"
+        case .rectangles: "detectRectangles"
         }
     }
 

@@ -25,6 +25,9 @@ struct ReceiverSnapshot: Sendable {
     var unknownMessages: UInt64
     var cameraInfo: CameraInfo?
     var cameraInfoSeenAt: Date?
+    var ignoredMessages: UInt64
+    var activeHost: String?
+    var recentHosts: [String]
 }
 
 final class ReceiverService: Sendable {
@@ -39,6 +42,7 @@ final class ReceiverService: Sendable {
         var nextLogID: UInt64 = 0
         var cameraInfo: CameraInfo?
         var cameraInfoSeenAt: Date?
+        var ignoredMessages: UInt64 = 0
     }
 
     private struct Subscribers {
@@ -50,6 +54,7 @@ final class ReceiverService: Sendable {
     private let server = OSAllocatedUnfairLock<UDPDatagramServer?>(initialState: nil)
     private let taps = OSAllocatedUnfairLock<[ObjectIdentifier: any DatagramTap]>(initialState: [:])
     private let subscribers = OSAllocatedUnfairLock(initialState: Subscribers())
+    private let selector = OSAllocatedUnfairLock(initialState: SourceSelector())
     private let advertiser = BonjourAdvertiser()
 
     /// Only one log entry per kind per interval, so the log stays readable at 60 Hz.
@@ -82,6 +87,15 @@ final class ReceiverService: Sendable {
     func advertise(name: String, port: UInt16) throws -> String {
         try advertiser.start(name: name, port: port)
         return name
+    }
+
+    // MARK: - Source selection
+
+    func setSourcePolicy(_ policy: SourcePolicy, onlyHost: String) {
+        selector.withLock { s in
+            s.policy = policy
+            s.onlyHost = onlyHost
+        }
     }
 
     // MARK: - Taps and subscribers
@@ -124,6 +138,7 @@ final class ReceiverService: Sendable {
             }
             let entries = s.pendingLog
             s.pendingLog = []
+            let (activeHost, recentHosts) = selector.withLock { ($0.activeHost, $0.recentHosts(at: .now)) }
             return ReceiverSnapshot(
                 latest: s.latest,
                 rates: rates,
@@ -131,7 +146,10 @@ final class ReceiverService: Sendable {
                 totalMessages: s.totalMessages,
                 unknownMessages: s.unknownMessages,
                 cameraInfo: s.cameraInfo,
-                cameraInfoSeenAt: s.cameraInfoSeenAt
+                cameraInfoSeenAt: s.cameraInfoSeenAt,
+                ignoredMessages: s.ignoredMessages,
+                activeHost: activeHost,
+                recentHosts: recentHosts
             )
         }
     }
@@ -144,6 +162,12 @@ final class ReceiverService: Sendable {
     // MARK: - Pipeline
 
     private func handle(datagram: Data, from host: String, at instant: ContinuousClock.Instant) {
+        // Source selection comes first: an ignored host is invisible to
+        // taps (forwarding, recording) and to decoding alike.
+        guard selector.withLock({ $0.accepts(host: host, at: instant) }) else {
+            state.withLock { $0.ignoredMessages += 1 }
+            return
+        }
         let taps = taps.withLock { Array($0.values) }
         for tap in taps {
             tap.receive(datagram, from: host, at: instant)

@@ -26,7 +26,8 @@
   const CAMERA_INFO_STALE_MS = 2000;
   const KEYPOINT_COUNTS = { "/poses/arr": 17, "/hands/arr": 21, "/faces/arr": 76, "/animalposes/arr": 25 };
   const ALL_ADDRESSES = ["/camerainfo", "/poses/arr", "/hands/arr", "/faces/arr", "/faces/box", "/faces/contour",
-    "/texts/arr", "/animals/arr", "/poses3d/arr", "/barcodes/arr", "/animalposes/arr", "/humans/arr"];
+    "/texts/arr", "/animals/arr", "/poses3d/arr", "/barcodes/arr", "/animalposes/arr", "/humans/arr",
+    "/contours/arr", "/horizon", "/rectangles/arr"];
 
   /** The running-argument-cursor idiom: read values in wire order. */
   class Cursor {
@@ -77,9 +78,9 @@
         frame.detections.push({ confidence: cur.float(), box: cur.rect(), label: "human" });
       } else if (address === "/faces/box") {
         frame.detections.push({ confidence: cur.float(), box: cur.rect(), roll: cur.float(), yaw: cur.float(), pitch: cur.float() });
-      } else if (address === "/faces/contour") {
+      } else if (address === "/faces/contour" || address === "/contours/arr") {
         const confidence = cur.float();
-        const m = cur.count();  // varies per face – always loop on m
+        const m = cur.count();  // varies per contour – always loop on m
         const points = [];
         for (let j = 0; j < m; j++) points.push({ x: cur.float(), y: cur.float() });
         frame.detections.push({ confidence, points });
@@ -95,6 +96,15 @@
         const corners = [];
         for (let j = 0; j < 4; j++) corners.push({ x: cur.float(), y: cur.float() });
         frame.detections.push({ confidence, box, corners, symbology: cur.string(), payload: cur.string() });
+      } else if (address === "/rectangles/arr") {
+        const confidence = cur.float();
+        const box = cur.rect();
+        const corners = [];
+        for (let j = 0; j < 4; j++) corners.push({ x: cur.float(), y: cur.float() });
+        frame.detections.push({ confidence, box, corners });
+      } else if (address === "/horizon") {
+        frame.detections.push({ confidence: cur.float(), angle: cur.float(),
+          start: { x: cur.float(), y: cur.float() }, end: { x: cur.float(), y: cur.float() } });
       }
     }
     return frame;

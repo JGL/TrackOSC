@@ -279,6 +279,50 @@ func syntheticHuman(time t: Double) -> HumanDetection {
     )
 }
 
+/// Two drifting blobs' outlines, as the contour detector would report them.
+func syntheticContours(time t: Double) -> [ContourDetection] {
+    let w = Float(frameWidth), h = Float(frameHeight)
+    func blob(cx: Float, cy: Float, radius: Float, wobble: Float, phase: Float) -> ContourDetection {
+        let points = (0..<24).map { i -> WireXY in
+            let a = Float(i) / 24 * 2 * .pi
+            let r = radius * (1 + wobble * sinf(a * 3 + phase))
+            return WireXY(x: cx + cosf(a) * r, y: cy + sinf(a) * r)
+        }
+        return ContourDetection(confidence: 1, points: points)
+    }
+    let ft = Float(t)
+    return [
+        blob(cx: w * 0.22, cy: h * 0.42 + sinf(ft * 0.9) * 40, radius: 70, wobble: 0.15, phase: ft),
+        blob(cx: w * 0.8, cy: h * 0.32, radius: 45, wobble: 0.25, phase: -ft * 1.3)
+    ]
+}
+
+/// A horizon that slowly rocks about the frame's centre.
+func syntheticHorizon(time t: Double) -> HorizonDetection {
+    let w = Float(frameWidth), h = Float(frameHeight)
+    let angle = sinf(Float(t) * 0.5) * 8   // degrees
+    let cy = h * 0.5
+    let dy = tanf(angle * .pi / 180) * (w / 2)
+    return HorizonDetection(confidence: 0.95, angleDegrees: angle,
+                            start: WireXY(x: 0, y: cy - dy), end: WireXY(x: w, y: cy + dy))
+}
+
+/// A rectangle seen in perspective, sliding along the bottom of the frame.
+func syntheticRectangle(time t: Double) -> RectangleDetection {
+    let w = Float(frameWidth), h = Float(frameHeight)
+    let cx = w * 0.3 + sinf(Float(t) * 0.6) * w * 0.12, cy = h * 0.8
+    let corners = [
+        WireXY(x: cx - 90, y: cy - 40), WireXY(x: cx + 110, y: cy - 55),
+        WireXY(x: cx + 120, y: cy + 50), WireXY(x: cx - 100, y: cy + 40)
+    ]
+    let xs = corners.map(\.x), ys = corners.map(\.y)
+    return RectangleDetection(
+        confidence: 0.9,
+        box: WireRect(left: xs.min()!, top: ys.min()!, width: xs.max()! - xs.min()!, height: ys.max()! - ys.min()!),
+        corners: corners
+    )
+}
+
 let start = Date()
 while true {
     let t = Date().timeIntervalSince(start)
@@ -294,7 +338,10 @@ while true {
         WireCodec.encodePoses3D(DetectionFrame(width: frameWidth, height: frameHeight, detections: [syntheticPose3D(time: t)])),
         WireCodec.encodeBarcodes(DetectionFrame(width: frameWidth, height: frameHeight, detections: [syntheticBarcode(time: t)])),
         WireCodec.encodeAnimalPoses(DetectionFrame(width: frameWidth, height: frameHeight, detections: [syntheticAnimalPose(time: t)])),
-        WireCodec.encodeHumans(DetectionFrame(width: frameWidth, height: frameHeight, detections: [syntheticHuman(time: t)]))
+        WireCodec.encodeHumans(DetectionFrame(width: frameWidth, height: frameHeight, detections: [syntheticHuman(time: t)])),
+        WireCodec.encodeContours(DetectionFrame(width: frameWidth, height: frameHeight, detections: syntheticContours(time: t))),
+        WireCodec.encodeHorizon(DetectionFrame(width: frameWidth, height: frameHeight, detections: [syntheticHorizon(time: t)])),
+        WireCodec.encodeRectangles(DetectionFrame(width: frameWidth, height: frameHeight, detections: [syntheticRectangle(time: t)]))
     ]
     for message in messages {
         do {

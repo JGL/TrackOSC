@@ -4,9 +4,9 @@ Three small scripts and a parser package:
 
 | File | What it does |
 |---|---|
-| [`trackosc_receiver.py`](trackosc_receiver.py) | A pygame window drawing all twelve TrackOSC messages – skeletons, landmarks, boxes, barcode quads, the 3D skeleton (via its pixel projections) – with the same coordinate guides as the native receiver, plus a top-down minimap of the 3D poses. |
+| [`trackosc_receiver.py`](trackosc_receiver.py) | A pygame window drawing all fifteen TrackOSC messages – skeletons, landmarks, boxes, barcode quads, the 3D skeleton (via its pixel projections) – with the same coordinate guides as the native receiver, plus a top-down minimap of the 3D poses. |
 | [`trackosc_print.py`](trackosc_print.py) | Headless: one line per message. The smallest possible starting point for your own receiver. |
-| [`trackosc_testsend.py`](trackosc_testsend.py) | Sends a synthetic scene of all twelve messages at 30 fps – test any receiver in this repository without a camera or Xcode. |
+| [`trackosc_testsend.py`](trackosc_testsend.py) | Sends a synthetic scene of the twelve v1.4 messages at 30 fps – test any receiver in this repository without a camera or Xcode. |
 | [`trackosc_record.py`](trackosc_record.py) | Records a stream to a [`.trackosc` file](../RECORDING_FORMAT.md), standard library only. |
 | [`trackosc_play.py`](trackosc_play.py) | Plays a `.trackosc` file back to any receiver, with `--loop` and `--speed`. The same files as TrackOSC Recorder on macOS. |
 | [`trackosc/`](trackosc/) | `parse_message(address, args)` → dataclasses (`Keypoints`, `Box`, `FaceBox`, `Contour`, `Pose3D`, `Barcode`, `CameraInfo`), the joint orders / edge lists / colours, and `trackosc.recording` for `.trackosc` files. |

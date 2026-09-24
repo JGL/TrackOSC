@@ -1,11 +1,11 @@
 //
-//  PresentationController.swift
+//  FullScreenController.swift
 //  TrackOSC (ReceiverCore)
 //
-//  "Presentation" is the installation mode every receiver-type app shares:
-//  the window goes full screen, the controls and toolbar disappear, and the
-//  cursor hides after a moment of stillness, leaving only the stage. Esc, the
-//  menu item or the shortcut bring everything back.
+//  Full screen is the installation mode every receiver-type app shares:
+//  the window fills the screen in the stage's background colour with the
+//  title bar, toolbar, controls and cursor all gone, leaving only the
+//  content. Esc, the menu item or ⌘⇧F bring everything back.
 //
 
 import AppKit
@@ -13,11 +13,11 @@ import Observation
 import SwiftUI
 
 @Observable @MainActor
-final class PresentationController {
+final class FullScreenController {
     /// Controls, toolbar and status are hidden; only the stage is visible.
     private(set) var isGUIHidden = false
     /// The hosting window is in native full screen.
-    private(set) var isFullScreen = false
+    private(set) var isNativeFullScreen = false
     /// A small "press Esc" hint is showing over the stage.
     private(set) var isHintVisible = false
 
@@ -31,8 +31,10 @@ final class PresentationController {
     private var mouseMonitor: Any?
     private var observers: [NSObjectProtocol] = []
     private var hideTask: Task<Void, Never>?
+    private var background = NSColor.black
 
-    var isPresenting: Bool { isGUIHidden && isFullScreen }
+    /// Native full screen with the controls hidden: the installation mode.
+    var isInFullScreenMode: Bool { isGUIHidden && isNativeFullScreen }
 
     /// Called once the SwiftUI content has a window (see WindowAccessor).
     func attach(window: NSWindow) {
@@ -40,60 +42,94 @@ final class PresentationController {
         self.window = window
         window.collectionBehavior.insert(.fullScreenPrimary)
         window.acceptsMouseMovedEvents = true
+        window.backgroundColor = background
         let center = NotificationCenter.default
         observers.forEach(center.removeObserver)
         observers = [
             center.addObserver(forName: NSWindow.didEnterFullScreenNotification, object: window, queue: .main) { [weak self] _ in
-                Task { @MainActor in self?.isFullScreen = true }
+                Task { @MainActor in
+                    self?.isNativeFullScreen = true
+                    self?.applyChrome()
+                }
             },
             center.addObserver(forName: NSWindow.didExitFullScreenNotification, object: window, queue: .main) { [weak self] _ in
                 Task { @MainActor in
-                    self?.isFullScreen = false
+                    self?.isNativeFullScreen = false
+                    self?.applyChrome()
                     self?.applyWindowLevel()
                 }
             }
         ]
-        isFullScreen = window.styleMask.contains(.fullScreen)
+        isNativeFullScreen = window.styleMask.contains(.fullScreen)
         installMonitors()
         applyWindowLevel()
+        applyChrome()
     }
 
-    func enterPresentation() {
+    /// The window's own background, so nothing but the stage colour shows
+    /// around or behind the content.
+    func setBackground(_ color: NSColor) {
+        background = color
+        window?.backgroundColor = color
+    }
+
+    func enterFullScreen() {
         isGUIHidden = true
+        applyChrome()
         if let window, !window.styleMask.contains(.fullScreen) {
             window.toggleFullScreen(nil)
         }
         showHintThenHideCursor()
     }
 
-    func exitPresentation() {
+    func exitFullScreen() {
         isGUIHidden = false
         hideTask?.cancel()
         isHintVisible = false
         NSCursor.setHiddenUntilMouseMoves(false)
+        applyChrome()
         if let window, window.styleMask.contains(.fullScreen) {
             window.toggleFullScreen(nil)
         }
     }
 
-    func togglePresentation() {
-        if isPresenting { exitPresentation() } else { enterPresentation() }
+    func toggleFullScreen() {
+        if isInFullScreenMode { exitFullScreen() } else { enterFullScreen() }
     }
 
-    /// Hide or show the controls without touching full screen.
+    /// Hide or show the controls without touching native full screen.
     func toggleGUI() {
         isGUIHidden.toggle()
+        applyChrome()
         if isGUIHidden { showHintThenHideCursor() } else {
             hideTask?.cancel()
             isHintVisible = false
         }
     }
 
-    func toggleFullScreen() {
+    func toggleNativeFullScreen() {
         window?.toggleFullScreen(nil)
     }
 
     // MARK: - Private
+
+    /// With the controls hidden, the title bar and toolbar disappear and the
+    /// content extends under where they were, so the window is one flat
+    /// colour edge to edge.
+    private func applyChrome() {
+        guard let window else { return }
+        if isGUIHidden {
+            window.styleMask.insert(.fullSizeContentView)
+            window.titlebarAppearsTransparent = true
+            window.titleVisibility = .hidden
+            window.toolbar?.isVisible = false
+        } else {
+            window.styleMask.remove(.fullSizeContentView)
+            window.titlebarAppearsTransparent = false
+            window.titleVisibility = .visible
+            window.toolbar?.isVisible = true
+        }
+    }
 
     private func showHintThenHideCursor() {
         isHintVisible = true
@@ -111,7 +147,7 @@ final class PresentationController {
         if keyMonitor == nil {
             keyMonitor = NSEvent.addLocalMonitorForEvents(matching: .keyDown) { [weak self] event in
                 guard let self, event.keyCode == 53, isGUIHidden else { return event }   // Esc
-                exitPresentation()
+                exitFullScreen()
                 return nil
             }
         }
@@ -131,7 +167,7 @@ final class PresentationController {
     }
 }
 
-/// Hands the hosting NSWindow to the presentation controller.
+/// Hands the hosting NSWindow to the full-screen controller.
 struct WindowAccessor: NSViewRepresentable {
     let onWindow: @MainActor (NSWindow) -> Void
 

@@ -13,7 +13,7 @@ struct ContentView: View {
         ReceiverWindow(model: store.model) {
             ZStack(alignment: .bottom) {
                 VisualizerView(model: store.model)
-                if !store.model.presentation.isGUIHidden {
+                if !store.model.fullScreen.isGUIHidden {
                     TransportStrip(store: store)
                 }
             }

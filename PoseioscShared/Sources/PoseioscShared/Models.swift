@@ -227,6 +227,47 @@ public struct BarcodeDetection: Sendable, Equatable {
     }
 }
 
+/// One detected edge contour (/contours/arr): a closed polyline in pixels.
+public struct ContourDetection: Sendable, Equatable {
+    public var confidence: Float
+    public var points: [WireXY]
+
+    public init(confidence: Float, points: [WireXY]) {
+        self.confidence = confidence
+        self.points = points
+    }
+}
+
+/// The horizon (/horizon): its angle in degrees and the line through the
+/// frame's centre at that angle, as two endpoints in pixels.
+public struct HorizonDetection: Sendable, Equatable {
+    public var confidence: Float
+    public var angleDegrees: Float
+    public var start: WireXY
+    public var end: WireXY
+
+    public init(confidence: Float, angleDegrees: Float, start: WireXY, end: WireXY) {
+        self.confidence = confidence
+        self.angleDegrees = angleDegrees
+        self.start = start
+        self.end = end
+    }
+}
+
+/// A detected rectangle (/rectangles/arr): axis-aligned box plus the four
+/// corners of the quadrilateral in its own orientation (TL, TR, BR, BL).
+public struct RectangleDetection: Sendable, Equatable {
+    public var confidence: Float
+    public var box: WireRect
+    public var corners: [WireXY]
+
+    public init(confidence: Float, box: WireRect, corners: [WireXY]) {
+        self.confidence = confidence
+        self.box = box
+        self.corners = corners
+    }
+}
+
 /// A full frame of detections of one kind, with the camera frame dimensions
 /// (oriented pixels) that all coordinates are expressed in.
 public struct DetectionFrame<Detection: Sendable & Equatable>: Sendable, Equatable {
@@ -287,6 +328,9 @@ public enum DecodedFrame: Sendable {
     case barcodes(DetectionFrame<BarcodeDetection>)
     case animalPoses(DetectionFrame<AnimalPoseDetection>)
     case humans(DetectionFrame<HumanDetection>)
+    case contours(DetectionFrame<ContourDetection>)
+    case horizon(DetectionFrame<HorizonDetection>)
+    case rectangles(DetectionFrame<RectangleDetection>)
 
     /// The OSC address this frame kind corresponds to.
     public var address: String {
@@ -303,6 +347,9 @@ public enum DecodedFrame: Sendable {
         case .barcodes: OSCAddress.barcodes
         case .animalPoses: OSCAddress.animalPoses
         case .humans: OSCAddress.humans
+        case .contours: OSCAddress.contours
+        case .horizon: OSCAddress.horizon
+        case .rectangles: OSCAddress.rectangles
         }
     }
 }

@@ -1,7 +1,7 @@
 # TrackOSC receiver examples
 
 Every folder here is a complete receiver for TrackOSC's OSC stream in a
-different environment: it parses **all twelve messages** (the five
+different environment: it parses **all twelve v1.4 messages** (the five
 VisionOSC-compatible ones plus TrackOSC's additive `/camerainfo`,
 `/faces/box`, `/faces/contour`, `/poses3d/arr`, `/barcodes/arr`,
 `/animalposes/arr` and `/humans/arr`), draws or sonifies them, and is meant
@@ -23,6 +23,13 @@ because those tools aren't installed on the development machine. If you run
 one, please open an issue or pull request saying which version you used and
 what (if anything) needed changing – that is the most useful contribution
 this folder can get.
+
+> **v1.6 messages.** `/contours/arr`, `/horizon` and `/rectangles/arr`
+> (added 2026-09-24) are parsed and drawn by the native receiver and the
+> Processing, Python and p5.js examples. The TouchDesigner, Max/MSP, Pure
+> Data, openFrameworks and SuperCollider examples ignore them (unknown
+> addresses are skipped, nothing breaks); their layouts are in the README's
+> wire-format section if you want to add them.
 
 ## Testing without a camera
 

@@ -1,6 +1,6 @@
 //
 //  VisualizerView.swift
-//  Poseiosc Receiver (macOS)
+//  TrackOSC (ReceiverCore)
 //
 //  Draws the most recent frame of each kind on a canvas, letterboxed to the
 //  frame dimensions carried in the OSC messages. Uses the shared Skeleton edge
@@ -16,7 +16,7 @@ struct VisualizerView: View {
     var body: some View {
         TimelineView(.animation(minimumInterval: 1.0 / 30.0)) { _ in
             Canvas { context, size in
-                context.fill(Path(CGRect(origin: .zero, size: size)), with: .color(.black))
+                context.fill(Path(CGRect(origin: .zero, size: size)), with: .color(model.settings.stageBackground))
 
                 let now = Date.now
                 let fresh = model.latest.filter {
@@ -63,7 +63,12 @@ struct VisualizerView: View {
                     )
                 }
 
-                for (kind, frame) in fresh {
+                // Contours and the horizon go underneath everything else.
+                let ordered = fresh.sorted { a, b in
+                    let order: [FrameKind: Int] = [.contours: 0, .horizon: 1, .rectangles: 2]
+                    return (order[a.key] ?? 9) < (order[b.key] ?? 9)
+                }
+                for (kind, frame) in ordered {
                     switch frame.decoded {
                     case .poses(let f):
                         for pose in f.detections {
@@ -81,13 +86,7 @@ struct VisualizerView: View {
                         }
                     case .faces(let f):
                         for face in f.detections {
-                            for point in face.points where point.confidence > 0 {
-                                let p = mapPoint(point)
-                                context.fill(
-                                    Path(ellipseIn: CGRect(x: p.x - 1.5, y: p.y - 1.5, width: 3, height: 3)),
-                                    with: .color(kind.color)
-                                )
-                            }
+                            drawFaceLandmarks(context: context, points: face.points, color: kind.color, map: mapPoint)
                         }
                     case .faceBoxes(let f):
                         for faceBox in f.detections {
@@ -160,6 +159,45 @@ struct VisualizerView: View {
                             let label = Text("\(barcode.symbology) \(barcode.payload.prefix(40))")
                                 .font(.footnote.weight(.semibold).monospaced())
                                 .foregroundStyle(kind.color)
+                            context.draw(label, at: CGPoint(x: top.x, y: max(top.y - 10, 8)), anchor: .bottom)
+                        }
+                    case .contours(let f):
+                        for contour in f.detections where contour.points.count >= 2 {
+                            var path = Path()
+                            path.move(to: mapXY(contour.points[0]))
+                            for point in contour.points.dropFirst() { path.addLine(to: mapXY(point)) }
+                            path.closeSubpath()
+                            context.stroke(path, with: .color(kind.color.opacity(0.8)), lineWidth: 1.5)
+                        }
+                    case .horizon(let f):
+                        for horizon in f.detections {
+                            var path = Path()
+                            path.move(to: mapXY(horizon.start))
+                            path.addLine(to: mapXY(horizon.end))
+                            context.stroke(path, with: .color(kind.color), style: StrokeStyle(lineWidth: 2, dash: [10, 6]))
+                            let mid = mapXY(WireXY(x: (horizon.start.x + horizon.end.x) / 2, y: (horizon.start.y + horizon.end.y) / 2))
+                            let label = Text(String(format: "horizon %.1f°", horizon.angleDegrees))
+                                .font(.footnote.weight(.semibold).monospaced())
+                                .foregroundStyle(kind.color)
+                            context.draw(label, at: CGPoint(x: mid.x, y: mid.y - 8), anchor: .bottom)
+                        }
+                    case .rectangles(let f):
+                        for rectangle in f.detections {
+                            let corners = rectangle.corners.map(mapXY)
+                            guard corners.count == 4 else { continue }
+                            var path = Path()
+                            path.move(to: corners[0])
+                            for corner in corners.dropFirst() { path.addLine(to: corner) }
+                            path.closeSubpath()
+                            context.stroke(path, with: .color(kind.color), lineWidth: 2)
+                            context.fill(
+                                Path(ellipseIn: CGRect(x: corners[0].x - 4, y: corners[0].y - 4, width: 8, height: 8)),
+                                with: .color(kind.color)
+                            )
+                            let label = Text("rect \(formatted(rectangle.confidence))")
+                                .font(.footnote.weight(.semibold).monospaced())
+                                .foregroundStyle(kind.color)
+                            let top = corners.min { $0.y < $1.y } ?? corners[0]
                             context.draw(label, at: CGPoint(x: top.x, y: max(top.y - 10, 8)), anchor: .bottom)
                         }
                     case .cameraInfo:
@@ -262,6 +300,27 @@ struct VisualizerView: View {
         }
     }
 
+    /// Every landmark as a dot, and each feature (eyes, brows, nose, lips,
+    /// jaw) joined into a line so the full constellation reads at a glance.
+    private func drawFaceLandmarks(context: GraphicsContext, points: [WirePoint], color: Color, map: (WirePoint) -> CGPoint) {
+        var lines = Path()
+        for region in FaceLandmarks.regions where region.range.upperBound <= points.count {
+            let visible = points[region.range].filter { $0.confidence > 0 }
+            guard visible.count >= 2 else { continue }
+            lines.move(to: map(visible[0]))
+            for point in visible.dropFirst() { lines.addLine(to: map(point)) }
+            if region.isClosed { lines.closeSubpath() }
+        }
+        context.stroke(lines, with: .color(color.opacity(0.7)), lineWidth: 1)
+        for point in points where point.confidence > 0 {
+            let p = map(point)
+            context.fill(
+                Path(ellipseIn: CGRect(x: p.x - 1.5, y: p.y - 1.5, width: 3, height: 3)),
+                with: .color(color)
+            )
+        }
+    }
+
     private func drawLabeledBox(context: GraphicsContext, rect: CGRect, label: String, color: Color) {
         context.stroke(Path(rect), with: .color(color), lineWidth: 2)
         let text = Text(label)
@@ -287,6 +346,9 @@ struct VisualizerView: View {
         case .animalPoses(let f): (f.width, f.height)
         case .humans(let f): (f.width, f.height)
         case .barcodes(let f): (f.width, f.height)
+        case .contours(let f): (f.width, f.height)
+        case .horizon(let f): (f.width, f.height)
+        case .rectangles(let f): (f.width, f.height)
         case .cameraInfo(let info): (info.width, info.height)
         }
     }

@@ -588,6 +588,61 @@ v1.7 Synth, Costumes; v1.8 3D Costumes). Built on `feature/v1.5`.
   (⌘⇧F, Esc), Shortcuts and key-press actions (permission prompts), the
   Local Network prompt for the debug-signed builds.
 
+## v1.6 – Full screen, more Vision detectors, sender selection (2026-09-24)
+
+Joel's feedback after trying v1.5: (1) full screen still showed the dark
+grey title bar – call it *full screen* rather than *presentation*
+everywhere, make it a flat colour with only the content, and let the
+colour be chosen; (2) make sure both senders track full facial features;
+(3) add the other Vision requests worth having – contours, horizon,
+rectangles – at the end of the chip row; (4) the Recorder's playback was
+interfered with by the live iPhone, so live messages should be ignorable
+during playback; (5) Swift 6 actor errors in the Router's RuleStore.
+
+- **Full screen**: `PresentationController` became `FullScreenController`
+  (menu *Full Screen*, `startInFullScreen`, the old defaults key still
+  read). The grey band was the window's title-bar area surviving native
+  full screen; with the controls hidden the window now gets
+  `.fullSizeContentView`, a transparent hidden title bar and a hidden
+  toolbar, and its `backgroundColor` follows the stage colour, so the
+  screen is one flat colour with the content on top. Verified by sampling
+  the corners and top band of a full-screen capture: all (0,0,0). A
+  `--fullscreen` launch argument was added because the sandboxed
+  preferences file cannot be written from a shell while testing.
+- **Stage background** is a `Color` in `ReceiverSettings` (stored as sRGB
+  components), set from a colour well in the toolbar; every stage
+  (visualiser, Speaker, Router) fills with it.
+- **Face landmarks** were already the full 76-point constellation from
+  `DetectFaceLandmarksRequest`; what was missing was visibility. Both
+  overlays now join each `FaceLandmarks` region (eyes, brows, lips, nose,
+  jaw) into lines. If a region draws wrongly on a real face, the index
+  table in `FaceLandmarks.swift` is the one place to fix.
+- **Three detectors and messages** (`/contours/arr`, `/horizon`,
+  `/rectangles/arr`), additive like v1.3/v1.4: contours reuse the
+  count-prefixed layout of `/faces/contour` but are closed; the sender walks
+  Vision's contour tree depth-first, simplifies with
+  `polygonApproximation(epsilon: 0.004)` and caps 64 contours / 4,000 points
+  per message (a `header()` helper that clamps to 32 detections had to be
+  bypassed); the horizon is an angle plus a centre line with a single sign
+  constant; rectangles mirror barcodes without strings. Modern-API detail:
+  `ContoursObservation` exposes `topLevelContours` and each
+  `ContoursObservation.Contour` its `childContours`; there is no
+  `contour(at:)`. 60 package tests, 20 Python tests, 14 p5.js tests.
+- **Sender selection** (`SourcePolicy`, `SourceSelector` in ReceiverCore,
+  applied before taps so forwarding and recording follow it): *latest
+  sender wins* by default – a host that starts sending after a second of
+  silence takes the stream, and the previous host gets it back a second
+  after the new one stops – plus *all* (the old behaviour) and *only one
+  host*. Verified with two `poseiosc-testsend` instances, one via
+  127.0.0.1 and one via the Mac's LAN address: the second took over, the
+  first resumed when it stopped, and the ignored count climbed meanwhile.
+- The Router's `RuleStore` panel helpers are `@MainActor`. The Recorder's
+  "Invalid view geometry" message could not be reproduced from a shell
+  launch; the "DetachedSignatures" line is macOS noise for ad-hoc-signed
+  debug builds.
+- Versions to 1.6.0 (build 11); the iOS sender changes, so this release
+  needs an App Store upload (em-dash check first).
+
 ## Verification record (2026-07-28)
 
 - `swift test` in `PoseioscShared`: 18 tests green, including round-trips for

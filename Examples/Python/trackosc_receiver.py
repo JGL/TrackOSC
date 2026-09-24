@@ -16,7 +16,7 @@ from pythonosc.dispatcher import Dispatcher
 from pythonosc.osc_server import ThreadingOSCUDPServer
 
 from trackosc import (ANIMAL_EDGES, BODY_EDGES, COLOURS, HAND_EDGES, POSE3D_EDGES,
-                      Barcode, Box, CameraInfo, Contour, FaceBox, Keypoints, Pose3D,
+                      Barcode, Box, CameraInfo, Contour, FaceBox, Horizon, Keypoints, Pose3D, Rectangle,
                       parse_message, visible)
 
 STALE_S = 0.5
@@ -174,8 +174,19 @@ def main() -> None:
                                     (pts[0][0] + 8, pts[0][1] - 18))
                     elif isinstance(d, FaceBox):
                         draw_box(screen, font, d.box, None, colour, sc, ox, oy)
-                    elif isinstance(d, Contour) and d.points:
-                        pygame.draw.lines(screen, colour, False, [(ox + x * sc, oy + y * sc) for x, y in d.points], 2)
+                    elif isinstance(d, Contour) and len(d.points) >= 2:
+                        # /faces/contour is an OPEN jawline; /contours/arr outlines are CLOSED.
+                        closed = address == "/contours/arr"
+                        pygame.draw.lines(screen, colour, closed, [(ox + x * sc, oy + y * sc) for x, y in d.points], 2 if not closed else 1)
+                    elif isinstance(d, Horizon):
+                        a = (ox + d.start[0] * sc, oy + d.start[1] * sc)
+                        b = (ox + d.end[0] * sc, oy + d.end[1] * sc)
+                        pygame.draw.line(screen, colour, a, b, 2)
+                        screen.blit(font.render(f"horizon {d.angle:.1f}°", True, colour), ((a[0] + b[0]) / 2, (a[1] + b[1]) / 2 - 18))
+                    elif isinstance(d, Rectangle):
+                        pts = [(ox + x * sc, oy + y * sc) for x, y in d.corners]
+                        pygame.draw.lines(screen, colour, True, pts, 2)
+                        pygame.draw.circle(screen, colour, pts[0], 4)
                     elif isinstance(d, Barcode):
                         pts = [(ox + x * sc, oy + y * sc) for x, y in d.corners]
                         pygame.draw.lines(screen, colour, True, pts, 2)
