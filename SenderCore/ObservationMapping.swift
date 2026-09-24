@@ -196,23 +196,22 @@ enum ObservationMapping {
         let frameSize = CGSize(width: CGFloat(width), height: CGFloat(height))
 
         let landmarkDetections = capped.compactMap { observation -> FaceDetection? in
-            guard let allPoints = observation.landmarks?.allPoints else { return nil }
-
-            // Don't assume anything about the landmarks' normalization basis
-            // (it is NOT documented in the public interface): let Vision
-            // itself convert to image pixels, requesting the wire format's
-            // upper-left origin directly.
-            let imagePoints = allPoints.pointsInImageCoordinates(frameSize, origin: .upperLeft)
-            guard imagePoints.count == WireCounts.facePoints else { return nil }
-
-            let precisions = allPoints.precisionEstimatesPerPoint
-            let points = imagePoints.enumerated().map { index, point in
-                WirePoint(
-                    x: Float(point.x),
-                    y: Float(point.y),
-                    confidence: precisions.flatMap { index < $0.count ? Float($0[index]) : nil } ?? observation.confidence
-                )
+            guard let landmarks = observation.landmarks else { return nil }
+            // Assemble the wire's 76 points from the named regions in the
+            // documented order (FaceLandmarks.swift), converting each with
+            // Vision's own image-coordinate mapping. This no longer depends
+            // on allPoints' order or count, and a region that comes back with
+            // a different number of points is resampled to the expected one.
+            var points: [WirePoint] = []
+            points.reserveCapacity(WireCounts.facePoints)
+            for (region, expected) in FaceLandmarks.assemblyOrder(landmarks) {
+                let imagePoints = region?.pointsInImageCoordinates(frameSize, origin: .upperLeft) ?? []
+                let resampled = resample(imagePoints, to: expected)
+                // Every point carries the face's confidence: a detected face
+                // has all 76 landmarks, so none is "missing".
+                points += resampled.map { WirePoint(x: Float($0.x), y: Float($0.y), confidence: observation.confidence) }
             }
+            guard points.count == WireCounts.facePoints else { return nil }
             return FaceDetection(confidence: observation.confidence, points: points)
         }
 
@@ -337,6 +336,23 @@ enum ObservationMapping {
             )
         }
         return DetectionFrame(width: width, height: height, detections: Array(detections))
+    }
+
+    /// Linear resampling of a polyline to a fixed point count; an empty
+    /// region becomes that many points at the origin with the face's
+    /// confidence (a receiver can still draw the rest of the face).
+    private static func resample(_ points: [CGPoint], to count: Int) -> [CGPoint] {
+        guard count > 0 else { return [] }
+        guard !points.isEmpty else { return Array(repeating: .zero, count: count) }
+        guard points.count != count else { return points }
+        guard points.count > 1 else { return Array(repeating: points[0], count: count) }
+        return (0..<count).map { i in
+            let t = Double(i) / Double(count - 1) * Double(points.count - 1)
+            let a = Int(t.rounded(.down)), b = min(a + 1, points.count - 1)
+            let f = t - Double(a)
+            return CGPoint(x: points[a].x + (points[b].x - points[a].x) * f,
+                           y: points[a].y + (points[b].y - points[a].y) * f)
+        }
     }
 
     // MARK: - Contours, horizon, rectangles (v1.6)

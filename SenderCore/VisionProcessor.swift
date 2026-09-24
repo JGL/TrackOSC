@@ -114,7 +114,7 @@ actor VisionProcessor {
         // interleave, so enabled requests execute concurrently.
         async let poses = cfg.isEnabled(.poses) ? runBody(frame) : nil
         async let hands = cfg.isEnabled(.hands) ? runHands(frame, maxHands: cfg.maxHands) : nil
-        async let faces = cfg.isEnabled(.faces) ? runFaces(frame) : nil
+        async let faces = (cfg.isEnabled(.faces) || cfg.isEnabled(.faceLandmarks)) ? runFaces(frame) : nil
         async let texts = cfg.isEnabled(.texts) ? runTexts(frame) : nil
         async let animals = cfg.isEnabled(.animals) ? runAnimals(frame) : nil
         async let animalPoses = cfg.isEnabled(.animalPoses) ? runAnimalPoses(frame) : nil
@@ -133,12 +133,18 @@ actor VisionProcessor {
             sender.send(WireCodec.encodeHands(result))
         }
         if let result = await faces {
-            snapshot.faces = result.landmarks.detections
-            snapshot.faceBoxes = result.boxes.detections
-            snapshot.faceContours = result.contours.detections
-            sender.send(WireCodec.encodeFaces(result.landmarks))
-            sender.send(WireCodec.encodeFaceBoxes(result.boxes))
-            sender.send(WireCodec.encodeFaceContours(result.contours))
+            // One Vision request serves two chips: Face = box, angles and
+            // jawline; Face Landmarks = the 76-point constellation.
+            if cfg.isEnabled(.faceLandmarks) {
+                snapshot.faces = result.landmarks.detections
+                sender.send(WireCodec.encodeFaces(result.landmarks))
+            }
+            if cfg.isEnabled(.faces) {
+                snapshot.faceBoxes = result.boxes.detections
+                snapshot.faceContours = result.contours.detections
+                sender.send(WireCodec.encodeFaceBoxes(result.boxes))
+                sender.send(WireCodec.encodeFaceContours(result.contours))
+            }
         }
         if let result = await texts {
             snapshot.texts = result.detections
@@ -241,9 +247,9 @@ actor VisionProcessor {
     }
 
     private func runFaces(_ frame: FrameBox) async -> ObservationMapping.FaceFrames? {
-        // Revision 3 (the only revision of the modern API) produces the
-        // 76-point constellation VisionOSC expects.
-        let request = DetectFaceLandmarksRequest()
+        // Revision 3 produces the 76-point constellation VisionOSC expects;
+        // pin it so a newer default revision cannot change the wire format.
+        let request = DetectFaceLandmarksRequest(.revision3)
         guard let observations = try? await request.perform(
             on: frame.pixelBuffer, orientation: frame.orientation
         ) else { return nil }

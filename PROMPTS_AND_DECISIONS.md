@@ -640,6 +640,18 @@ during playback; (5) Swift 6 actor errors in the Router's RuleStore.
   "Invalid view geometry" message could not be reproduced from a shell
   launch; the "DetachedSignatures" line is macOS noise for ad-hoc-signed
   debug builds.
+- **Face Landmarks chip** (Joel, after testing on both devices: no
+  landmarks appeared at all). The mapper had two fragilities: it relied
+  on `allPoints` having exactly 76 entries in Vision's order, and it used
+  each point's *precision estimate* as its confidence, so zero estimates
+  would hide every landmark while the box and jawline still worked. It now
+  assembles the 76 points from the named regions in the documented order
+  (`FaceLandmarks.assemblyOrder`), resampling any region with an
+  unexpected count, and gives every point the face's confidence; the
+  request pins revision 3. Per Joel's suggestion the row gains a **Face
+  Landmarks** chip next to **Face**: Face = box, angles and jawline; Face
+  Landmarks = `/faces/arr`; one Vision request serves both; both on by
+  default.
 - Versions to 1.6.0 (build 11); the iOS sender changes, so this release
   needs an App Store upload (em-dash check first).
 

@@ -217,11 +217,12 @@ click. Send to `127.0.0.1` to feed a receiver on the same Mac.
 3. Point the camera at a person: a skeleton appears on the sender's overlay
    and, live, on the receiver's canvas.
 4. Toggle detectors with the chips along the bottom (2D Body / 3D Body /
-   Hand / Face / Text / Animal / Animal Pose / Human / Barcode / Contours /
-   Horizon / Rectangle – the row scrolls sideways on the iPhone). **Face**
-   sends the full 76-point landmark constellation (eyes, pupils, brows,
-   nose, lips, jaw) as well as the box with head angles and the jawline;
-   both overlays draw each feature as a line so you can see it all. More detectors = lower frame rate;
+   Hand / Face / Face Landmarks / Text / Animal / Animal Pose / Human /
+   Barcode / Contours / Horizon / Rectangle – the row scrolls sideways on
+   the iPhone). **Face** sends the box with head angles and the jawline;
+   **Face Landmarks** sends the full 76-point constellation (eyes, pupils,
+   brows, nose, lips, jaw) as `/faces/arr`, drawn feature by feature on
+   both overlays. One Vision request serves both chips. More detectors = lower frame rate;
    2D Body + Hand + Face is the comfortable default. **3D Body** runs in its
    own lane at its own, lower rate so it never slows the other detectors;
    its rate is shown in Settings → Statistics. The status capsule shows

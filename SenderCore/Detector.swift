@@ -15,6 +15,7 @@ enum Detector: String, CaseIterable, Identifiable, Sendable {
     case poses3D
     case hands
     case faces
+    case faceLandmarks
     case texts
     case animals
     case animalPoses
@@ -33,6 +34,7 @@ enum Detector: String, CaseIterable, Identifiable, Sendable {
         case .poses3D: "3D Body"
         case .hands: "Hand"
         case .faces: "Face"
+        case .faceLandmarks: "Face Landmarks"
         case .texts: "Text"
         case .animals: "Animal"
         case .animalPoses: "Animal Pose"
@@ -51,6 +53,7 @@ enum Detector: String, CaseIterable, Identifiable, Sendable {
         case .poses3D: .mint
         case .hands: .orange
         case .faces: .cyan
+        case .faceLandmarks: .blue
         case .texts: .yellow
         case .animals: .pink
         case .animalPoses: .brown
@@ -66,7 +69,7 @@ enum Detector: String, CaseIterable, Identifiable, Sendable {
     /// colours, white on the darker new ones.
     var chipTextColor: Color {
         switch self {
-        case .animalPoses, .humans, .barcodes, .horizon: .white
+        case .animalPoses, .humans, .barcodes, .horizon, .faceLandmarks: .white
         default: .black
         }
     }
@@ -74,7 +77,7 @@ enum Detector: String, CaseIterable, Identifiable, Sendable {
     /// VisionOSC's defaults: body, hand and face on; everything else off.
     var isOnByDefault: Bool {
         switch self {
-        case .poses, .hands, .faces: true
+        case .poses, .hands, .faces, .faceLandmarks: true
         default: false
         }
     }
@@ -86,6 +89,7 @@ enum Detector: String, CaseIterable, Identifiable, Sendable {
         case .poses: "detectPoses"
         case .hands: "detectHands"
         case .faces: "detectFaces"
+        case .faceLandmarks: "detectFaceLandmarks"
         case .texts: "detectTexts"
         case .animals: "detectAnimals"
         case .poses3D: "detectPoses3D"
