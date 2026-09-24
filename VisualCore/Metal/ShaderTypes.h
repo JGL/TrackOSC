@@ -1,0 +1,82 @@
+//
+//  ShaderTypes.h
+//  TrackOSC (VisualCore)
+//
+//  Shared between Swift (bridging header) and Metal: the scene as the GPU
+//  sees it. Coordinates are the scene's normalised 0–1 space (x across,
+//  y down); shaders map them into the view with sceneOrigin/sceneSize.
+//
+
+#ifndef ShaderTypes_h
+#define ShaderTypes_h
+
+#include <simd/simd.h>
+
+#define VC_MAX_PERSONS 8
+#define VC_BODY_JOINTS 17
+#define VC_MAX_HANDS 8
+#define VC_HAND_JOINTS 21
+#define VC_MAX_FACES 4
+#define VC_MAX_PARAMS 16
+#define VC_MAX_PALETTE 8
+
+typedef struct {
+    vector_float2 joints[VC_BODY_JOINTS];
+    float visible[VC_BODY_JOINTS];
+    vector_float2 velocities[VC_BODY_JOINTS];
+    vector_float2 centroid;
+    vector_float2 boxMin;
+    vector_float2 boxMax;
+    float id;
+    float age;
+    float confidence;
+    float speed;
+} GPUPerson;
+
+typedef struct {
+    vector_float2 joints[VC_HAND_JOINTS];
+    float visible[VC_HAND_JOINTS];
+    vector_float2 centre;
+    float openness;
+    float isLeft;     // 1 left, 0 right, -1 unknown
+    float person;     // owning person id, or -1
+    float _pad;
+} GPUHand;
+
+typedef struct {
+    vector_float2 centre;
+    vector_float2 size;
+    float yaw;
+    float pitch;
+    float roll;
+    float mouth;
+    float person;
+    float _pad[3];
+} GPUFace;
+
+typedef struct {
+    vector_float2 resolution;    // pixels
+    vector_float2 sceneOrigin;   // uv of the scene's top-left
+    vector_float2 sceneSize;     // uv extent of the scene
+    float time;
+    float dt;
+    float aspect;                // view width / height
+    float presence;
+    float activity;
+    float isAttract;
+    int personCount;
+    int handCount;
+    int faceCount;
+    int frame;
+    float params[VC_MAX_PARAMS];
+    vector_float4 palette[VC_MAX_PALETTE];
+    int paletteCount;
+    float vignette;
+    float grain;
+    float gamma;
+    float feedbackAvailable;
+    float seed;
+    float _pad[2];
+} SceneUniforms;
+
+#endif

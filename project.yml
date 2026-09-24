@@ -236,6 +236,32 @@ targets:
         # Rule files can be imported from and exported to anywhere.
         com.apple.security.files.user-selected.read-write: true
 
+  TrackOSCColours:
+    templates: [TrackOSCReceiverApp]
+    templateAttributes:
+      app_dir: Colours
+      display_name: TrackOSC Colours
+    sources: [VisualCore]
+    settings:
+      base:
+        SWIFT_OBJC_BRIDGING_HEADER: VisualCore/Metal/ShaderTypes.h
+        MTL_HEADER_SEARCH_PATHS: $(SRCROOT)/VisualCore/Metal
+    entitlements:
+      properties:
+        # Screenshots go to Downloads.
+        com.apple.security.files.downloads.read-write: true
+
+  TrackOSCColoursTests:
+    type: bundle.unit-test
+    platform: macOS
+    sources: [VisualCoreTests]
+    dependencies:
+      - target: TrackOSCColours
+    settings:
+      base:
+        SWIFT_OBJC_BRIDGING_HEADER: VisualCore/Metal/ShaderTypes.h
+        GENERATE_INFOPLIST_FILE: YES
+
 schemes:
   TrackOSCSender:
     build:
@@ -273,3 +299,12 @@ schemes:
         TrackOSCRouter: all
     run:
       config: Debug
+  TrackOSCColours:
+    build:
+      targets:
+        TrackOSCColours: all
+        TrackOSCColoursTests: [test]
+    run:
+      config: Debug
+    test:
+      targets: [TrackOSCColoursTests]
