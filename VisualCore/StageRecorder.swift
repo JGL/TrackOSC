@@ -14,6 +14,22 @@ import Foundation
 import Metal
 import Observation
 
+/// One frame in flight: the pixel buffer the GPU renders into, its Metal
+/// view and its timestamp. CVPixelBuffer is not marked Sendable, but the
+/// buffer is only ever touched by the GPU and then by the writer's queue,
+/// one after the other, so passing the handle across is safe.
+final class RecorderFrame: @unchecked Sendable {
+    let texture: MTLTexture
+    let pixelBuffer: CVPixelBuffer
+    let time: CMTime
+
+    init(texture: MTLTexture, pixelBuffer: CVPixelBuffer, time: CMTime) {
+        self.texture = texture
+        self.pixelBuffer = pixelBuffer
+        self.time = time
+    }
+}
+
 /// The part that runs off the main actor: the writer and the GPU frames.
 final class RecorderSink: @unchecked Sendable {
     let url: URL
@@ -66,7 +82,7 @@ final class RecorderSink: @unchecked Sendable {
 
     /// A pixel buffer from the pool with a Metal texture view of it, or nil
     /// when the writer is busy (the frame is dropped, never queued).
-    func dequeueFrame() -> (texture: MTLTexture, pixelBuffer: CVPixelBuffer, time: CMTime)? {
+    func dequeueFrame() -> RecorderFrame? {
         lock.lock()
         defer { lock.unlock() }
         guard started, !finished, input.isReadyForMoreMediaData, let pool = adaptor.pixelBufferPool, let cache = textureCache else {
@@ -80,16 +96,17 @@ final class RecorderSink: @unchecked Sendable {
         CVMetalTextureCacheCreateTextureFromImage(nil, cache, pixelBuffer, nil, .bgra8Unorm, width, height, 0, &cvTexture)
         guard let cvTexture, let texture = CVMetalTextureGetTexture(cvTexture) else { droppedCount += 1; return nil }
         let seconds = CACurrentMediaTime() - startTime
-        return (texture, pixelBuffer, CMTime(seconds: seconds, preferredTimescale: 600))
+        return RecorderFrame(texture: texture, pixelBuffer: pixelBuffer, time: CMTime(seconds: seconds, preferredTimescale: 600))
     }
 
-    /// Called from the command buffer's completion handler.
-    func append(_ pixelBuffer: CVPixelBuffer, at time: CMTime) {
+    /// Called from the command buffer's completion handler once the GPU has
+    /// finished with the frame.
+    func append(_ frame: RecorderFrame) {
         queue.async { [self] in
             lock.lock()
             defer { lock.unlock() }
             guard started, !finished, input.isReadyForMoreMediaData else { droppedCount += 1; return }
-            if adaptor.append(pixelBuffer, withPresentationTime: time) { frameCount += 1 } else { droppedCount += 1 }
+            if adaptor.append(frame.pixelBuffer, withPresentationTime: frame.time) { frameCount += 1 } else { droppedCount += 1 }
         }
     }
 

@@ -142,8 +142,7 @@ final class MetalRenderer {
                 encoder.drawPrimitives(type: .triangle, vertexStart: 0, vertexCount: 3)
                 encoder.endEncoding()
             }
-            let pixelBuffer = frame.pixelBuffer, time = frame.time
-            commandBuffer.addCompletedHandler { _ in recorder.append(pixelBuffer, at: time) }
+            commandBuffer.addCompletedHandler { _ in recorder.append(frame) }
         }
         commandBuffer.present(drawable)
         commandBuffer.commit()
