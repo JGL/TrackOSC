@@ -21,6 +21,11 @@ fragment float4 colours_body_hue(MODE_ARGS) {
         float3 hue = vc_palette(person.id * 0.23 + u.time * 0.02, u);
         c += hue * (smoothstep(thickness, 0.0, d) + glow * vc_glow(d, 0.08 * glow)) * (0.4 + 0.6 * person.confidence);
     }
+    for (int i = 0; i < u.animalCount; i++) {
+        float d = vc_animalSkeletonDistance(p, animals[i], u);
+        float3 hue = vc_palette(vc_animalHue(animals[i]) + u.time * 0.02, u);
+        c += hue * (smoothstep(thickness, 0.0, d) + glow * vc_glow(d, 0.08 * glow)) * (0.4 + 0.6 * animals[i].confidence);
+    }
     // Hands and faces draw in their owner's colour, finer.
     for (int i = 0; i < u.handCount; i++) {
         float d = vc_handSkeletonDistance(p, hands[i], u);
@@ -87,6 +92,15 @@ fragment float4 colours_joint_stops(MODE_ARGS) {
         sum += vc_palette(0.8 + faces[i].yaw / 180.0 + u.time * drift * 0.05, u) * w;
         weight += w;
     }
+    for (int i = 0; i < u.animalCount; i++) {
+        for (int j = 0; j < VC_ANIMAL_JOINTS; j++) {
+            if (animals[i].visible[j] < 0.5) continue;
+            float d = distance(p, vc_sceneToView(animals[i].joints[j], u));
+            float w = 1.0 / pow(d * falloff + 0.02, 2.0);
+            sum += vc_palette(float(j) / VC_ANIMAL_JOINTS * spread + vc_animalHue(animals[i]) + u.time * drift * 0.05, u) * w;
+            weight += w;
+        }
+    }
     float3 c = weight > 0.0 ? sum / weight : vc_palette(u.time * 0.02, u) * 0.2;
     return float4(c, 1);
 }
@@ -120,6 +134,14 @@ fragment float4 colours_voronoi(MODE_ARGS) {
         if (d < best) { second = best; best = d; bestID = 20.0 + float(i); }
         else if (d < second) { second = d; }
     }
+    for (int i = 0; i < u.animalCount; i++) {
+        for (int j = 0; j < VC_ANIMAL_JOINTS; j++) {
+            if (animals[i].visible[j] < 0.5) continue;
+            float d = distance(p, vc_sceneToView(animals[i].joints[j], u));
+            if (d < best) { second = best; best = d; bestID = 30.0 + animals[i].id; }
+            else if (d < second) { second = d; }
+        }
+    }
     if (best > 1e8) return float4(vc_palette(u.time * 0.03, u) * 0.15, 1);
     float3 c = vc_palette(bestID * 0.21 + sin(u.time * pulse) * 0.05, u);
     float line = smoothstep(edge, 0.0, second - best);
@@ -148,6 +170,13 @@ fragment float4 colours_metaballs(MODE_ARGS) {
     for (int i = 0; i < u.faceCount; i++) {
         float d = distance(p, vc_sceneToView(faces[i].centre, u));
         field += (size * size) * (3.0 + faces[i].mouth * 3.0) / (d * d + 1e-4);
+    }
+    for (int i = 0; i < u.animalCount; i++) {
+        for (int j = 0; j < VC_ANIMAL_JOINTS; j++) {
+            if (animals[i].visible[j] < 0.5) continue;
+            float d = distance(p, vc_sceneToView(animals[i].joints[j], u));
+            field += (size * size) * 0.7 / (d * d + 1e-4);
+        }
     }
     float f = field / max(threshold, 0.01);
     float3 c = vc_palette(fract(log2(f + 1.0) * bands * 0.1 + u.time * 0.02), u);
@@ -179,7 +208,13 @@ fragment float4 colours_rings(MODE_ARGS) {
         float ring = smoothstep(1.0 - width, 1.0, 0.5 + 0.5 * cos(phase * 6.28318));
         c += vc_palette(0.8 + float(i) * 0.1, u) * ring * exp(-d * 3.0) * 0.8;
     }
-    if (u.personCount == 0 && u.handCount == 0 && u.faceCount == 0) {
+    for (int i = 0; i < u.animalCount; i++) {
+        float d = distance(p, vc_sceneToView(animals[i].centroid, u));
+        float phase = d / spacing - u.time * speed * (0.5 + animals[i].speed * 2.0 + u.activity);
+        float ring = smoothstep(1.0 - width, 1.0, 0.5 + 0.5 * cos(phase * 6.28318));
+        c += vc_palette(vc_animalHue(animals[i]) + d * 0.5, u) * ring * exp(-d * 1.2);
+    }
+    if (u.personCount == 0 && u.handCount == 0 && u.faceCount == 0 && u.animalCount == 0) {
         float d = distance(p, vc_view(float2(0.5, 0.5), u));
         c = vc_palette(d, u) * 0.15 * (0.5 + 0.5 * cos(d / spacing * 6.28318 - u.time * speed));
     }
@@ -198,6 +233,9 @@ fragment float4 colours_stripes(MODE_ARGS) {
             float2 s = vc_sceneToView(person.joints[6], u) - vc_sceneToView(person.joints[5], u);
             angle = atan2(s.y, s.x) * turn;
         }
+    } else if (u.animalCount > 0 && animals[0].visible[9] > 0.5 && animals[0].visible[22] > 0.5) {
+        float2 s = vc_sceneToView(animals[0].joints[22], u) - vc_sceneToView(animals[0].joints[9], u);   // neck → tail
+        angle = atan2(s.y, s.x) * turn;
     } else if (u.faceCount > 0) {
         angle = faces[0].roll * 0.01745 * turn;
     }
@@ -235,6 +273,14 @@ fragment float4 colours_checkers(MODE_ARGS) {
             q += normalize(dir + 1e-5) * warp * 0.03 * exp(-d / (radius * 0.5));
         }
     }
+    for (int i = 0; i < u.animalCount; i++) {
+        for (int j = 0; j < VC_ANIMAL_JOINTS; j++) {
+            if (animals[i].visible[j] < 0.5) continue;
+            float2 dir = p - vc_sceneToView(animals[i].joints[j], u);
+            float d = length(dir);
+            q += normalize(dir + 1e-5) * warp * 0.05 * exp(-d / radius);
+        }
+    }
     for (int i = 0; i < u.faceCount; i++) {
         float2 dir = p - vc_sceneToView(faces[i].centre, u);
         float d = length(dir);
@@ -257,6 +303,10 @@ fragment float4 colours_memory_wash(MODE_ARGS) {
         float d = vc_figureDistance(p, person, u, faces);
         c += vc_palette(u.time * hueSpeed * 0.1 + person.id * 0.3, u) * smoothstep(brush, 0.0, d) * 0.3;
     }
+    for (int i = 0; i < u.animalCount; i++) {
+        float d = vc_animalSkeletonDistance(p, animals[i], u);
+        c += vc_palette(u.time * hueSpeed * 0.1 + vc_animalHue(animals[i]), u) * smoothstep(brush, 0.0, d) * 0.3;
+    }
     for (int i = 0; i < u.handCount; i++) {
         float d = vc_handSkeletonDistance(p, hands[i], u);
         c += vc_palette(u.time * hueSpeed * 0.1 + 0.5, u) * smoothstep(brush * 0.7, 0.0, d) * 0.3;
@@ -277,6 +327,10 @@ fragment float4 colours_heat_map(MODE_ARGS) {
     heat *= cooling;
     for (int i = 0; i < u.personCount; i++) {
         float d = vc_jointDistance(p, persons[i], u);
+        heat += warmth * 0.02 * vc_glow(d, spot);
+    }
+    for (int i = 0; i < u.animalCount; i++) {
+        float d = vc_animalJointDistance(p, animals[i], u);
         heat += warmth * 0.02 * vc_glow(d, spot);
     }
     for (int i = 0; i < u.handCount; i++) {
@@ -307,6 +361,10 @@ fragment float4 colours_kaleido(MODE_ARGS) {
         constant GPUPerson& person = persons[i];
         float d = vc_figureDistance(q, person, u, faces);
         c += vc_palette(person.id * 0.23 + r * 0.3 + u.time * 0.03, u) * (smoothstep(0.01, 0.0, d) + vc_glow(d, 0.06));
+    }
+    for (int i = 0; i < u.animalCount; i++) {
+        float d = vc_animalSkeletonDistance(q, animals[i], u);
+        c += vc_palette(vc_animalHue(animals[i]) + r * 0.3 + u.time * 0.03, u) * (smoothstep(0.01, 0.0, d) + vc_glow(d, 0.06));
     }
     float extras = vc_extrasDistance(q, u, hands, faces);
     c += vc_palette(0.6 + r * 0.3 + u.time * 0.03, u) * (smoothstep(0.006, 0.0, extras) + vc_glow(extras, 0.03));
@@ -367,6 +425,10 @@ fragment float4 colours_palette_sweep(MODE_ARGS) {
         float2 fc = vc_sceneToUV(faces[0].centre, u);
         phase += fc.x * follow;
         tilt = (fc.y - 0.5) * follow * 0.5;
+    } else if (u.animalCount > 0 && animals[0].visible[0] > 0.5) {
+        float2 an = vc_sceneToUV(animals[0].joints[0], u);
+        phase += an.x * follow;
+        tilt = (an.y - 0.5) * follow * 0.5;
     }
     for (int i = 0; i < u.handCount; i++) {
         float2 h = vc_sceneToUV(hands[i].centre, u);

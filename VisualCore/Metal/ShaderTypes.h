@@ -20,6 +20,8 @@
 #define VC_MAX_PARAMS 16
 #define VC_MAX_PALETTE 8
 #define VC_FACE_LANDMARKS 76
+#define VC_MAX_ANIMALS 4
+#define VC_ANIMAL_JOINTS 25
 
 typedef struct {
     vector_float2 joints[VC_BODY_JOINTS];
@@ -58,6 +60,17 @@ typedef struct {
 } GPUFace;
 
 typedef struct {
+    vector_float2 joints[VC_ANIMAL_JOINTS];
+    float visible[VC_ANIMAL_JOINTS];
+    vector_float2 centroid;
+    float id;
+    float age;
+    float confidence;
+    float speed;
+    float _pad;
+} GPUAnimal;
+
+typedef struct {
     vector_float2 resolution;    // pixels
     vector_float2 sceneOrigin;   // uv of the scene's top-left
     vector_float2 sceneSize;     // uv extent of the scene
@@ -79,7 +92,8 @@ typedef struct {
     float gamma;
     float feedbackAvailable;
     float seed;
-    float _pad[2];
+    int animalCount;
+    float _pad;
 } SceneUniforms;
 
 #endif

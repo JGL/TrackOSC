@@ -465,11 +465,14 @@ can be edited; nine preset slots save mode, parameters and palette
 together. When nobody has been tracked for a while a synthetic figure
 wanders through so the wall never goes dead (Display → Attract after).
 
-Every mode uses whatever is arriving: with Hand and Face Landmarks on,
-hand skeletons and a face ring join the body in the drawing modes, hand
+Every mode uses whatever is arriving: cats and dogs from **Animal Pose**
+are tracked and drawn exactly like people (their own colours); with Hand
+and Face Landmarks on, hand skeletons and a face ring join the body in
+the drawing modes, hand
 joints and face centres become extra stops, seeds, warps and heat sources
 in the field modes, and mouth openness and hand openness push the aurora,
-stripes and metaballs about.
+stripes and metaballs about. A person's head is drawn from their face
+landmarks when those arrive, otherwise as a circle.
 
 **Recording**: the Record button (or the V key) writes the rendered
 output – not a screen grab – to an H.264 `.mp4` in Downloads at the

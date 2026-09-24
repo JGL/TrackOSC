@@ -15,7 +15,7 @@ import PoseioscShared
 @MainActor
 final class SceneBuilder {
     var mirror = false
-    var smoothing: Float = 0.08 { didSet { tracker.smoothing = smoothing } }
+    var smoothing: Float = 0.08 { didSet { tracker.smoothing = smoothing; animalTracker.smoothing = smoothing } }
     /// Seconds without live tracking before the attract scene takes over (0 = never).
     var attractDelay: Float = 20
     var staleInterval: TimeInterval = ReceiverModel.staleInterval
@@ -23,6 +23,7 @@ final class SceneBuilder {
     private(set) var scene = TrackingScene.empty
     private(set) var history = SceneHistory()
     private var tracker = PersonTracker()
+    private var animalTracker = PersonTracker()
     private var attract = AttractScene()
     private var lastTime: Float?
     private var lastLive: Float?
@@ -142,6 +143,21 @@ final class SceneBuilder {
             }
         }
 
+        // Cats and dogs → their own tracker (same identity and smoothing rules).
+        var animalDetections: [(joints: [ScenePoint], visible: [Bool])] = []
+        if case .animalPoses(let f)? = fresh(.animalPoses) {
+            aspect = Float(f.width) / Float(max(f.height, 1))
+            for animal in f.detections {
+                animalDetections.append((animal.joints.map { normalise($0, f.width, f.height) }, animal.joints.map { $0.confidence > 0 }))
+            }
+        }
+        animalTracker.update(detections: animalDetections, time: time, dt: dt)
+        let animals: [SceneAnimal] = animalTracker.tracked.map { t in
+            SceneAnimal(id: t.id, joints: t.joints, visible: t.visible, velocities: t.velocities,
+                        centroid: PersonTracker.centroid(t.joints, t.visible),
+                        age: time - t.firstSeen, confidence: t.missing ? 0 : 1, speed: t.speed)
+        }
+
         // Text and codes.
         var texts: [SceneText] = []
         if case .texts(let f)? = fresh(.texts) {
@@ -158,16 +174,17 @@ final class SceneBuilder {
         }
 
         // Moods.
-        let live = !persons.isEmpty || !hands.isEmpty || !faces.isEmpty
+        let live = !persons.isEmpty || !hands.isEmpty || !faces.isEmpty || !animals.isEmpty
         if live { lastLive = time }
         let presenceTarget: Float = live ? 1 : 0
         presence += (presenceTarget - presence) * min(1, dt / (live ? 0.3 : 1.5))
-        let meanSpeed = persons.isEmpty ? 0 : persons.map(\.speed).reduce(0, +) / Float(persons.count)
+        let speeds = persons.map(\.speed) + animals.map(\.speed)
+        let meanSpeed = speeds.isEmpty ? 0 : speeds.reduce(0, +) / Float(speeds.count)
         let activityTarget = min(1, meanSpeed / 0.8)
         activity += (activityTarget - activity) * min(1, dt / 0.5)
 
         var built = TrackingScene(time: time, deltaTime: dt, frameAspect: aspect, persons: persons, hands: hands,
-                                  faces: faces, texts: texts, presence: presence, activity: activity, isAttract: false)
+                                  faces: faces, animals: animals, texts: texts, presence: presence, activity: activity, isAttract: false)
 
         let idleFor = lastLive.map { time - $0 } ?? .infinity
         if !live, attractDelay > 0, idleFor > attractDelay {
@@ -183,6 +200,7 @@ final class SceneBuilder {
 
     func reset() {
         tracker.reset()
+        animalTracker.reset()
         history = SceneHistory()
         scene = .empty
     }

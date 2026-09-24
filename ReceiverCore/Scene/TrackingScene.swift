@@ -64,6 +64,22 @@ struct ScenePerson: Sendable, Equatable, Identifiable {
     }
 }
 
+/// A cat or dog from /animalposes/arr: 25 joints in JointOrder.animal25.
+struct SceneAnimal: Sendable, Equatable, Identifiable {
+    let id: Int
+    var joints: [ScenePoint]
+    var visible: [Bool]
+    var velocities: [ScenePoint]
+    var centroid: ScenePoint
+    var age: Float
+    var confidence: Float
+    var speed: Float
+
+    static func == (lhs: SceneAnimal, rhs: SceneAnimal) -> Bool {
+        lhs.id == rhs.id && lhs.joints == rhs.joints && lhs.confidence == rhs.confidence
+    }
+}
+
 struct SceneText: Sendable, Equatable {
     var text: String
     var centre: ScenePoint
@@ -80,6 +96,7 @@ struct TrackingScene: Sendable {
     /// Hands not attached to anyone, plus copies of every attached one.
     var hands: [SceneHand] = []
     var faces: [SceneFace] = []
+    var animals: [SceneAnimal] = []
     var texts: [SceneText] = []
     /// 0 … 1, how much someone has been here recently (smoothed).
     var presence: Float = 0
@@ -87,7 +104,7 @@ struct TrackingScene: Sendable {
     var activity: Float = 0
     /// True while the attract scene is standing in for real tracking.
     var isAttract = false
-    var isLive: Bool { !persons.isEmpty || !hands.isEmpty || !faces.isEmpty }
+    var isLive: Bool { !persons.isEmpty || !hands.isEmpty || !faces.isEmpty || !animals.isEmpty }
 
     static let empty = TrackingScene()
 }

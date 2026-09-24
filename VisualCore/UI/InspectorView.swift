@@ -248,7 +248,7 @@ struct FrameStatsRow: View {
                 Text(String(format: "%.0f fps · %.1f ms CPU", store.stats.fps, store.stats.frameMilliseconds))
                 Spacer()
                 let scene = store.builder.scene
-                Text("\(scene.persons.count) people · \(scene.hands.count) hands · \(scene.faces.count) faces" + (scene.isAttract ? " · attract" : ""))
+                Text("\(scene.persons.count) people · \(scene.hands.count) hands · \(scene.faces.count) faces · \(scene.animals.count) animals" + (scene.isAttract ? " · attract" : ""))
             }
             .font(.system(.callout, design: .monospaced))
             .foregroundStyle(.secondary)

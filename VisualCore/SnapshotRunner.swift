@@ -10,6 +10,26 @@ import AppKit
 import Foundation
 
 enum SnapshotRunner {
+    /// A side-on quadruped in JointOrder.animal25, facing left.
+    static func syntheticAnimal(at origin: SIMD2<Float>, aspect: Float) -> SceneAnimal {
+        func p(_ x: Float, _ y: Float) -> SIMD2<Float> { origin + SIMD2<Float>(x * 0.35 / aspect * 0.5, y * 0.12) }
+        let joints: [SIMD2<Float>] = [
+            p(-0.50, -0.20),                                     // nose
+            p(-0.44, -0.30), p(-0.36, -0.30),                    // eyes
+            p(-0.46, -0.48), p(-0.42, -0.42), p(-0.40, -0.36),   // left ear
+            p(-0.30, -0.48), p(-0.32, -0.42), p(-0.34, -0.36),   // right ear
+            p(-0.25, -0.10),                                     // neck
+            p(-0.22, 0.20), p(-0.22, 0.50), p(-0.24, 0.80),      // left front leg
+            p(-0.12, 0.20), p(-0.12, 0.50), p(-0.14, 0.80),      // right front leg
+            p(0.30, 0.20), p(0.32, 0.50), p(0.34, 0.80),         // left back leg
+            p(0.40, 0.20), p(0.42, 0.50), p(0.44, 0.80),         // right back leg
+            p(0.35, -0.05), p(0.50, -0.25), p(0.60, -0.50),      // tail
+        ]
+        return SceneAnimal(id: 1, joints: joints, visible: Array(repeating: true, count: 25),
+                           velocities: Array(repeating: .zero, count: 25), centroid: p(0.05, 0.1),
+                           age: 3, confidence: 1, speed: 0.1)
+    }
+
     /// 76 points in the FaceLandmarks layout, drawn as simple shapes around a nose.
     static func syntheticLandmarks(around nose: SIMD2<Float>, aspect: Float) -> [SIMD2<Float>] {
         func ring(_ centre: SIMD2<Float>, _ rx: Float, _ ry: Float, _ count: Int, from: Float = 0, to: Float = 2 * .pi) -> [SIMD2<Float>] {
@@ -61,6 +81,7 @@ enum SnapshotRunner {
                              landmarks: Self.syntheticLandmarks(around: nose, aspect: 9.0 / 16.0), personID: 0)
         scene.faces = [face]
         scene.persons[0].face = face
+        scene.animals = [Self.syntheticAnimal(at: SIMD2<Float>(0.68, 0.8), aspect: 9.0 / 16.0)]
         scene.isAttract = false
         scene.presence = 1
         scene.activity = 0.4

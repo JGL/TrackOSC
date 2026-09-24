@@ -39,6 +39,7 @@ final class MetalRenderer {
     private var personBuffers: [MTLBuffer] = []
     private var handBuffers: [MTLBuffer] = []
     private var faceBuffers: [MTLBuffer] = []
+    private var animalBuffers: [MTLBuffer] = []
     private var bufferIndex = 0
     private let inflight = DispatchSemaphore(value: 3)
     private var frame: Int32 = 0
@@ -59,6 +60,7 @@ final class MetalRenderer {
             personBuffers.append(device.makeBuffer(length: MemoryLayout<GPUPerson>.stride * Int(VC_MAX_PERSONS), options: .storageModeShared)!)
             handBuffers.append(device.makeBuffer(length: MemoryLayout<GPUHand>.stride * Int(VC_MAX_HANDS), options: .storageModeShared)!)
             faceBuffers.append(device.makeBuffer(length: MemoryLayout<GPUFace>.stride * Int(VC_MAX_FACES), options: .storageModeShared)!)
+            animalBuffers.append(device.makeBuffer(length: MemoryLayout<GPUAnimal>.stride * Int(VC_MAX_ANIMALS), options: .storageModeShared)!)
         }
     }
 
@@ -216,6 +218,7 @@ final class MetalRenderer {
         encoder.setFragmentBuffer(personBuffers[bufferIndex], offset: 0, index: 1)
         encoder.setFragmentBuffer(handBuffers[bufferIndex], offset: 0, index: 2)
         encoder.setFragmentBuffer(faceBuffers[bufferIndex], offset: 0, index: 3)
+        encoder.setFragmentBuffer(animalBuffers[bufferIndex], offset: 0, index: 4)
         encoder.setFragmentTexture(previous, index: 0)
         encoder.drawPrimitives(type: .triangle, vertexStart: 0, vertexCount: 3)
         encoder.endEncoding()
@@ -248,6 +251,7 @@ final class MetalRenderer {
         u.personCount = Int32(min(scene.persons.count, Int(VC_MAX_PERSONS)))
         u.handCount = Int32(min(scene.hands.count, Int(VC_MAX_HANDS)))
         u.faceCount = Int32(min(scene.faces.count, Int(VC_MAX_FACES)))
+        u.animalCount = Int32(min(scene.animals.count, Int(VC_MAX_ANIMALS)))
         u.frame = frame
         withUnsafeMutableBytes(of: &u.params) { raw in
             let floats = raw.bindMemory(to: Float.self)
@@ -326,6 +330,24 @@ final class MetalRenderer {
                 }
             }
             faces[i] = gpu
+        }
+        let animals = animalBuffers[bufferIndex].contents().bindMemory(to: GPUAnimal.self, capacity: Int(VC_MAX_ANIMALS))
+        for (i, animal) in scene.animals.prefix(Int(VC_MAX_ANIMALS)).enumerated() {
+            var gpu = GPUAnimal()
+            withUnsafeMutableBytes(of: &gpu.joints) { raw in
+                let p = raw.bindMemory(to: SIMD2<Float>.self)
+                for j in 0..<min(animal.joints.count, Int(VC_ANIMAL_JOINTS)) { p[j] = animal.joints[j] }
+            }
+            withUnsafeMutableBytes(of: &gpu.visible) { raw in
+                let p = raw.bindMemory(to: Float.self)
+                for j in 0..<min(animal.visible.count, Int(VC_ANIMAL_JOINTS)) { p[j] = animal.visible[j] ? 1 : 0 }
+            }
+            gpu.centroid = animal.centroid
+            gpu.id = Float(animal.id)
+            gpu.age = animal.age
+            gpu.confidence = animal.confidence
+            gpu.speed = animal.speed
+            animals[i] = gpu
         }
     }
 }

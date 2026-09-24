@@ -23,6 +23,7 @@ struct VertexOut {
     constant GPUPerson* persons [[buffer(1)]], \
     constant GPUHand* hands [[buffer(2)]], \
     constant GPUFace* faces [[buffer(3)]], \
+    constant GPUAnimal* animals [[buffer(4)]], \
     texture2d<float> previous [[texture(0)]]
 
 constexpr sampler vc_sampler(address::clamp_to_edge, filter::linear);
@@ -205,6 +206,45 @@ inline float vc_extrasDistance(float2 p, constant SceneUniforms& u, constant GPU
     }
     return d;
 }
+
+// ---- Animal edges (JointOrder.animal25, Skeleton.animal25Edges).
+constant int2 vc_animalEdges[24] = {
+    int2(0, 1), int2(0, 2),
+    int2(1, 5), int2(5, 4), int2(4, 3),
+    int2(2, 8), int2(8, 7), int2(7, 6),
+    int2(0, 9),
+    int2(9, 10), int2(10, 11), int2(11, 12),
+    int2(9, 13), int2(13, 14), int2(14, 15),
+    int2(9, 22),
+    int2(22, 16), int2(16, 17), int2(17, 18),
+    int2(22, 19), int2(19, 20), int2(20, 21),
+    int2(22, 23), int2(23, 24)
+};
+constant int vc_animalEdgeCount = 24;
+
+/// Distance to the nearest visible bone of a cat or dog.
+inline float vc_animalSkeletonDistance(float2 p, constant GPUAnimal& animal, constant SceneUniforms& u) {
+    float d = 1e9;
+    for (int e = 0; e < vc_animalEdgeCount; e++) {
+        int a = vc_animalEdges[e].x, b = vc_animalEdges[e].y;
+        if (animal.visible[a] < 0.5 || animal.visible[b] < 0.5) continue;
+        d = min(d, vc_sdSegment(p, vc_sceneToView(animal.joints[a], u), vc_sceneToView(animal.joints[b], u)));
+    }
+    return d;
+}
+
+/// Distance to the nearest visible joint of a cat or dog.
+inline float vc_animalJointDistance(float2 p, constant GPUAnimal& animal, constant SceneUniforms& u) {
+    float d = 1e9;
+    for (int j = 0; j < VC_ANIMAL_JOINTS; j++) {
+        if (animal.visible[j] < 0.5) continue;
+        d = min(d, distance(p, vc_sceneToView(animal.joints[j], u)));
+    }
+    return d;
+}
+
+/// A hue for an animal that never collides with a person's.
+inline float vc_animalHue(constant GPUAnimal& animal) { return 0.5 + animal.id * 0.19; }
 
 /// The whole figure: body bones plus the head.
 inline float vc_figureDistance(float2 p, constant GPUPerson& person, constant SceneUniforms& u, constant GPUFace* faces) {
