@@ -90,7 +90,7 @@ final class SpeakerStore {
                 FileManager.default.createFile(atPath: url.path, contents: nil)
             }
             transcriptHandle = try? FileHandle(forWritingTo: url)
-            try? transcriptHandle?.seekToEnd()
+            _ = try? transcriptHandle?.seekToEnd()
         }
         let time = utterance.createdAt.formatted(.iso8601.year().month().day().time(includingFractionalSeconds: true))
         let line = "\(time)\t\(utterance.category.rawValue)\t\(utterance.text)\n"
