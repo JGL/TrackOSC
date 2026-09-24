@@ -110,3 +110,42 @@ struct TrackingScene: Sendable {
 
     static let empty = TrackingScene()
 }
+
+extension ScenePerson {
+    /// The head as polylines: the face's landmark features (eyes, brows,
+    /// nose, lips, jaw) when Face Landmarks is arriving for this person,
+    /// otherwise a circle sized from the ears, eyes or shoulders. The same
+    /// rule the shader modes use, for simulations that need bones to react to.
+    func headOutlines(aspect: Float) -> [[ScenePoint]] {
+        if let face, face.landmarks.count >= 76 {
+            return FaceLandmarks.regions.map { region in
+                var points = Array(face.landmarks[region.range])
+                if region.isClosed, let first = points.first { points.append(first) }
+                return points
+            }
+        }
+        let headJoints = (0..<5).filter { visible[$0] }.map { joints[$0] }
+        guard !headJoints.isEmpty else { return [] }
+        let centre = headJoints.reduce(.zero, +) / Float(headJoints.count)
+        var radius: Float = 0.03
+        if visible[3], visible[4] { radius = simd_distance(joints[3], joints[4]) * 0.6 }
+        else if visible[1], visible[2] { radius = simd_distance(joints[1], joints[2]) * 1.3 }
+        else if visible[5], visible[6] { radius = simd_distance(joints[5], joints[6]) * 0.28 }
+        let a = max(aspect, 0.1)
+        let n = 12
+        return [(0...n).map { i in
+            let angle = Float(i) / Float(n) * 2 * .pi
+            return centre + ScenePoint(cosf(angle) * radius / a, sinf(angle) * radius)
+        }]
+    }
+
+    /// Points on the head worth attracting to: pupils and the mouth when
+    /// landmarks are present, otherwise the nose.
+    var headAnchors: [ScenePoint] {
+        if let face, face.landmarks.count >= 76 {
+            return [face.landmarks[FaceLandmarks.leftPupil], face.landmarks[FaceLandmarks.rightPupil],
+                    face.landmarks[FaceLandmarks.innerLipTop], face.landmarks[FaceLandmarks.innerLipBottom]]
+        }
+        return visible[0] ? [joints[0]] : []
+    }
+}

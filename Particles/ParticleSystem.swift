@@ -30,27 +30,23 @@ struct SceneGeometry {
         let bodyEdges: [(Int, Int)] = [(5, 6), (5, 7), (7, 9), (6, 8), (8, 10), (5, 11), (6, 12), (11, 12), (11, 13), (13, 15), (12, 14), (14, 16)]
         for person in scene.persons where person.confidence > 0 {
             centroids.append(person.centroid)
-            for (j, joint) in person.joints.enumerated() where person.visible[j] {
+            for (j, joint) in person.joints.enumerated() where person.visible[j] && j >= 5 {
                 anchors.append(joint)
                 anchorVelocities.append(person.velocities[j])
                 if simd_length(person.velocities[j]) > speedThreshold {
                     fastJoints.append((joint, person.velocities[j]))
                 }
             }
+            for anchor in person.headAnchors {
+                anchors.append(anchor)
+                anchorVelocities.append(person.visible[0] ? person.velocities[0] : .zero)
+            }
             for (a, b) in bodyEdges where person.visible[a] && person.visible[b] {
                 bones.append((person.joints[a], person.joints[b]))
             }
-            // The head as a ring of short bones.
-            let headJoints = (0..<5).filter { person.visible[$0] }.map { person.joints[$0] }
-            if !headJoints.isEmpty {
-                let centre = headJoints.reduce(.zero, +) / Float(headJoints.count)
-                let radius: Float = person.visible[3] && person.visible[4] ? simd_distance(person.joints[3], person.joints[4]) * 0.6 : 0.03
-                let n = 10
-                for i in 0..<n {
-                    let a0 = Float(i) / Float(n) * 2 * .pi, a1 = Float(i + 1) / Float(n) * 2 * .pi
-                    let aspect = max(scene.frameAspect, 0.1)
-                    bones.append((centre + SIMD2(cosf(a0) * radius / aspect, sinf(a0) * radius), centre + SIMD2(cosf(a1) * radius / aspect, sinf(a1) * radius)))
-                }
+            // The head: landmark features when they arrive, else a circle.
+            for outline in person.headOutlines(aspect: scene.frameAspect) where outline.count >= 2 {
+                for i in 1..<outline.count { bones.append((outline[i - 1], outline[i])) }
             }
         }
         let animalEdges: [(Int, Int)] = [(0, 1), (0, 2), (1, 5), (5, 4), (4, 3), (2, 8), (8, 7), (7, 6), (0, 9), (9, 10), (10, 11), (11, 12), (9, 13), (13, 14), (14, 15), (9, 22), (22, 16), (16, 17), (17, 18), (22, 19), (19, 20), (20, 21), (22, 23), (23, 24)]
