@@ -318,6 +318,13 @@ final class MetalRenderer {
             gpu.roll = face.rollDegrees
             gpu.mouth = face.mouthOpenness
             gpu.person = Float(face.personID ?? -1)
+            if face.landmarks.count >= Int(VC_FACE_LANDMARKS) {
+                gpu.hasLandmarks = 1
+                withUnsafeMutableBytes(of: &gpu.landmarks) { raw in
+                    let p = raw.bindMemory(to: SIMD2<Float>.self)
+                    for j in 0..<Int(VC_FACE_LANDMARKS) { p[j] = face.landmarks[j] }
+                }
+            }
             faces[i] = gpu
         }
     }

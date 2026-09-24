@@ -76,14 +76,78 @@ inline float3 vc_hsv(float h, float s, float v) {
     return v * mix(float3(1.0), clamp(p - 1.0, 0.0, 1.0), s);
 }
 
-// ---- Body edges (JointOrder.body17), for drawing skeletons in shaders.
-constant int2 vc_bodyEdges[16] = {
-    int2(0, 1), int2(0, 2), int2(1, 3), int2(2, 4),
+// ---- Body edges (JointOrder.body17) without the nose–eye–ear bones: the
+// head is drawn separately (landmarks or a circle) because those bones
+// read as an "M" rather than a face.
+constant int2 vc_bodyEdges[12] = {
     int2(5, 6), int2(5, 7), int2(7, 9), int2(6, 8), int2(8, 10),
     int2(5, 11), int2(6, 12), int2(11, 12),
     int2(11, 13), int2(13, 15), int2(12, 14), int2(14, 16)
 };
-constant int vc_bodyEdgeCount = 16;
+constant int vc_bodyEdgeCount = 12;
+
+// ---- Face landmark regions (FaceLandmarks.swift): start, end (exclusive), closed.
+constant int3 vc_faceRegions[9] = {
+    int3(0, 6, 1), int3(7, 13, 1),          // eyes
+    int3(14, 20, 0), int3(20, 26, 0),       // brows
+    int3(26, 40, 1), int3(40, 46, 1),       // lips
+    int3(46, 54, 0), int3(54, 59, 0),       // nose, nose crest
+    int3(59, 76, 0)                         // jaw
+};
+
+/// Distance to the nearest landmark feature line of a face with landmarks.
+inline float vc_landmarkDistance(float2 p, constant GPUFace& face, constant SceneUniforms& u) {
+    float d = 1e9;
+    for (int r = 0; r < 9; r++) {
+        int start = vc_faceRegions[r].x, end = vc_faceRegions[r].y;
+        for (int i = start; i < end - 1; i++) {
+            d = min(d, vc_sdSegment(p, vc_sceneToView(face.landmarks[i], u), vc_sceneToView(face.landmarks[i + 1], u)));
+        }
+        if (vc_faceRegions[r].z == 1) {
+            d = min(d, vc_sdSegment(p, vc_sceneToView(face.landmarks[end - 1], u), vc_sceneToView(face.landmarks[start], u)));
+        }
+    }
+    return d;
+}
+
+/// Where a person's head is and how big, from nose, eyes and ears.
+inline float vc_headCircle(constant GPUPerson& person, constant SceneUniforms& u, thread float2& centre) {
+    float2 sum = 0.0;
+    float n = 0.0;
+    for (int j = 0; j < 5; j++) {
+        if (person.visible[j] < 0.5) continue;
+        sum += vc_sceneToView(person.joints[j], u);
+        n += 1.0;
+    }
+    if (n < 1.0) { centre = float2(-10.0); return 0.0; }
+    centre = sum / n;
+    float radius = 0.0;
+    if (person.visible[3] > 0.5 && person.visible[4] > 0.5) {
+        radius = distance(vc_sceneToView(person.joints[3], u), vc_sceneToView(person.joints[4], u)) * 0.6;
+    } else if (person.visible[1] > 0.5 && person.visible[2] > 0.5) {
+        radius = distance(vc_sceneToView(person.joints[1], u), vc_sceneToView(person.joints[2], u)) * 1.3;
+    } else if (person.visible[5] > 0.5 && person.visible[6] > 0.5) {
+        radius = distance(vc_sceneToView(person.joints[5], u), vc_sceneToView(person.joints[6], u)) * 0.28;
+    }
+    return max(radius, 0.015);
+}
+
+/// Distance to a person's head: their face's landmark features when Face
+/// Landmarks is arriving for them, otherwise a circle.
+inline float vc_headDistance(float2 p, constant GPUPerson& person, constant SceneUniforms& u, constant GPUFace* faces) {
+    for (int i = 0; i < u.faceCount; i++) {
+        if (faces[i].person == person.id && faces[i].hasLandmarks > 0.5) {
+            return vc_landmarkDistance(p, faces[i], u);
+        }
+    }
+    float2 centre;
+    float radius = vc_headCircle(person, u, centre);
+    if (radius <= 0.0) return 1e9;
+    return abs(distance(p, centre) - radius);
+}
+
+/// A face on its own (no body): landmark features, or the box's ellipse.
+inline float vc_faceOutlineDistance(float2 p, constant GPUFace& face, constant SceneUniforms& u);
 
 /// Distance from view point `p` to the nearest visible bone of a person.
 inline float vc_skeletonDistance(float2 p, constant GPUPerson& person, constant SceneUniforms& u) {
@@ -125,13 +189,26 @@ inline float vc_faceRingDistance(float2 p, constant GPUFace& face, constant Scen
     return (length(q) - 1.0) * min(halfSize.x, halfSize.y);
 }
 
-/// Distance to the nearest hand bone or face ring of everyone – the
-/// "extras" a body-only look can add for free.
+inline float vc_faceOutlineDistance(float2 p, constant GPUFace& face, constant SceneUniforms& u) {
+    return face.hasLandmarks > 0.5 ? vc_landmarkDistance(p, face, u) : abs(vc_faceRingDistance(p, face, u));
+}
+
+/// Distance to the nearest hand bone, or the outline of a face that is not
+/// attached to a tracked body (attached faces are drawn as their person's
+/// head) – the "extras" a body-only look can add for free.
 inline float vc_extrasDistance(float2 p, constant SceneUniforms& u, constant GPUHand* hands, constant GPUFace* faces) {
     float d = 1e9;
     for (int i = 0; i < u.handCount; i++) d = min(d, vc_handSkeletonDistance(p, hands[i], u));
-    for (int i = 0; i < u.faceCount; i++) d = min(d, abs(vc_faceRingDistance(p, faces[i], u)));
+    for (int i = 0; i < u.faceCount; i++) {
+        if (faces[i].person >= 0.0) continue;
+        d = min(d, vc_faceOutlineDistance(p, faces[i], u));
+    }
     return d;
+}
+
+/// The whole figure: body bones plus the head.
+inline float vc_figureDistance(float2 p, constant GPUPerson& person, constant SceneUniforms& u, constant GPUFace* faces) {
+    return min(vc_skeletonDistance(p, person, u), vc_headDistance(p, person, u, faces));
 }
 
 /// Distance to the nearest visible joint of a person.

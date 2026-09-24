@@ -17,7 +17,7 @@ fragment float4 colours_body_hue(MODE_ARGS) {
     float3 c = vc_palette(0.05 + u.time * 0.01, u) * background * 0.15;
     for (int i = 0; i < u.personCount; i++) {
         constant GPUPerson& person = persons[i];
-        float d = vc_skeletonDistance(p, person, u);
+        float d = vc_figureDistance(p, person, u, faces);
         float3 hue = vc_palette(person.id * 0.23 + u.time * 0.02, u);
         c += hue * (smoothstep(thickness, 0.0, d) + glow * vc_glow(d, 0.08 * glow)) * (0.4 + 0.6 * person.confidence);
     }
@@ -28,8 +28,9 @@ fragment float4 colours_body_hue(MODE_ARGS) {
         c += hue * (smoothstep(thickness * 0.6, 0.0, d) + glow * 0.6 * vc_glow(d, 0.04 * glow));
     }
     for (int i = 0; i < u.faceCount; i++) {
-        float d = abs(vc_faceRingDistance(p, faces[i], u));
-        float3 hue = vc_palette(max(faces[i].person, 0.0) * 0.23 + u.time * 0.02, u);
+        if (faces[i].person >= 0.0) continue;   // drawn as that person's head
+        float d = vc_faceOutlineDistance(p, faces[i], u);
+        float3 hue = vc_palette(0.5 + u.time * 0.02, u);
         c += hue * (smoothstep(thickness * 0.6, 0.0, d) + glow * 0.6 * vc_glow(d, 0.04 * glow)) * (0.6 + faces[i].mouth);
     }
     return float4(c, 1);
@@ -253,7 +254,7 @@ fragment float4 colours_memory_wash(MODE_ARGS) {
     float3 c = u.feedbackAvailable > 0.5 ? previous.sample(vc_sampler, in.uv).rgb * decay : float3(0.0);
     for (int i = 0; i < u.personCount; i++) {
         constant GPUPerson& person = persons[i];
-        float d = vc_skeletonDistance(p, person, u);
+        float d = vc_figureDistance(p, person, u, faces);
         c += vc_palette(u.time * hueSpeed * 0.1 + person.id * 0.3, u) * smoothstep(brush, 0.0, d) * 0.3;
     }
     for (int i = 0; i < u.handCount; i++) {
@@ -261,7 +262,8 @@ fragment float4 colours_memory_wash(MODE_ARGS) {
         c += vc_palette(u.time * hueSpeed * 0.1 + 0.5, u) * smoothstep(brush * 0.7, 0.0, d) * 0.3;
     }
     for (int i = 0; i < u.faceCount; i++) {
-        float d = abs(vc_faceRingDistance(p, faces[i], u));
+        if (faces[i].person >= 0.0) continue;
+        float d = vc_faceOutlineDistance(p, faces[i], u);
         c += vc_palette(u.time * hueSpeed * 0.1 + 0.8, u) * smoothstep(brush * 0.7, 0.0, d) * 0.3;
     }
     return float4(min(c, 1.5), 1);
@@ -303,7 +305,7 @@ fragment float4 colours_kaleido(MODE_ARGS) {
     float3 c = float3(0.0);
     for (int i = 0; i < u.personCount; i++) {
         constant GPUPerson& person = persons[i];
-        float d = vc_skeletonDistance(q, person, u);
+        float d = vc_figureDistance(q, person, u, faces);
         c += vc_palette(person.id * 0.23 + r * 0.3 + u.time * 0.03, u) * (smoothstep(0.01, 0.0, d) + vc_glow(d, 0.06));
     }
     float extras = vc_extrasDistance(q, u, hands, faces);

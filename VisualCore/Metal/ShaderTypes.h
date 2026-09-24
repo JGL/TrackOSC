@@ -19,6 +19,7 @@
 #define VC_MAX_FACES 4
 #define VC_MAX_PARAMS 16
 #define VC_MAX_PALETTE 8
+#define VC_FACE_LANDMARKS 76
 
 typedef struct {
     vector_float2 joints[VC_BODY_JOINTS];
@@ -51,7 +52,9 @@ typedef struct {
     float roll;
     float mouth;
     float person;
-    float _pad[3];
+    float hasLandmarks;   // 1 when `landmarks` holds the 76 points
+    float _pad[2];
+    vector_float2 landmarks[VC_FACE_LANDMARKS];
 } GPUFace;
 
 typedef struct {
