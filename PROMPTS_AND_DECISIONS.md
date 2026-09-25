@@ -716,6 +716,172 @@ dogs everywhere. All three apps share `VisualCore/` and the
   word in Metal.
 - Versions to 1.7.0 (build 12); no sender change, so no App Store upload.
 
+## v1.8 – Synth and Costumes (2026-09-24)
+
+Joel: "Once that's complete, please continue with Synth and Costumes
+parts, as well as 3D Costumes – I'll be back later to check." Built on
+`feature/v1.8` while the v1.7.0 notarisation waited for the keychain.
+
+- **SynthCore** is a local Swift package with no app dependencies, so
+  `swift test` renders the instrument offline: PolyBLEP saw and pulse, a
+  Zavalishin zero-delay ladder with soft-clipped feedback (stable at full
+  resonance across a 100 Hz–8 kHz sweep by test), a Simper state-variable
+  filter, a 303-style bass (envelope-modulated cutoff, accent, 60 ms
+  slide, overdrive) and eight 808-style drums (swept-sine kick, two-tone
+  snare with filtered noise, six-square hats at the 808 ratios, toms, a
+  clap of four noise bursts, a two-square cowbell), a delay and a small
+  Schroeder reverb. Decisions: every knob is a `Float` bit pattern in an
+  `Atomic<UInt32>` (`ParameterBank`), events cross to the audio thread
+  through a single-producer single-consumer ring (`EventQueue`) and
+  triggers come back the same way, so the render path never locks or
+  allocates; the `AVAudioSourceNode` is made in a `nonisolated static`
+  factory so its render closure is not main-actor isolated (the Swift 6
+  trap); the sequencer counts samples, with swing lengthening even
+  sixteenths and shortening odd ones, and a conductor mode where steps
+  advance only on a gesture.
+- **Mappings** are pure logic in the package (`ContinuousMapping` with
+  input range, output range, curve, invert and smoothing; `EventMapping`;
+  an `EdgeDetector` with hysteresis and a refractory period, so a wrist
+  hovering at the threshold fires once), and the app reads the sources
+  out of the tracking scene once per tick (`SynthSources`). A hand is
+  "raised" when the wrist is above its shoulder, measured in shoulder
+  widths; a "hit" is wrist speed; "hands together" is wrist distance
+  under 0.6 shoulder widths; codes, arrivals and departures are events by
+  nature and bypass the detectors.
+- **TrackOSC Synth** app: rotary knobs (drag up and down, double-click
+  to reset, accent ring when a mapping drives them), bass and mix,
+  drums with audition buttons, a 16-step grid (bass row with note drag,
+  ⌥ accent, ⇧ slide; drum rows cycling off/on/accent), eight patterns,
+  the mapping table with live bars and readouts, presets (three built
+  in, user presets in Application Support, JSON import and export; the
+  whole state is autosaved as a preset), an output-device picker that
+  rebuilds the graph, and a virtual MIDI source "TrackOSC Synth" that
+  mirrors everything played (bass ch 1, drums ch 10 on General MIDI
+  notes, optional clock). The stage is a ring of sixteen step lights
+  round a level glow with drum flashes and the figure behind. `--panel`
+  opens on a tab (for screenshots).
+- Verified: 11 package tests (offline render clean and non-silent,
+  drums decay to silence, ladder stability, PolyBLEP ≥ 20 dB below the
+  naive saw off-harmonic, sequencer sample timing and swing, conductor
+  mode, hysteresis and refractory, mapping curves, UMP words, queue
+  bounds, preset JSON round trip); live with `poseiosc-testsend`: the
+  "Acid theremin" preset starts on person entered, the mapped knobs
+  follow the figure, and a CoreMIDI listener sees bass note-ons on
+  channel 1, GM drum notes on channel 10 and all-notes-off on gate off.
+- Renamed the package's `Pattern` to `StepPattern` because the app also
+  sees SwiftUI's type of that name.
+- **CostumeCore** is the second local package: an `XMLParser`-based SVG
+  reader for the subset costumes need (svg, g, path with the full grammar
+  including arcs, rect, circle, ellipse, line, polyline, polygon,
+  transforms baked into document space, `<style>` class/element/id rules,
+  `style=""` and presentation attributes cascading in that order,
+  `display:none`; `use`, gradients, clip paths, masks, filters, text and
+  images skipped with a warning each), the layer-name grammar
+  `prefix:part[:side][.flag]` resolved from inkscape:label → data-name →
+  serif:id → id with Illustrator's `_x3A_`/`_x2E_` escapes and `_N_`
+  copies undone, and the rig. Decisions: the rig works in stage pixels
+  and maps an art segment onto a target segment with one formula
+  (translate, rotate the axis to +x, scale along and across, rotate to
+  the target, translate), so uniform, `.stretch` (across = the figure's
+  overall scale, live torso over art torso) and `.fixed` differ only in
+  the two scale factors and mirroring is a negative across-scale; the
+  head spans the ears (eyes or the nose otherwise); face parts map their
+  horizontal midline onto a landmark cluster's extent along the pupil
+  line and fall back to riding on the head layer's transform; hand parts
+  use the 21-joint chains and fall back to the body's wrist; facing away
+  is the shoulders crossing with hysteresis of 12 % of the torso; lost
+  parts fade over 0.3 s and hold their last transform; scenery (unnamed
+  art) is fitted to the stage once per costume however many people wear
+  it. A `<style>` inside `<defs>` was being skipped with the defs, which
+  drew the skeleton and robot black on black; defs now hide their shapes
+  but keep their styles.
+- **TrackOSC Costumes** app: a `Canvas` stage at the display rate drawing
+  a `StageFrame` the store solves at 60 Hz (so the recorder can draw the
+  same frame into a pixel buffer on its own queue, at the backing scale),
+  a library of the bundled costumes plus a user folder kept as a
+  security-scoped bookmark and watched with a `DispatchSource` for hot
+  reload, a layer inspector with live dots and the parser's warnings,
+  display settings (mirror, fit/fill, background, skeleton overlay,
+  smoothing, fade, attract delay), same/cycle assignment for several
+  people, hands-only and face-only wearers when nobody's body is
+  tracked, and `--panel`/`-costume`/`-showSkeleton` launch arguments for
+  screenshots. Bundled: an annotated `Template.svg`, `skeleton.svg` and
+  `robot.svg` (stretching limbs, a `.noflip` visor, hand parts), with a
+  README of export recipes for Illustrator, Inkscape, Figma and Affinity.
+- Verified: 15 package tests (four exporter-shaped fixtures, path
+  grammar, transforms and colours, the layer grammar, bones landing on
+  joints, stretch keeping width, mirroring with hysteresis, fades, face
+  parts on landmarks and their fallback, fingers and the wrist fallback,
+  the renderer painting); live with `poseiosc-testsend`, all three
+  bundled costumes follow the synthetic figure and the skeleton overlay
+  confirms the joints. The test sender's synthetic face is a ring of 76
+  points beside the body, so face parts land on that ring rather than
+  the head; real Face Landmarks put them on the face.
+- Versions to 1.8.0 (build 13); no sender change, so no App Store upload.
+
+## v1.9 – 3D Costumes (2026-09-24)
+
+The last part of Joel's "Synth and Costumes parts, as well as 3D
+Costumes". Built on `feature/v1.8` after v1.8.0.
+
+- **Format decision (from the plan)**: a rigged USDZ on Apple's
+  motion-capture skeleton is the primary format, because it is the one
+  documented rig ("Validating a Model for Motion Capture": 91 joints,
+  T-pose, +Y up, facing +Z, left hand along +X, each joint's +X down its
+  bone, at most four influences, one bind pose) and Apple ships the Biped
+  Robot for it. Two no-rigging paths beside it: a folder of parts named
+  per bone (the SVG costumes' vocabulary) and a built-in mannequin.
+- **Costume3DCore** is pure simd, so `swift test` runs headless: the
+  91-joint table with parents (paths like `root/hips_joint/…`, which is
+  what RealityKit's `jointNames` report), validation listing missing
+  driven and optional joints, a synthetic T-pose (`RestPose.tPose()`)
+  built from world positions with +X-down-the-bone frames, `Retarget17`
+  (hips, spine and neck aim root → centre-shoulder → head with the hip
+  and shoulder lines as side vectors; limbs aim shoulder → elbow → wrist
+  and hip → knee → ankle; feet flat and forward), and the `FKSolver`
+  (parent-first: each driven joint's local rotation = parent-world⁻¹ ×
+  delta × rest-world, delta being either a full-frame change when a side
+  vector is given or the minimal rotation from the rest bone axis to the
+  live direction; slerp smoothing; hold when the body is missing; scale
+  = body height over rest height; only the hips translate). A first
+  version put the side vector on the character's left, but in Apple's
+  rest frames (+X up the spine, +Z forward) +Y is the character's right;
+  the T-pose test caught the 180° twist.
+- **Blocky.usda**: rather than download Apple's sample, the package
+  writes a rigged USD by hand (`USDAWriter`: SkelRoot, Skeleton with
+  joints, bindTransforms and restTransforms, a Mesh of boxes each
+  skinned rigidly to its joint with SkelBindingAPI). RealityKit loads
+  it, reports 91 joints, and the FK solver drives it, which is the same
+  path a real rigged model takes; it also doubles as a readable example
+  of the rig.
+- **Shared 3D stage**: the Receiver's floor grid, axis gnomon, camera
+  marker and orbit camera moved into `ReceiverCore/Scene3D/Stage3D`
+  (with `OrbitState` and an `OrbitGestures` modifier); `Pose3DScene` now
+  composes it, so the Receiver and 3D Costumes look the same.
+- **TrackOSC 3D Costumes** app: a `RealityView` stage over the shared
+  Stage3D; one costume entity per 3D pose (rigged: `Entity(contentsOf:)`,
+  the skinned `ModelEntity` found by non-empty `jointNames`, rest pose
+  read from `jointTransforms`, driven by setting each joint's rotation,
+  entity scaled and positioned so the hips land on the live root; parts:
+  a holder per file placed by `PartsMath`; primitives: cylinders or boxes
+  per edge plus a head), same/cycle assignment, opacity fades on leaving,
+  a library with a bookmarked folder (model files are rigged costumes,
+  sub-folders with model files are parts sets) and hot reload, a Rig tab
+  with validation warnings and the driven-joint list, display settings
+  (mirror by flipping the root's x scale, gnomon, background, smoothing,
+  fade), keys, and a link to Apple's rig page rather than a download
+  button (the sandbox and the licence make opening the page the honest
+  option). No recording: RealityKit output cannot be drawn into a
+  CoreGraphics context; screen recording covers it.
+- Verified: 10 package tests (rig completeness and order, validation,
+  T-pose frames, the T-pose reproducing the rest, a 90° elbow landing
+  the hand joint on the live wrist, hip yaw carrying the whole body,
+  holding and smoothing, part-name matching, parts placement, the USDA
+  skeleton and skinning); live with `poseiosc-testsend`'s walking 3D
+  figure, the mannequin, blocks and Blocky all follow it; every Mac
+  scheme builds.
+- Versions to 1.9.0 (build 14); no sender change, so no App Store upload.
+
 ## Verification record (2026-07-28)
 
 - `swift test` in `PoseioscShared`: 18 tests green, including round-trips for

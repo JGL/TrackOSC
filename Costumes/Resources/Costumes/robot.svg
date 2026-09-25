@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- TrackOSC Costumes – Robot: boxy limbs that stretch, a visor that never flips, and hand parts for the Hands detector. -->
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape" viewBox="0 0 400 800" width="400" height="800">
+  <defs><style>
+    .metal{fill:#90a4ae;stroke:#37474f;stroke-width:3}
+    .dark{fill:#546e7a;stroke:#263238;stroke-width:3}
+    .rivet{fill:#eceff1}
+    .glow{fill:#00e5ff}
+  </style></defs>
+  <g inkscape:label="guide:torso" data-name="guide:torso" style="display:none"><line x1="200" y1="220" x2="200" y2="430"/></g>
+  <g inkscape:label="bone:thigh:right.stretch" data-name="bone:thigh:right.stretch">
+    <rect class="metal" x="145" y="428" width="50" height="170" rx="6"/>
+    <circle class="rivet" cx="155" cy="440" r="3"/><circle class="rivet" cx="185" cy="440" r="3"/>
+    <circle class="rivet" cx="155" cy="585" r="3"/><circle class="rivet" cx="185" cy="585" r="3"/>
+  </g>
+  <g inkscape:label="bone:thigh:left.stretch" data-name="bone:thigh:left.stretch">
+    <rect class="metal" x="205" y="428" width="50" height="170" rx="6"/>
+    <circle class="rivet" cx="215" cy="440" r="3"/><circle class="rivet" cx="245" cy="440" r="3"/>
+    <circle class="rivet" cx="215" cy="585" r="3"/><circle class="rivet" cx="245" cy="585" r="3"/>
+  </g>
+  <g inkscape:label="bone:shin:right.stretch" data-name="bone:shin:right.stretch">
+    <rect class="dark" x="150" y="598" width="40" height="160" rx="6"/>
+    <rect class="metal" x="146" y="640" width="48" height="16" rx="4"/>
+  </g>
+  <g inkscape:label="bone:shin:left.stretch" data-name="bone:shin:left.stretch">
+    <rect class="dark" x="210" y="598" width="40" height="160" rx="6"/>
+    <rect class="metal" x="206" y="640" width="48" height="16" rx="4"/>
+  </g>
+  <g inkscape:label="bone:foot:right.fixed" data-name="bone:foot:right.fixed">
+    <path class="dark" d="M140 756 h60 a12 12 0 0 1 12 12 v20 h-84 v-20 a12 12 0 0 1 12 -12 z"/>
+  </g>
+  <g inkscape:label="bone:foot:left.fixed" data-name="bone:foot:left.fixed">
+    <path class="dark" d="M200 756 h60 a12 12 0 0 1 12 12 v20 h-84 v-20 a12 12 0 0 1 12 -12 z"/>
+  </g>
+  <g inkscape:label="bone:torso" data-name="bone:torso">
+    <rect class="metal" x="128" y="218" width="144" height="214" rx="10"/>
+    <rect class="dark" x="150" y="250" width="100" height="70" rx="6"/>
+    <circle class="glow" cx="175" cy="285" r="8"/><circle class="glow" cx="200" cy="285" r="8"/><circle class="glow" cx="225" cy="285" r="8"/>
+    <rect class="dark" x="150" y="340" width="100" height="12" rx="3"/>
+    <rect class="dark" x="150" y="362" width="100" height="12" rx="3"/>
+    <rect class="dark" x="150" y="384" width="100" height="12" rx="3"/>
+    <circle class="rivet" cx="138" cy="228" r="3"/><circle class="rivet" cx="262" cy="228" r="3"/>
+    <circle class="rivet" cx="138" cy="422" r="3"/><circle class="rivet" cx="262" cy="422" r="3"/>
+  </g>
+  <g inkscape:label="bone:neck.stretch" data-name="bone:neck.stretch">
+    <rect class="dark" x="184" y="150" width="32" height="80" rx="4"/>
+    <rect class="metal" x="178" y="170" width="44" height="10" rx="3"/>
+    <rect class="metal" x="178" y="195" width="44" height="10" rx="3"/>
+  </g>
+  <g inkscape:label="bone:upperArm:right.stretch" data-name="bone:upperArm:right.stretch">
+    <rect class="metal" x="78" y="214" width="44" height="130" rx="6"/>
+    <circle class="dark" cx="100" cy="222" r="14"/>
+  </g>
+  <g inkscape:label="bone:upperArm:left.stretch" data-name="bone:upperArm:left.stretch">
+    <rect class="metal" x="278" y="214" width="44" height="130" rx="6"/>
+    <circle class="dark" cx="300" cy="222" r="14"/>
+  </g>
+  <g inkscape:label="bone:forearm:right.stretch" data-name="bone:forearm:right.stretch">
+    <rect class="dark" x="82" y="338" width="36" height="126" rx="6"/>
+    <circle class="metal" cx="100" cy="342" r="12"/>
+  </g>
+  <g inkscape:label="bone:forearm:left.stretch" data-name="bone:forearm:left.stretch">
+    <rect class="dark" x="282" y="338" width="36" height="126" rx="6"/>
+    <circle class="metal" cx="300" cy="342" r="12"/>
+  </g>
+  <g inkscape:label="bone:hand:right" data-name="bone:hand:right">
+    <path class="metal" d="M80 464 h40 v26 l6 26 h-8 l-4 -20 h-6 l2 26 h-8 l-4 -26 h-6 l-2 26 h-8 l4 -32 z"/>
+  </g>
+  <g inkscape:label="bone:hand:left" data-name="bone:hand:left">
+    <path class="metal" d="M280 464 h40 v26 l6 26 h-8 l-4 -20 h-6 l2 26 h-8 l-4 -26 h-6 l-2 26 h-8 l4 -32 z"/>
+  </g>
+  <g inkscape:label="head" data-name="head">
+    <rect class="metal" x="132" y="48" width="136" height="124" rx="14"/>
+    <rect class="dark" x="192" y="10" width="16" height="40" rx="4"/>
+    <circle class="glow" cx="200" cy="12" r="9"/>
+    <rect class="dark" x="120" y="96" width="14" height="30" rx="3"/>
+    <rect class="dark" x="266" y="96" width="14" height="30" rx="3"/>
+    <circle class="rivet" cx="144" cy="60" r="3"/><circle class="rivet" cx="256" cy="60" r="3"/>
+    <circle class="rivet" cx="144" cy="160" r="3"/><circle class="rivet" cx="256" cy="160" r="3"/>
+  </g>
+  <g inkscape:label="face:face.noflip" data-name="face:face.noflip">
+    <rect class="dark" x="150" y="80" width="100" height="40" rx="8"/>
+    <rect class="glow" x="158" y="88" width="84" height="24" rx="6" fill-opacity="0.85"/>
+  </g>
+  <g inkscape:label="face:mouth.noflip" data-name="face:mouth.noflip">
+    <rect class="dark" x="170" y="136" width="60" height="18" rx="4"/>
+    <path d="M178 145 h44 M186 138 v14 M198 138 v14 M210 138 v14" stroke="#00e5ff" stroke-width="2" fill="none"/>
+  </g>
+  <g inkscape:label="hand:palm" data-name="hand:palm">
+    <rect class="metal" x="340" y="600" width="44" height="50" rx="8"/>
+  </g>
+  <g inkscape:label="hand:thumb" data-name="hand:thumb">
+    <rect class="dark" x="330" y="650" width="14" height="40" rx="6"/>
+  </g>
+  <g inkscape:label="hand:index" data-name="hand:index">
+    <rect class="dark" x="346" y="650" width="10" height="56" rx="5"/>
+  </g>
+  <g inkscape:label="hand:middle" data-name="hand:middle">
+    <rect class="dark" x="358" y="650" width="10" height="60" rx="5"/>
+  </g>
+  <g inkscape:label="hand:ring" data-name="hand:ring">
+    <rect class="dark" x="370" y="650" width="10" height="54" rx="5"/>
+  </g>
+  <g inkscape:label="hand:pinky" data-name="hand:pinky">
+    <rect class="dark" x="382" y="650" width="9" height="44" rx="4"/>
+  </g>
+</svg>

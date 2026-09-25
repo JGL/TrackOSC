@@ -12,9 +12,12 @@
   <img src="Images/icon-mac-router.png" width="128" alt="TrackOSC Router macOS app icon">&nbsp;&nbsp;
   <img src="Images/icon-mac-colours.png" width="128" alt="TrackOSC Colours macOS app icon">&nbsp;&nbsp;
   <img src="Images/icon-mac-particles.png" width="128" alt="TrackOSC Particles macOS app icon">&nbsp;&nbsp;
-  <img src="Images/icon-mac-text.png" width="128" alt="TrackOSC Text macOS app icon">
+  <img src="Images/icon-mac-text.png" width="128" alt="TrackOSC Text macOS app icon">&nbsp;&nbsp;
+  <img src="Images/icon-mac-synth.png" width="128" alt="TrackOSC Synth macOS app icon">&nbsp;&nbsp;
+  <img src="Images/icon-mac-costumes.png" width="128" alt="TrackOSC Costumes macOS app icon">&nbsp;&nbsp;
+  <img src="Images/icon-mac-costumes3d.png" width="128" alt="TrackOSC 3D Costumes macOS app icon">
 </p>
-<p align="center"><em>TrackOSC Recorder&ensp;·&ensp;TrackOSC Speaker&ensp;·&ensp;TrackOSC Router&ensp;·&ensp;TrackOSC Colours&ensp;·&ensp;TrackOSC Particles&ensp;·&ensp;TrackOSC Text – six more macOS apps that do things with the stream</em></p>
+<p align="center"><em>TrackOSC Recorder&ensp;·&ensp;TrackOSC Speaker&ensp;·&ensp;TrackOSC Router&ensp;·&ensp;TrackOSC Colours&ensp;·&ensp;TrackOSC Particles&ensp;·&ensp;TrackOSC Text&ensp;·&ensp;TrackOSC Synth&ensp;·&ensp;TrackOSC Costumes&ensp;·&ensp;TrackOSC 3D Costumes – nine more macOS apps that do things with the stream</em></p>
 
 Live camera → Apple Vision tracking → OSC. TrackOSC streams (almost) all of
 [Apple's Vision framework](https://developer.apple.com/documentation/vision)
@@ -70,6 +73,22 @@ Nine apps plus open receiver examples for eight creative-coding environments:
   fall and get knocked about, words along skeletons and outlines, word
   clouds, orbits, scatter, a typewriter, a marquee, box labels and letter
   rain – in a choice of typefaces.
+- **TrackOSC Synth** (macOS 15+, AVAudioEngine): a 303-and-808-flavoured
+  synth and drum machine played by the stream – an acid bass with a ladder
+  filter, eight analogue-model drums, a sixteen-step sequencer with eight
+  patterns, swing and a conductor mode, and mappings from noses, wrists,
+  hands, faces and presence to every knob and trigger, with MIDI out.
+- **TrackOSC Costumes** (macOS 15+): dresses tracked bodies, faces and
+  hands in SVG costumes – one file per costume with named layers
+  (`bone:upperArm:left`, `head`, `face:mouth`, `hand:index`…) drawn in
+  Illustrator, Inkscape, Figma or Affinity; three bundled, a folder of your
+  own that reloads as you save, several people at once, mirroring when
+  someone turns their back, and recording to .mp4.
+- **TrackOSC 3D Costumes** (macOS 15+, RealityKit): dresses the 3D body
+  pose in a rigged USDZ model on Apple's motion-capture skeleton (the rig
+  ARKit drives, so the Biped Robot and anything made for it works), a
+  folder of parts named per bone, or the built-in mannequin and blocks,
+  with an orbit camera, a settling floor and several people at once.
 - **[Receiver examples](Examples/README.md)** for Processing, Python, p5.js,
   TouchDesigner, Max/MSP, Pure Data, openFrameworks and SuperCollider: each
   is a complete, hackable receiver of every TrackOSC message – the same
@@ -142,6 +161,21 @@ message rates, camera info, and a live log.</em></p>
   <img src="Images/screenshot-mac-text-modes.png" width="90%" alt="A contact sheet of the ten TrackOSC Text modes rendered from the same synthetic figure and two synthetic texts: along contour, along skeleton, box labels, letter rain, marquee, orbit, physics letters, scatter, typewriter and word cloud">
 </p>
 <p align="center"><em>The ten Text modes.</em></p>
+
+<p align="center">
+  <img src="Images/screenshot-mac-synth.png" width="90%" alt="Four views of the TrackOSC Synth window with the synthetic figure on its black stage: the bass and mix knobs, the drum knobs, the sixteen-step sequencer grid, and the mapping table with live source readouts">
+</p>
+<p align="center"><em>TrackOSC Synth: bass and mix, drums, steps and mappings, with the step ring, level glow and drum flashes on the stage.</em></p>
+
+<p align="center">
+  <img src="Images/screenshot-mac-costumes.png" width="90%" alt="Three views of the TrackOSC Costumes window with the synthetic figure wearing the bundled robot, skeleton and Template costumes, with the library, the layer inspector and the display settings beside the stage">
+</p>
+<p align="center"><em>TrackOSC Costumes: the bundled robot, skeleton and Template on the same tracked figure.</em></p>
+
+<p align="center">
+  <img src="Images/screenshot-mac-costumes3d.png" width="90%" alt="Three views of the TrackOSC 3D Costumes window with the test sender's walking 3D figure wearing the mannequin, the blocks and the rigged Blocky model on a floor grid, with the library, the display settings and the rig inspector beside the stage">
+</p>
+<p align="center"><em>TrackOSC 3D Costumes: the mannequin, the blocks and the rigged Blocky model on the same 3D pose.</em></p>
 
 <p align="center">
   <img src="Images/screenshot-ios-sender.jpg" width="28%" alt="TrackOSC on iPhone tracking a person's face and a peace-sign hand gesture, with face box, jawline contour and landmarks in blue, hand skeleton in orange, body pose in green, and the detector chips along the bottom">
@@ -549,6 +583,104 @@ landmarks when they arrive and a circle otherwise, and cats and dogs get
 words along their spines, legs, ears and tails, marquee rows and outlines
 just like people.
 
+### TrackOSC Synth
+
+A synth and drum machine in the spirit of the Roland 303, 606 and 808,
+played by whoever the sender is tracking. The **bass** is a saw or pulse
+through a four-pole ladder filter with envelope modulation, accent, slide
+and overdrive; the **drums** are analogue models (a swept sine kick, a
+two-tone snare with filtered noise, hats from six square waves at the 808's
+ratios, two toms, a clap of noise bursts and a cowbell), each with tune,
+decay, tone and level. The **Steps** tab is a sixteen-step sequencer: a bass
+row (click to gate a step, drag for the note, ⌥-click for accent, ⇧-click
+for slide) and a row per drum (click cycles off, on, accent), eight
+patterns, tempo, swing, randomise and clear. **Conductor** mode stops the
+clock and lets a gesture advance the steps instead. The **Mapping** tab
+connects tracking to the instrument: continuous sources (nose across and
+down, wrist heights, movement speed, hand openness and spread, hands apart,
+3D body height and distance, face yaw, roll and pitch, mouth openness,
+number of people, presence, activity) drive any knob, the tempo, the mix or
+a MIDI CC through an input range, an output range, a curve, smoothing and
+invert, and event sources (a hand raised, a hit, hands together, mouth
+opened, a code changing, a person entering or leaving, every beat) fire
+drums, bass notes, MIDI notes, pattern changes, step toggles, the conductor
+step or play/stop. Three presets to start from: **Acid theremin** (nose
+sweeps the filter, wrists set resonance and decay), **Drum conductor**
+(hits advance the steps, hands play clap and cowbell) and **Two-hand
+filter** (hands apart opens the filter, hand openness sets resonance).
+Presets hold the whole instrument, patterns and mappings, and can be
+saved, imported and exported as JSON. Everything the synth plays also goes
+out of a virtual MIDI source called "TrackOSC Synth" (bass on channel 1,
+drums on channel 10 as General MIDI notes, optional clock and start/stop)
+and, if you choose one, to a MIDI destination. The stage is black with the
+sixteen steps as a ring of lights, the level as a glow, drum hits as
+flashes and the tracked figure faintly behind; the audio keeps running with
+the controls hidden and in full screen. The DSP lives in the `SynthCore`
+package (`cd SynthCore && swift test` renders it offline: no NaNs, filter
+stability at full resonance, PolyBLEP aliasing, sequencer timing).
+
+### TrackOSC Costumes
+
+Cut-out puppetry: a costume is one SVG file whose layers are named after
+the parts they dress, and the app places each layer on the tracked person
+at the display rate. Bones (`bone:torso`, `bone:upperArm:left`,
+`bone:shin:right`, …) map the layer's art axis (a `pivot` line you draw,
+or the shape's midline) onto the live joint pair, scaling uniformly, only
+along the bone (`.stretch`) or not at all (`.fixed`); `head` spans the
+ears; `face:` parts sit on the Face Landmarks clusters (the mouth opens
+with the lips) and ride on the head when landmarks are not arriving;
+`hand:` parts follow the Hands detector's fingers, per finger or per
+phalanx, and sit at the body's wrist without it. When someone turns their
+back the shoulders cross and every layer without `.noflip` is mirrored;
+`.front` and `.back` layers show only one way round. Parts whose joints
+vanish fade out and hold their last place. Layer names are read from
+Inkscape labels, Figma and Illustrator ids (with Illustrator's `_x3A_`
+escapes undone) and Affinity's `serif:id`; the parser handles paths with
+arcs, transforms, `<style>` classes, `style=""` and presentation
+attributes, and lists what it skipped (gradients, clones, clip paths,
+text, images) in the **Layers** tab. Three costumes are bundled
+(**robot**, **skeleton** and an annotated **Template** to copy from), and
+**Choose Folder…** points the app at a folder of your own that reloads
+whenever a file is saved, so a drawing app can stay open beside the
+stage. With several people tracked, everyone wears the same costume or
+each new arrival gets the next one in the library. **V** records the
+stage to an .mp4 in Downloads, **M** mirrors, **K** shows the tracked
+skeleton, **[** and **]** change costume. The parser and rig are the
+`CostumeCore` package (`cd CostumeCore && swift test` runs fixtures in
+the shapes each drawing app exports); the recipe for each app is in
+`Costumes/Resources/Costumes/README.md`.
+
+### TrackOSC 3D Costumes
+
+The 3D sibling of Costumes, for `/poses3d/arr` (turn on **3D Body** on
+the sender). Three ways to dress the pose. A **rigged model** (`.usdz`,
+`.usd`, `.usda`, `.usdc` or `.reality`) whose skeleton follows Apple's
+motion-capture rig: the 91 joints named `root`, `hips_joint`,
+`spine_1_joint` … `left_forearm_joint`, `right_upLeg_joint` and so on, in
+Apple's hierarchy, T-posed with +Y up, facing +Z, the left hand along +X
+and each joint's +X pointing down its bone. That is the rig ARKit's body
+tracking drives, so a model made for it, Apple's own Biped Robot, a
+renamed Mixamo rig or anything from Maya, Blender or Cinema 4D via
+Reality Converter works here; TrackOSC drives the hips, spine, neck,
+head, shoulders, arms, hands, legs and feet by forward kinematics (each
+bone is aimed along the live joint pair in its parent's frame, the hips
+and spine also take the hip and shoulder lines for yaw and twist, the
+model keeps its own bone lengths and is scaled to the person's height,
+and only the hips translate), and the **Rig** tab lists any joints that
+are missing. A **folder of parts** needs no rigging: one model per bone
+named `torso`, `head`, `forearm-left`, `shin-right` and so on, each laid
+along its bone by its longest axis and scaled to the bone's length. And
+the built-in **Mannequin** (capsules) and **Blocks** show something the
+moment 3D poses arrive. `Blocky.usda`, bundled, is a hand-written rigged
+model on the exact rig, readable in a text editor. The stage is the
+Receiver's 3D stage: metres, a floor that settles under the lowest
+ankle, an axis gnomon and camera marker at the origin, drag to orbit
+and pinch to zoom; several people each get a costume, the same or
+cycling through the library, fading when they leave. The rig maths is
+the `Costume3DCore` package (`cd Costume3DCore && swift test`), and
+`swift run costume3d-blocky out.usda` writes the example model. The
+models README is in `Costumes3D/Resources/README.md`.
+
 ### Hiding the video
 
 Both senders have a **Hide video preview** option (the eye button on the
@@ -829,7 +961,8 @@ SenderMac/             macOS sender app shell (camera picker, rig rotation)
 ReceiverCore/          Shared by every receiver-type macOS app: UDP listener,
                        decoding, forwarding, port fall-forward, Bonjour, settings,
                        full screen, window shell, presence/metrics analysis,
-                       tracking scene (person tracker, history, attract figure)
+                       tracking scene (person tracker, history, attract figure),
+                       the RealityKit 3D stage (floor, gnomon, orbit camera)
 Receiver/              macOS receiver (2D + 3D visualisers, log)
 Recorder/              macOS recorder/player (.trackosc files)
 Speaker/               macOS speaker (narration engine, AVSpeech, voice catalogue)
@@ -840,6 +973,20 @@ VisualCore/            Shared by the visual apps: Metal canvas and renderer (sha
 Colours/               macOS colours app (fourteen shader modes)
 Particles/             macOS particles app (CPU simulation, twelve behaviours)
 Text/                  macOS kinetic text app (word pool, letter system, ten behaviours)
+SynthCore/             Swift package: DSP (PolyBLEP oscillators, ladder and state-variable
+                       filters, envelopes), 303 bass and 808 drum voices, lock-free
+                       parameter bank and event queues, audio graph and AVAudioEngine
+                       host, step sequencer, mapping logic, MIDI words, presets, tests
+Synth/                 macOS synth app (knobs, drums, sequencer grid, mapping table, MIDI out)
+CostumeCore/           Swift package: SVG-subset parser (XMLParser, path grammar, transforms,
+                       CSS classes), layer-name grammar, 2D rig (bones, head, face, hands,
+                       mirroring, fades), CoreGraphics renderer, fixture tests
+Costumes/              macOS costumes app (library with folder bookmarks and hot reload,
+                       Canvas stage, mp4 recorder, bundled costumes and recipe README)
+Costume3DCore/         Swift package: Apple's 91-joint motion-capture rig table, T-pose rest,
+                       17-joint retargeting, FK solver, parts maths, USDA writer, tests
+Costumes3D/            macOS 3D costumes app (RealityKit stage shared with the Receiver,
+                       rigged/parts/primitive costume entities, library, Blocky.usda)
 Examples/              Receiver examples: Processing, Python, p5.js, TouchDesigner,
                        Max/MSP, Pure Data, openFrameworks, SuperCollider – see
                        Examples/README.md; Examples/SKELETONS.md is the shared
